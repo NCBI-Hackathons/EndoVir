@@ -1,16 +1,10 @@
-# -*- coding: utf-8 -*-
+#  samparser.py
 #
-#  magicblast.py
-#
-#  Copyright 2017 USYD
 #  Author: Jan Piotr Buchmann <jan.buchmann@sydney.edu.au>
 #  Description:
 #
 #  Version: 0.0
 
-
-import sys
-import subprocess
 
 class Samparser:
 
@@ -93,22 +87,3 @@ class Samparser:
         self.parse_header(cols)
       else:
         self.alignments.append(self.Alignment(cols[0], cols[3], cols[9]))
-
-class Magicblast:
-
-  def __init__(self):
-    self.cmd = 'magicblast'
-    self.isPaired = False
-    self.num_threads = 2
-    self.outfmt = 'sam'
-    self.out = 'magicblast_out'
-    self.word_size = 20
-    self.perc_identity = 60
-
-  def run(self, db, sra, parser=Samparser()):
-    magicblast = subprocess.Popen([self.cmd, '-db', db, '-sra', sra,
-                                                 '-num_threads', str(self.num_threads),
-                                                 '-outfmt', self.outfmt],
-                                  stdout=subprocess.PIPE, bufsize=1)
-    parser.parse(magicblast.stdout)
-    return parser.alignments
