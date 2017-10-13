@@ -65,8 +65,9 @@ class Samparser:
     def __init__(self, qname, pos, seq):
       self.qname = qname
       self.seq = seq
-      self.pos = pos
+      self.pos = int(pos)
       self.length = len(seq)
+      self.sra_rowid = self.qname.split('.')[-2]
 
   def __init__(self):
     self.header = Samparser.Header()
@@ -91,7 +92,7 @@ class Samparser:
       if cols[0][0] == '@':
         self.parse_header(cols)
       else:
-        self.alignments.append(self.Alignment(cols[0], cols[2], cols[9]))
+        self.alignments.append(self.Alignment(cols[0], cols[3], cols[9]))
 
 class Magicblast:
 

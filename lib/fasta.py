@@ -19,11 +19,12 @@ class FastaSequence(sequence.Sequence):
 
   def get_sequence(self):
     return ">{0}\n{1}".format(self.header, self.name)
-  #def save_fasta(self, fname):
-    #fh = open(fname, 'w')
-    #fh.write('>'+self.header+'\n')
-    #fh.write(self.seq+'\n')
-    #fh.close()
+
+  def subseq(self, start, length, header=None):
+    if header == None:
+      return FastaSequence(self.header, self.sequence[start:start+length])
+    return FastaSequence(header, self.sequence[start:start+length])
+
 
 class Fasta:
 

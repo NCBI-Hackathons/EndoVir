@@ -45,7 +45,8 @@ def magicblast(db=None, sra=None):
   return mgb.run('ebola', sra)
 
 def megahit(alignments, sra):
-
+  vdbd = lib.vdbdump.VdbDump()
+  vdbd.run(sra, alignments)
 
 def contigs2blastdb(dbname, contigs, minlen=500):
   f = Flanker()
