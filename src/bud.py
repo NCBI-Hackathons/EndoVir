@@ -19,6 +19,7 @@ import lib.blastdb.blastdb
 import lib.fasta.parser
 import lib.magicblast.magicblast
 import lib.vdbdump.vdbdump
+import lib.megahit.megahit
 
 
 class Flanker(lib.fasta.parser.FastaParser):
@@ -45,10 +46,20 @@ def magicblast(db=None, srr=None):
   return mgb.run('ebola', srr)
 
 def megahit(alignments, srr):
+  print("Fetching flanking sequences", file=sys.stderr)
+  flanks = 'flanks.fq'
   vdbd = lib.vdbdump.vdbdump.VdbDump()
-  vdbd.run(srr, alignments)
+  fh_flanks = open(flanks, 'w')
+  seqs = vdbd.run(srr, alignments, fh_flanks)
+  fh_flanks.close()
+  print("Running meggahit with flanking sequences", file=sys.stderr)
+  mgh = lib.megahit.megahit.Megahit()
+  mgh.out_prefix = srr
+  mgh.out_dir = srr+"_megahit"
+  mgh.run(flanks)
 
 def contigs2blastdb(dbname, contigs, minlen=500):
+  print("Creating BLAST DB of flanking sequences", file=sys.stderr)
   f = Flanker()
   f.read(fil=contigs)
   bdb = lib.blastdb.blastdb.BlastDatabase(path=dbname)
