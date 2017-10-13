@@ -14,12 +14,19 @@ import subprocess
 
 class BlastDatabase:
 
-  def __init__(self, db='', typ='nucl'):
-    self.path = 'makeblastdb'
+  def __init__(self, path='', typ='nucl'):
+    self.cmd = 'makeblastdb'
     self.typ = typ
-    self.db = db
+    self.path = path
 
-  def make_db(self, seqfile):
-    subprocess.run([self.path], ['-dbtype'], [self.typ],
-                                 ['-in'], [seqfile],
-                                 ['-out'], self.db)
+  def make_db(self, filepath):
+    # Would love to pipe the sequences into makeblastdb but need to figure out
+    # how to pass a stream into a method
+    #subprocess.Popen([self.cmd, '-dbtype', self.typ,
+                              #'-in', filepath,
+                              #'-out', self.path],
+                                       #stdout=subprocess.PIPE,
+                                       #bufsize=1)
+    subprocess.run([self.cmd, '-dbtype', self.typ,
+                              '-in', filepath,
+                              '-out', self.path])

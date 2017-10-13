@@ -17,32 +17,57 @@ import sys
 sys.path.insert(1, os.path.join(sys.path[0], '../'))
 import lib.blastdb
 import lib.fasta
+import lib.magicblast
+import lib.vdbdump
 
 class Flanker(lib.fasta.Fasta):
 
   def __init__(self):
     super().__init__()
     self.len_flank = 500
+    self.lhs_count = 0
+    self.rhs_count = 0
 
   def add_sequence(self, seq):
     if seq.length <= self.len_flank:
-      seq.header += "_lhs"
+      seq.name += "_lhs"
       self.sequences.append(seq)
+      self.lhs_count += 1
     else:
-      self.sequences.append(seq.subseq(0, self.len_flank, seq.header+"_lhs"))
-      self.sequences.append(seq.subseq(seq.length-self.len_flank, self.len_flank, seq.header+"_rhs"))
+      self.sequences.append(seq.subseq(0, self.len_flank, seq.name+"_lhs"))
+      self.sequences.append(seq.subseq(seq.length-self.len_flank, self.len_flank, seq.name+"_rhs"))
+      self.lhs_count += 1
+
+      self.rhs_count += 1
+
+def magicblast(db=None, sra=None):
+  mgb = lib.magicblast.Magicblast()
+  return mgb.run('ebola', sra)
+
+def megahit(alignments, sra):
+
 
 def contigs2blastdb(dbname, contigs, minlen=500):
   f = Flanker()
   f.read(fil=contigs)
-  f.stream_fasta()
-  bdb = lib.blastdb.BlastDatabase(db=dbname)
-  bdb.make_db(contigs)
+  bdb = lib.blastdb.BlastDatabase(path=dbname)
+  bdb.make_db(f.write_fasta('tmp.fa'))
+
 
 def main():
   contigs = 'contigs.noextend.fa'
   minlen = 500
-  contigs2blastdb('ends', contigs, minlen)
+  sra = 'SRR5150787'
+  iteration = 0
+  db = 'ends'
+
+  while True:
+    contigs2blastdb(db, contigs, minlen)
+    alignments = magicblast(db, sra)
+    megahit(alignments, sra)
+    iteration += 1
+    if iteration == 1: # only for initial testing  purposes.
+      break
   return 0
 
 if __name__ == '__main__':
