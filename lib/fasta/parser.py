@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 #  parser.py
 #
 #  Author: Jan Piotr Buchmann <jan.buchmann@sydney.edu.au>
@@ -33,7 +32,6 @@ class FastaParser:
       else:
         seq += i.strip()
     self.add_sequence(sequence.FastaSequence(header, seq))
-
     if self.doFhClose == True:
       src.close()
 

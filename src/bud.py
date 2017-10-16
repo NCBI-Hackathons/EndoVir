@@ -15,7 +15,7 @@
 import os
 import sys
 sys.path.insert(1, os.path.join(sys.path[0], '../'))
-import lib.blastdb.blastdb
+import lib.blastdb.makeblastdb
 import lib.fasta.parser
 import lib.magicblast.magicblast
 import lib.vdbdump.vdbdump
@@ -24,9 +24,9 @@ import lib.megahit.megahit
 
 class Flanker(lib.fasta.parser.FastaParser):
 
-  def __init__(self):
+  def __init__(self, flank_len):
     super().__init__()
-    self.len_flank = 500
+    self.len_flank = flank_len
     self.lhs_count = 0
     self.rhs_count = 0
 
@@ -60,10 +60,12 @@ def megahit(alignments, srr):
 
 def contigs2blastdb(dbname, contigs, minlen=500):
   print("Creating BLAST DB of flanking sequences", file=sys.stderr)
-  f = Flanker()
+  f = Flanker(minlen)
   f.read(fil=contigs)
-  bdb = lib.blastdb.blastdb.BlastDatabase(path=dbname)
-  bdb.make_db(f.write_fasta('tmp.fa'))
+  tmpdb = 'tmp.fa'
+  bdb = lib.blastdb.makeblastdb.Makeblastdb(tmpdb, 'nucl')
+  f.write_fasta(tmpdb)
+  bdb.make_db(f.write_fasta(tmpdb))
 
 
 def main():
