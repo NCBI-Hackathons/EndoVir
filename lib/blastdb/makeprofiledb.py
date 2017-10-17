@@ -5,17 +5,9 @@
 #
 #  Version: 0.0
 
-import sys
-import subprocess
-from . import BlastDatabase
+from . import database
 
-class Makeprofiledb(BlastDatabase):
+class Makeprofiledb(database.BlastDatabase):
 
-  def __init__(self, typ):
-    super().__init__(cmd='makeprofiledb', typ=typ)
-
-  def make_db(self, src, title=None):
-    cmd = [self.cmd, '-dbtype', self.typ, '-in', src, '-out', self.path]
-    if title != None:
-      cmd += ['-title', title]
-    subprocess.run(cmd)
+  def __init__(self, dbdir, name, typ):
+    super().__init__(dbdir=dbdir, name=name, typ=typ, cmd='makeprofiledb')

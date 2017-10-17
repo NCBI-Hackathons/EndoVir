@@ -1,7 +1,9 @@
 #  blastdbcmd.py
 #
 #  Author: Jan Piotr Buchmann <jan.buchmann@sydney.edu.au>
-#  Description:
+# blast return codes
+# https://www.ncbi.nlm.nih.gov/books/NBK279677/
+#
 #
 #  Version: 0.0
 
@@ -13,15 +15,12 @@ import subprocess
 class Blastdbcmd:
 
   def __init__(self):
-    self.cmd = 'blastdbcommand'
+    self.cmd = 'blastdbcmd'
 
-  def exists(self, dbname, path=None):
-    re_error = re.compile("BLAST Database error:")
-    if path != None:
-      db = os.join(path, db)
+  def exists(self, path):
+    cmd = [self.cmd, '-db', path, '-info']
 
-    bdbc = subprocess.Popen([self.cmd, '-db', db, '-info'], stdout=subprocess.PIPE)
-    for i in bdbc.stdout:
-      if re.match(re_error, i.decode().strip()):
-        return False
+    bdbc = subprocess.run(cmd, stdout=subprocess.PIPE, bufsize=1)
+    if bdbc.returncode > 0:
+      return False
     return True
