@@ -19,8 +19,6 @@ class Blastdbcmd:
 
   def exists(self, path):
     cmd = [self.cmd, '-db', path, '-info']
-
-    bdbc = subprocess.run(cmd, stdout=subprocess.PIPE, bufsize=1)
-    if bdbc.returncode > 0:
+    if subprocess.run(cmd, stdout=subprocess.PIPE, bufsize=1).returncode > 0:
       return False
     return True

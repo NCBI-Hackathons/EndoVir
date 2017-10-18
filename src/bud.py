@@ -21,7 +21,6 @@ import lib.magicblast.magicblast
 import lib.vdbdump.vdbdump
 import lib.megahit.megahit
 
-
 class Flanker(lib.fasta.parser.FastaParser):
 
   def __init__(self, flank_len):
@@ -41,32 +40,48 @@ class Flanker(lib.fasta.parser.FastaParser):
       self.lhs_count += 1
       self.rhs_count += 1
 
-def magicblast(db=None, srr=None):
-  mgb = lib.magicblast.magicblast.Magicblast()
-  return mgb.run('ebola', srr)
+class Buddy:
 
-def megahit(alignments, srr):
-  print("Fetching flanking sequences", file=sys.stderr)
-  flanks = 'flanks.fq'
-  vdbd = lib.vdbdump.vdbdump.VdbDump()
-  fh_flanks = open(flanks, 'w')
-  seqs = vdbd.run(srr, alignments, fh_flanks)
-  fh_flanks.close()
-  print("Running meggahit with flanking sequences", file=sys.stderr)
-  mgh = lib.megahit.megahit.Megahit()
-  mgh.out_prefix = srr
-  mgh.out_dir = srr+"_megahit"
-  mgh.run(flanks)
+  def __init__(self):
+    self.len_flank = 500
+    self.srascreener = lib.magicblast.magicblast.Magicblast()
+    self.vbddump =  lib.vdbdump.vdbdump.VdbDump()
+    self.assembler = lib.megahit.megahit.Megahit()
 
-def contigs2blastdb(dbname, contigs, minlen=500):
-  print("Creating BLAST DB of flanking sequences", file=sys.stderr)
-  f = Flanker(minlen)
-  f.read(fil=contigs)
-  tmpdb = 'tmp.fa'
-  bdb = lib.blastdb.makeblastdb.Makeblastdb(tmpdb, 'nucl')
-  f.write_fasta(tmpdb)
-  bdb.make_db(f.write_fasta(tmpdb))
+  def screen_srr(self, db=None, srr=None):
+    return self.srascreener.run(db, srr)
 
+  def get_flanks(self, alignments, srr):
+    print("Fetching flanking sequences", file=sys.stderr)
+    flanks = 'flanks.fq'
+    fh_flanks = open(flanks, 'w')
+    seqs = self.vbddump.run(srr, alignments, fh_flanks)
+    fh_flanks.close()
+    return flanks
+
+  def assemble(self, flanks)
+    print("Running meggahit with flanking sequences", file=sys.stderr)
+    self.assembler.out_prefix = srr
+    mgh.out_dir = srr+"_megahit"
+    mgh.run(flanks)
+
+  def contigs2blastdb(dbname, contigs, minlen=500):
+    print("Creating BLAST DB of flanking sequences", file=sys.stderr)
+    f = Flanker(minlen)
+    f.read(fil=contigs)
+    tmpdb = 'tmp.fa'
+    bdb = lib.blastdb.makeblastdb.Makeblastdb(tmpdb, 'nucl')
+    f.write_fasta(tmpdb)
+    bdb.make_db(f.write_fasta(tmpdb))
+
+  def bud(self, srr, contigs):
+    while True:
+      contigs2blastdb(db, contigs, minlen)
+      alignments = magicblast(db, srr)
+      megahit(alignments, srr)
+      iteration += 1
+      if iteration == 1: # only for initial testing  purposes.
+        break
 
 def main():
   contigs = 'contigs.noextend.fa'
@@ -75,13 +90,7 @@ def main():
   iteration = 0
   db = 'ends'
 
-  while True:
-    contigs2blastdb(db, contigs, minlen)
-    alignments = magicblast(db, srr)
-    megahit(alignments, srr)
-    iteration += 1
-    if iteration == 1: # only for initial testing  purposes.
-      break
+
   return 0
 
 if __name__ == '__main__':

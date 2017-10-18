@@ -21,6 +21,7 @@ class BlastDatabase:
     self.dbdir = dbdir
     self.typ  = typ
     self.dbtool = blastdbcmd.Blastdbcmd()
+    self.path = os.path.join(self.dbdir, self.title)
 
   def make_db(self, data=None):
     cmd = [self.cmd, '-dbtype', self.typ, '-in', data, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
