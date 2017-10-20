@@ -14,18 +14,27 @@ import lib.blast.blastdb.makeblastdb
 
 class Flanker(lib.fasta.parser.FastaParser):
 
-  def __init__(self, flank_len):
+  def __init__(self, flank_len=500):
     super().__init__()
     self.len_flank = flank_len
     self.lhs_count = 0
     self.rhs_count = 0
 
-  def add_sequence(self, seq):
+  def add_sequence(self, seq, stream=False):
     if seq.length <= self.len_flank:
       seq.name += "_lhs"
-      self.sequences.append(seq)
+      self.sequences[seq.hader] = (seq)
       self.lhs_count += 1
+      if stream == True:
+        print(seq.get_sequence())
     else:
-      self.sequences.append(seq.subseq(0, self.len_flank, seq.name+"_lhs"))
-      self.sequences.append(seq.subseq(seq.length-self.len_flank, self.len_flank, seq.name+"_rhs"))
+      subseq = seq.subseq(0, self.len_flank, seq.name+"_lhs")
+      self.sequences[subseq.header] = subseq
       self.lhs_count += 1
+      if stream == True:
+        print(subseq.get_sequence())
+      subseq = seq.subseq(seq.length-self.len_flank, self.len_flank, seq.name+"_rhs")
+      self.sequences[subseq.header] = subseq
+      self.rhs_count += 1
+      if stream == True:
+        print(subseq.get_sequence())

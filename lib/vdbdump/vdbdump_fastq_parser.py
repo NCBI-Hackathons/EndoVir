@@ -14,7 +14,7 @@ class VdbdumpFastqParser(fastq_parser.FastqParser):
     super().__init__()
     self.qual_placeholder = '$'
 
-  def parse(self, vdb_out, alignments, fh_flanks):
+  def parse(self, vdb_out, alignments):
     line_count = 1
     header = ''
     seq = ''
@@ -32,9 +32,7 @@ class VdbdumpFastqParser(fastq_parser.FastqParser):
           qual = qual[alignments[row_idx].qry.start:alignments[row_idx].qry.start+alignments[row_idx].qry.length+1]
         else:
           qual = len(seq) * self.qual_placeholder
-        s = sequence.FastqSequence(header, seq, qual)
+        self.sequences[header] = sequence.FastqSequence(header, seq, qual)
         row_idx += 1
-        fh_flanks.write(s.get_sequence())
-        #self.sequences.append()
         line_count = 0
       line_count += 1

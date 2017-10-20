@@ -28,9 +28,14 @@ class BlastParser:
     self.edges = {}
     self.hsp_count = 0
 
-  def parse(self):
-    blast_result = json.load(sys.stdin)
-    self.parse_results(blast_result['BlastOutput2']['report']['results'])
+##process = subprocess.Popen(args, stdout=subprocess.PIPE)
+#samfile = pysam.Samfile("/dev/fd/%d" % process.stdout.fileno(), "rb")
+# or fifo
+
+  def parse(self, stdin):
+    blast_result = json.load(stdin)
+    for i in blast_result['BlastOutput2']:
+      self.parse_results(i['report']['results'])
 
 
   def parse_results(self, results):
@@ -38,8 +43,8 @@ class BlastParser:
                                                results['search']['query_title'],
                                                results['search']['query_len']))
 
-
-    self.add_hits(results['search']['hits'], bl_query)
+    if len(results['search']['hits']) > 0:
+      self.add_hits(results['search']['hits'], bl_query)
 
   def add_hits(self, hits, bl_query):
     for i in hits:
@@ -49,19 +54,15 @@ class BlastParser:
                                          i['len'],
                                          i['num']))
       for j in i['hsps']:
-        print('qry: ',bl_query.length)
-        print('hit: ',bl_hit.length)
         h = self.add_hsp(hsp.Hsp(j, bl_query, bl_hit, self.hsp_count))
         qival = interval.Interval(j['query_from'], j['query_to'], "qry"+str(j['num']))
         hival = interval.Interval(j['hit_from'], j['hit_to'], "hit"+str(j['num']))
         hival.connect(qival, h)
-
         bl_hit.intervals.insert(hival)
         qival.connect(hival, h)
         bl_query.intervals.insert(qival)
-
         self.hsp_count += 1
-        print("----------------")
+
   def add_hsp(self, hsp):
     if hsp.hid not in self.hspmap:
       self.hspmap[hsp.hid] = hsp
@@ -85,3 +86,12 @@ class BlastParser:
   def show_hits(self):
     for i in self.hitmap:
       self.hitmap[i].dump()
+
+  def reset(self):
+    self.querymap = {}
+    self.query_ivals = {}
+    self.hit_ivals = {}
+    self.hitmap = {}
+    self.hspmap = {}
+    self.edges = {}
+    self.hsp_count = 0

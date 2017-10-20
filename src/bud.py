@@ -15,83 +15,49 @@
 import os
 import sys
 sys.path.insert(1, os.path.join(sys.path[0], '../'))
-import lib.blastdb.makeblastdb
-import lib.fasta.parser
-import lib.magicblast.magicblast
-import lib.vdbdump.vdbdump
-import lib.megahit.megahit
+import lib.blast.blastdb.makeblastdb
+import lib.blast.magicblast.magicblast
+#import lib.vdbdump.vdbdump
+#import lib.megahit.megahit
 
-class Flanker(lib.fasta.parser.FastaParser):
-
-  def __init__(self, flank_len):
-    super().__init__()
-    self.len_flank = flank_len
-    self.lhs_count = 0
-    self.rhs_count = 0
-
-  def add_sequence(self, seq):
-    if seq.length <= self.len_flank:
-      seq.name += "_lhs"
-      self.sequences.append(seq)
-      self.lhs_count += 1
-    else:
-      self.sequences.append(seq.subseq(0, self.len_flank, seq.name+"_lhs"))
-      self.sequences.append(seq.subseq(seq.length-self.len_flank, self.len_flank, seq.name+"_rhs"))
-      self.lhs_count += 1
-      self.rhs_count += 1
+import flanker
 
 class Buddy:
 
-  def __init__(self):
+  def __init__(self, wd):
+    self.wd = wd
     self.len_flank = 500
-    self.srascreener = lib.magicblast.magicblast.Magicblast()
-    self.vbddump =  lib.vdbdump.vdbdump.VdbDump()
-    self.assembler = lib.megahit.megahit.Megahit()
+    #self.vbddump =  lib.vdbdump.vdbdump.VdbDump()
+    #self.assembler = lib.megahit.megahit.Megahit()
+    self.flank_db = "flanks"
 
-  def screen_srr(self, db=None, srr=None):
-    return self.srascreener.run(db, srr)
+  def screen_srr(self, srr, db):
+    m = lib.blast.magicblast.magicblast.Magicblast()
+    m.run(srr, db)
 
-  def get_flanks(self, alignments, srr):
-    print("Fetching flanking sequences", file=sys.stderr)
-    flanks = 'flanks.fq'
-    fh_flanks = open(flanks, 'w')
-    seqs = self.vbddump.run(srr, alignments, fh_flanks)
-    fh_flanks.close()
-    return flanks
-
-  def assemble(self, flanks)
+  def assemble(self, flanks):
     print("Running meggahit with flanking sequences", file=sys.stderr)
     self.assembler.out_prefix = srr
     mgh.out_dir = srr+"_megahit"
     mgh.run(flanks)
 
-  def contigs2blastdb(dbname, contigs, minlen=500):
-    print("Creating BLAST DB of flanking sequences", file=sys.stderr)
-    f = Flanker(minlen)
-    f.read(fil=contigs)
-    tmpdb = 'tmp.fa'
-    bdb = lib.blastdb.makeblastdb.Makeblastdb(tmpdb, 'nucl')
-    f.write_fasta(tmpdb)
-    bdb.make_db(f.write_fasta(tmpdb))
+  def make_flankdb(self, contigs):
+    f = flanker.Flanker()
+    db_flanks = lib.blast.blastdb.makeblastdb.Makeblastdb(dbdir=self.wd, name=self.flank_db, typ='nucl')
+    p = db_flanks.make_db()
+    print(p)
+    for i in contigs:
+      p.stdin.write("asasssa\n")
+    p.stdin.flush()
+    p.stdin.close()
+    return db
 
   def bud(self, srr, contigs):
+    iteration = 0
     while True:
-      contigs2blastdb(db, contigs, minlen)
-      alignments = magicblast(db, srr)
-      megahit(alignments, srr)
+      db = self.make_flankdb(contigs)
+      self.screen_srr(srr, db.path)
+      self.assemble()
       iteration += 1
       if iteration == 1: # only for initial testing  purposes.
         break
-
-def main():
-  contigs = 'contigs.noextend.fa'
-  minlen = 500
-  srr = 'SRR5150787'
-  iteration = 0
-  db = 'ends'
-
-
-  return 0
-
-if __name__ == '__main__':
-  main()

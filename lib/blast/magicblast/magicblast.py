@@ -25,13 +25,21 @@ class Magicblast:
     self.word_size = 20
     self.perc_identity = 60
     self.vdbdump = lib.vdbdump.vdbdump.VdbDump()
+    self.parser = magicblast_parser.MagicblastParser()
 
-  def run(self, srr, db, result, parser=magicblast_parser.MagicblastParser()):
+  def run(self, srr, db):
     cmd = [self.path, '-db', db, '-sra', srr,'-num_threads', str(self.num_threads),
-                                                 '-outfmt', self.outfmt]
+                                              '-outfmt', self.outfmt]
     print(cmd)
-    magicblast = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1)
-    parser.parse(magicblast.stdout)
-    fh_vdb = open(result, 'w')
-    self.vdbdump.run(srr, parser.alignments, fh_vdb)
-    fh_vdb.close()
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1, universal_newlines=True)
+    self.parser.parse(p.stdout)
+    self.vdbdump.run(srr, self.parser.alignments)
+
+  # Unfortunately, databasea re still required when using several threads
+  #def run_subject_file(self, srr, fil):
+    #cmd = [self.path, '-subject', fil, '-sra', srr,'-num_threads', str(self.num_threads),
+                                                        #'-outfmt', self.outfmt]
+    #print(cmd)
+    #p = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1, universal_newlines=True)
+    #self.parser.parse(p.stdout)
+    #self.vdbdump.run(srr, self.parser.alignments)

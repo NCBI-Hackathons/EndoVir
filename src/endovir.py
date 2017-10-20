@@ -59,9 +59,11 @@ class Endovir:
     for i in srrs:
       s = screen.Screen(self.wd, i, self.dbs['virusdb'], self.dbs['cdd'])
       s.screen_srr(s.srr, s.virus_db.path)
-      s.assemble(s.aligned_srr)
-      s.protein_screen(s.asm_contigs, s.cdd_db.path, os.path.join(s.wd,'rpst'))
-
+      contigs = s.assemble(s.srascreener.vdbdump.parser.dump_to_file())
+      bud_contigs = []
+      for i in s.cdd_screen(contigs, s.cdd_db.path, os.path.join(s.wd,'rpst')):
+        bud_contigs.append(s.assembler.parser.sequences[i])
+      s.bud(bud_contigs)
 
 def main():
   srrs = ['SRR5150787']

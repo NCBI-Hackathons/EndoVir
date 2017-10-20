@@ -12,12 +12,11 @@ from . import sequence
 class FastaParser:
 
   def __init__(self):
-    self.sequences = []
+    self.sequences = {}
     self.doFhClose = False
 
-  def read(self, fil=None):
+  def parse(self, fil=None, stream=False):
     src = sys.stdin
-
     if fil != None:
       src = open(fil, 'r')
       self.doFhClose = True
@@ -26,27 +25,27 @@ class FastaParser:
     for i in src:
       if i[0] == '>':
         if len(seq) > 0:
-          self.add_sequence(sequence.FastaSequence(header, seq))
+          self.add_sequence(sequence.FastaSequence(header, seq), stream)
           seq = ''
         header = i[1:].strip()
       else:
         seq += i.strip()
-    self.add_sequence(sequence.FastaSequence(header, seq))
+    self.add_sequence(sequence.FastaSequence(header, seq), stream)
+
     if self.doFhClose == True:
       src.close()
 
-  def write_fasta(self, fname):
+  def write_file(self, fname):
     fh = open(fname, 'w')
     for i in self.sequences:
-      fh.write(i.get_sequence())
+      fh.write(self.sequences[i].get_sequence())
     fh.close()
     return fname
 
-  def stream_fasta(self):
-    stream = io.StringIO()
-    for i in self.sequences:
-      print(i.get_sequence(), file=stream)
-    yield stream.getvalue()
+  def add_sequence(self, seq, stream=False):
+    self.sequences[seq.header] = seq
+    if stream == True:
+      print(seq.get_sequence())
 
-  def add_sequence(self, seq):
-    self.sequences.append(seq)
+  def reset(self):
+    self.sequences = {}

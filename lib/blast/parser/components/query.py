@@ -1,9 +1,5 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-#
 #  blast_query.py
 #
-#  Copyright 2017 The University of Sydney
 #  Author: Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  Description:
 #
