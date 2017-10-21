@@ -7,7 +7,7 @@
 
 class Sequence:
 
-  def __init__(self, name=None, seq=None):
+  def __init__(self, name='', seq=''):
     self.name = name
     self.sequence = seq
     self.length = len(seq)

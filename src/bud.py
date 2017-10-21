@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-#
 #  bud.py
 #
 #  Author: Jan Piotr Buchmann <jan.buchmann@sydney.edu.au>
@@ -44,20 +41,20 @@ class Buddy:
   def make_flankdb(self, contigs):
     f = flanker.Flanker()
     db_flanks = lib.blast.blastdb.makeblastdb.Makeblastdb(dbdir=self.wd, name=self.flank_db, typ='nucl')
-    p = db_flanks.make_db()
-    print(p)
+    p = db_flanks.make_db_from_stdin()
     for i in contigs:
-      p.stdin.write("asasssa\n")
+      #print(f.add_sequence(i, stream=True))
+      p.stdin.write(str.encode(f.add_sequence(i, stream=True)))
     p.stdin.flush()
     p.stdin.close()
-    return db
+    return db_flanks
 
   def bud(self, srr, contigs):
     iteration = 0
     while True:
       db = self.make_flankdb(contigs)
-      self.screen_srr(srr, db.path)
-      self.assemble()
+      #self.screen_srr(srr, db.path)
+      #self.assemble()
       iteration += 1
       if iteration == 1: # only for initial testing  purposes.
         break

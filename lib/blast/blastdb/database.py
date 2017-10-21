@@ -28,16 +28,13 @@ class BlastDatabase:
       cmd = [self.cmd, '-dbtype', self.typ, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
       p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
       return p
-
     cmd = [self.cmd, '-dbtype', self.typ, '-in', fil, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
     subprocess.run(cmd)
-    # Would love to pipe the sequences into makeblastdb but need to figure out
-    # how to pass a stream into a method
-    #subprocess.Popen([self.cmd, '-dbtype', self.typ,
-                              #'-in', filepath,
-                              #'-out', self.path],
-                                       #stdout=subprocess.PIPE,
-                                       #bufsize=1)
+
+  def make_db_from_stdin(self):
+    cmd = [self.cmd, '-dbtype', self.typ, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+    return p
 
   def setup(self, src):
     if os.path.exists(self.dbdir):

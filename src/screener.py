@@ -17,7 +17,7 @@ import lib.vdbdump.vdbdump
 
 import bud
 
-class Screen:
+class Screener:
 
   def __init__(self, wd, srr, virus_db, cdd_db):
     self.wd = os.path.join(wd, srr)

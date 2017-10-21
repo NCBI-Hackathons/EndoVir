@@ -1,9 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-#
 #  endovir.py
 #
-#  Copyright 2017 USYD
 #  Author: Jan Piotr Buchmann <jan.buchmann@sydney.edu.au>
 #  Description:
 #
@@ -13,11 +11,11 @@
 import os
 import sys
 import argparse
-
 sys.path.insert(1, os.path.join(sys.path[0], '../'))
 import lib.blast.blastdb.makeblastdb
 import lib.blast.blastdb.makeprofiledb
-import screen
+import screener
+import virus_contig
 
 class Endovir:
 
@@ -57,13 +55,14 @@ class Endovir:
 
   def screen(self, srrs=[]):
     for i in srrs:
-      s = screen.Screen(self.wd, i, self.dbs['virusdb'], self.dbs['cdd'])
+      s = screener.Screener(self.wd, i, self.dbs['virusdb'], self.dbs['cdd'])
       s.screen_srr(s.srr, s.virus_db.path)
       contigs = s.assemble(s.srascreener.vdbdump.parser.dump_to_file())
-      bud_contigs = []
-      for i in s.cdd_screen(contigs, s.cdd_db.path, os.path.join(s.wd,'rpst')):
-        bud_contigs.append(s.assembler.parser.sequences[i])
-      s.bud(bud_contigs)
+      asm_cotigs = 0
+      for j in s.cdd_screen(contigs, s.cdd_db.path, os.path.join(s.wd,'rpst')):
+        c = virus_contig.VirusContig(j+"_c"+str(asm_cotigs), s.assembler.parser.sequences[j].sequence, s.assembler.parser.sequences[j].header)
+        print(c.name, c.sequence, c.length, c.source.srr, c.source.contig)
+        asm_cotigs += 1
 
 def main():
   srrs = ['SRR5150787']

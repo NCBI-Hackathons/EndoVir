@@ -10,7 +10,6 @@ import sys
 
 sys.path.insert(1, os.path.join(sys.path[0], '../'))
 import lib.fasta.parser
-import lib.blast.blastdb.makeblastdb
 
 class Flanker(lib.fasta.parser.FastaParser):
 
@@ -26,15 +25,13 @@ class Flanker(lib.fasta.parser.FastaParser):
       self.sequences[seq.hader] = (seq)
       self.lhs_count += 1
       if stream == True:
-        print(seq.get_sequence())
+        return seq.get_sequence()
     else:
-      subseq = seq.subseq(0, self.len_flank, seq.name+"_lhs")
-      self.sequences[subseq.header] = subseq
+      subseql = seq.subseq(0, self.len_flank, seq.name+"_lhs")
+      self.sequences[subseql.header] = subseql
       self.lhs_count += 1
-      if stream == True:
-        print(subseq.get_sequence())
-      subseq = seq.subseq(seq.length-self.len_flank, self.len_flank, seq.name+"_rhs")
-      self.sequences[subseq.header] = subseq
+      subseqr = seq.subseq(seq.length-self.len_flank, self.len_flank, seq.name+"_rhs")
+      self.sequences[subseqr.header] = subseqr
       self.rhs_count += 1
       if stream == True:
-        print(subseq.get_sequence())
+        return subseql.get_sequence() + subseqr.get_sequence()
