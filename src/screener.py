@@ -7,6 +7,7 @@
 import os
 import sys
 import shutil
+import  time
 sys.path.insert(1, os.path.join(sys.path[0], '../'))
 
 import lib.blast.blastdb.makeblastdb
@@ -34,6 +35,9 @@ class Screener:
     self.assembler = lib.megahit.megahit.Megahit()
     self.srascreener = lib.blast.magicblast.magicblast.Magicblast()
     self.cdd_screener = lib.blast.rps.rpstblastn.RpstBlastn()
+    self.flankdb = lib.blast.blastdb.makeblastdb.Makeblastdb(dbdir=self.wd,
+                                                             name='flanks',
+                                                             typ='nucl')
 
   def screen_srr(self, srr, db):
     self.srascreener.run(srr, db)
@@ -44,6 +48,19 @@ class Screener:
   def cdd_screen(self, contigs, db, outf):
     return self.cdd_screener.run(contigs, db, outf)
 
+  def screen_flanks(self, contigs):
+    print("lalal", self.flankdb.path)
+    rfd, wfd = os.pipe()
+    stdout = os.fdopen(wfd, 'w')
+    for i in contigs:
+      i.extract_flanks(stdout)
+    stdout.close()
+    stdin = os.fdopen(rfd, 'r')
+    self.flankdb.make_db_stdin(stdin)
+    stdin.close()
+    time.sleep(5)
+    print("lalal", self.flankdb.path)
+    self.srascreener.run(self.srr, self.flankdb.path)
+
   def bud(self, contigs):
-    b = bud.Buddy(wd=self.wd)
-    b.bud(self.srr, contigs)
+    self.screen_flanks(contigs)

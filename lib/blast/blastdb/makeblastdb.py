@@ -5,6 +5,8 @@
 #
 #  Version: 0.0
 
+import os
+
 from . import database
 
 class Makeblastdb(database.BlastDatabase):

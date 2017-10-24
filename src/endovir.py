@@ -54,15 +54,19 @@ class Endovir:
       self.dbs[i].setup(src=self.db_sources[i]['src'])
 
   def screen(self, srrs=[]):
+    ctgs = []
     for i in srrs:
       s = screener.Screener(self.wd, i, self.dbs['virusdb'], self.dbs['cdd'])
       s.screen_srr(s.srr, s.virus_db.path)
-      contigs = s.assemble(s.srascreener.vdbdump.parser.dump_to_file())
-      asm_cotigs = 0
-      for j in s.cdd_screen(contigs, s.cdd_db.path, os.path.join(s.wd,'rpst')):
-        c = virus_contig.VirusContig(j+"_c"+str(asm_cotigs), s.assembler.parser.sequences[j].sequence, s.assembler.parser.sequences[j].header)
-        print(c.name, c.sequence, c.length, c.source.srr, c.source.contig)
-        asm_cotigs += 1
+      vrs_contigs = s.assemble(s.srascreener.vdbdump.parser.dump_to_file())
+      for j in s.cdd_screen(vrs_contigs, s.cdd_db.path, os.path.join(s.wd,'rpst')):
+        print(j+"_c"+str(len(ctgs)))
+        c = virus_contig.VirusContig(i+"_c"+str(len(ctgs)),
+                                     s.assembler.parser.sequences[j].sequence,
+                                     i,
+                                     s.assembler.parser.sequences[j].header)
+        ctgs.append(c)
+      s.bud(ctgs)
 
 def main():
   srrs = ['SRR5150787']
