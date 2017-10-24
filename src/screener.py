@@ -33,6 +33,7 @@ class Screener:
     self.asm_dir = os.path.join(self.wd, 'asm')
     self.asm_contigs = None
     self.assembler = lib.megahit.megahit.Megahit()
+    self.vdbdump = lib.vdbdump.vdbdump.VdbDump()
     self.srascreener = lib.blast.magicblast.magicblast.Magicblast()
     self.cdd_screener = lib.blast.rps.rpstblastn.RpstBlastn()
     self.flankdb = lib.blast.blastdb.makeblastdb.Makeblastdb(dbdir=self.wd,
@@ -40,7 +41,7 @@ class Screener:
                                                              typ='nucl')
 
   def screen_srr(self, srr, db):
-    self.srascreener.run(srr, db)
+    return self.srascreener.run(srr, db)
 
   def assemble(self, sequences):
     return self.assembler.run(sequences, prefix=self.asm, outdir=self.asm_dir)
@@ -49,7 +50,6 @@ class Screener:
     return self.cdd_screener.run(contigs, db, outf)
 
   def screen_flanks(self, contigs):
-    print("lalal", self.flankdb.path)
     rfd, wfd = os.pipe()
     stdout = os.fdopen(wfd, 'w')
     for i in contigs:
@@ -58,9 +58,9 @@ class Screener:
     stdin = os.fdopen(rfd, 'r')
     self.flankdb.make_db_stdin(stdin)
     stdin.close()
-    time.sleep(5)
-    print("lalal", self.flankdb.path)
-    self.srascreener.run(self.srr, self.flankdb.path)
+    mp = self.srascreener.run(self.srr, self.flankdb.path)
+    for i in mp.alignments:
+      print(i.qry.name, i.ref.name)
 
   def bud(self, contigs):
     self.screen_flanks(contigs)

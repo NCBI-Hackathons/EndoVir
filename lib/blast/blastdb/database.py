@@ -16,29 +16,32 @@ from . import blastdbcmd
 class BlastDatabase:
 
   def __init__(self, cmd=None, dbdir=None, name=None, typ=None):
-    self.cmd  = cmd
     self.title = name
     self.dbdir = dbdir
     self.typ  = typ
     self.dbtool = blastdbcmd.Blastdbcmd()
     self.path = os.path.join(self.dbdir, self.title)
+    self.cmd  = [cmd, '-parse_seqids', '-hash_index']
 
   def make_db(self, fil=None):
     if fil == None:
-      cmd = [self.cmd, '-dbtype', self.typ, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
+      cmd = self.cmd + ['-dbtype', self.typ, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
       p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
       return p
-    cmd = [self.cmd, '-dbtype', self.typ, '-in', fil, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
+    cmd = self.cmd + ['-dbtype', self.typ, '-in', fil, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
+    print(cmd)
     subprocess.run(cmd)
 
   def make_db_stdin(self, stdout):
-    cmd = [self.cmd, '-dbtype', self.typ, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
+    cmd = self.cmd + ['-dbtype', self.typ, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
+    print(cmd)
     p = subprocess.Popen(cmd, stdin=stdout)
 
-  def get_process_stdin(self):
-    cmd = [self.cmd, '-dbtype', self.typ, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
-    p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
-    return p
+  #def get_process_stdin(self):
+    #cmd = [self.cmd, '-dbtype', self.typ, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
+    #print(cmd)
+    #p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+    #return p
 
   def setup(self, src):
     if os.path.exists(self.dbdir):
@@ -47,7 +50,7 @@ class BlastDatabase:
         if not os.path.exists(os.path.join(os.path.join(self.dbdir, self.title))):
           self.fetch_db(src, self.title)
         print("\tfound local data at {0}. Creating database".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
-        self.make_db(data=os.path.join(self.dbdir, self.title))
+        self.make_db(fil=os.path.join(self.dbdir, self.title))
       else:
         print("\tfound local Blast DB {0}".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
     else:

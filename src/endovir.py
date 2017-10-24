@@ -14,6 +14,7 @@ import argparse
 sys.path.insert(1, os.path.join(sys.path[0], '../'))
 import lib.blast.blastdb.makeblastdb
 import lib.blast.blastdb.makeprofiledb
+
 import screener
 import virus_contig
 
@@ -27,7 +28,7 @@ class Endovir:
     self.dbs_dirname = 'dbs'
     self.db_sources = {
       'virusdb' : {'src' : 'ftp://ftp.ncbi.nlm.nih.gov/refseq/release/viral/viral.1.1.genomic.fna.gz',
-                      'db'  : lib.blast.blastdb.makeblastdb.Makeblastdb(name='vrs_refseq',
+                      'db'  : lib.blast.blastdb.makeblastdb.Makeblastdb(name='viral.genomic.refseq.fna',
                                                                   dbdir=os.path.join(self.wd, self.dbs_dirname),
                                                                   typ='nucl')},
           'cdd'    : {'src' : 'ftp://ftp.ncbi.nlm.nih.gov/pub/mmdb/cdd/cdd.tar.gz',
@@ -57,10 +58,10 @@ class Endovir:
     ctgs = []
     for i in srrs:
       s = screener.Screener(self.wd, i, self.dbs['virusdb'], self.dbs['cdd'])
-      s.screen_srr(s.srr, s.virus_db.path)
-      vrs_contigs = s.assemble(s.srascreener.vdbdump.parser.dump_to_file())
+      sra_screen = s.screen_srr(s.srr, s.virus_db.path)
+      s.vdbdump.run(s.srr, sra_screen.alignments)
+      vrs_contigs = s.assemble(s.vdbdump.parser.dump_to_file())
       for j in s.cdd_screen(vrs_contigs, s.cdd_db.path, os.path.join(s.wd,'rpst')):
-        print(j+"_c"+str(len(ctgs)))
         c = virus_contig.VirusContig(i+"_c"+str(len(ctgs)),
                                      s.assembler.parser.sequences[j].sequence,
                                      i,
