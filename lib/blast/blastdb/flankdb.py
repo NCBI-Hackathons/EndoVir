@@ -23,7 +23,7 @@ class FlankDb(database.BlastDatabase):
     for i in contigs:
       print(i)
       contigs[i].extract_flanks(stdout)
-      #self.refs[i.split('|')[0]] = []
+      self.refs[i.split(':')[0]] = []
     stdout.close()
     stdin = os.fdopen(rfd, 'r')
     self.make_db_stdin(stdin)
@@ -31,10 +31,8 @@ class FlankDb(database.BlastDatabase):
 
   def demux(self, srr_parser):
     for i in srr_parser.alignments:
-      print(i.qry.name, i.ref.name)
-      #print(i.ref.name.split('|')[1])
-      #if i.ref.name.split('|')[0] in self.refs:
-        #self.refs[i.ref.name.split('|')[0]].append(i.qry.name)
+      if i.ref.name.split(':')[0] in self.refs:
+        self.refs[i.ref.name.split(':')[0]].append(i.qry.name)
 
-    #for i in self.refs:
-      #print(i, len(self.refs),"\n", self.refs)
+    for i in self.refs:
+      print(i, len(self.refs[i]))

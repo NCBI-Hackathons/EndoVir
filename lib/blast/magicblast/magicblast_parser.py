@@ -2,7 +2,7 @@
 #
 #  Author: Jan Piotr Buchmann <jan.buchmann@sydney.edu.au>
 #  Description:
-#
+#  https://ncbi.github.io/magicblast/doc/output.html
 #  Version: 0.0
 
 
@@ -40,12 +40,35 @@ class Alignment:
 
 class MagicblastParser:
 
+  NESTED = 1
+  LHS_OL = 2
+  RHS_OL = 4
+
   def __init__(self):
     self.alignments = []
 
+  def classify_overlap(self, cols): # qbeg, qend, rbeg, rend, qstrand, rstrand):
+    if col[13] == 'minus':    # query is minus, reference is plus
+      if
+    elif col[14] == 'minus':  # Reference is minus , query is plus
+      if col[6]
+    else:                     # both should be plus
+      rend = col[6]
+      rbeg = col[7]
+
+
   def parse(self, src):
+    self.alignments = []
     for i in src:
       cols = i.strip().split('\t')
+      print(cols)
       self.alignments.append(Alignment(cols[0], cols[1], cols[2], cols[6],
                                        cols[7], cols[8], cols[9], cols[13],
                                        cols[14]))
+      # 0: query
+      # 1: reference
+      # 2: pident
+      # 6: alignment start position on the query sequence
+      # 7: alignment stop  position on the query sequence
+      # 8: alignment start position on the reference sequence
+      # 9: alignment stop  position on the reference sequence

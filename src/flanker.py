@@ -14,6 +14,13 @@ import lib.fasta.sequence
 
 class Flanker(lib.fasta.parser.FastaParser):
 
+  class Flank(lib.fasta.sequence.FastaSequence):
+
+    def __init__(self, name, seq, location, contig):
+      super().__init__(name, seq)
+      self.location = location
+      self.contig = contig
+
   def __init__(self, flank_len=500):
     super().__init__()
     self.len_flank = flank_len
@@ -22,7 +29,7 @@ class Flanker(lib.fasta.parser.FastaParser):
 
   def extract_flanks(self, seq):
     if seq.length <= self.len_flank:
-      self.lhs = lib.fasta.sequence.FastaSequence(seq.name+"_lhs", seq.subseq(0, seq.length))
+      self.lhs = lib.fasta.sequence.FastaSequence(seq.name+":lhs", seq.subseq(0, seq.length))
     else:
-      self.lhs = lib.fasta.sequence.FastaSequence(seq.name+"_lhs", seq.subseq(0, self.len_flank))
-      self.rhs = lib.fasta.sequence.FastaSequence(seq.name+"_rhs", seq.subseq(seq.length-self.len_flank, self.len_flank, seq.name+"_rhs"))
+      self.lhs = lib.fasta.sequence.FastaSequence(seq.name+":lhs", seq.subseq(0, self.len_flank))
+      self.rhs = lib.fasta.sequence.FastaSequence(seq.name+":rhs", seq.subseq(seq.length-self.len_flank, self.len_flank, seq.name+"_rhs"))

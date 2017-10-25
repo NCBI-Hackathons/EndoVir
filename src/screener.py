@@ -36,7 +36,9 @@ class Screener:
     self.vdbdump = lib.vdbdump.vdbdump.VdbDump()
     self.srascreener = lib.blast.magicblast.magicblast.Magicblast()
     self.cdd_screener = lib.blast.rps.rpstblastn.RpstBlastn()
-    self.flankdb = lib.blast.blastdb.flankdb.FlankDb(dbdir=self.wd, dbname='flanks')
+    self.flankdb_dir = 'flanks'
+    self.flankdb = lib.blast.blastdb.flankdb.FlankDb(dbdir=os.path.join(self.wd, self.flankdb_dir),
+                                                     dbname='flanks')
     self.contigs = {}
 
   def screen_srr(self, srr, db):
