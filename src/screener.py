@@ -10,7 +10,7 @@ import shutil
 import  time
 sys.path.insert(1, os.path.join(sys.path[0], '../'))
 
-import lib.blast.blastdb.makeblastdb
+import lib.blast.blastdb.flankdb
 import lib.blast.magicblast.magicblast
 import lib.megahit.megahit
 import lib.blast.rps.rpstblastn
@@ -21,9 +21,9 @@ import bud
 class Screener:
 
   def __init__(self, wd, srr, virus_db, cdd_db):
+    if not os.path.exists(os.path.join(wd, srr)):
+      os.makedir(os.path.join(wd, srr))
     self.wd = os.path.join(wd, srr)
-    if not os.path.exists(self.wd):
-      os.makedir(self.wd)
     self.srr = srr
     self.virus_db = virus_db
     self.cdd_db = cdd_db
@@ -36,9 +36,8 @@ class Screener:
     self.vdbdump = lib.vdbdump.vdbdump.VdbDump()
     self.srascreener = lib.blast.magicblast.magicblast.Magicblast()
     self.cdd_screener = lib.blast.rps.rpstblastn.RpstBlastn()
-    self.flankdb = lib.blast.blastdb.makeblastdb.Makeblastdb(dbdir=self.wd,
-                                                             name='flanks',
-                                                             typ='nucl')
+    self.flankdb = lib.blast.blastdb.flankdb.FlankDb(dbdir=self.wd, dbname='flanks')
+    self.contigs = {}
 
   def screen_srr(self, srr, db):
     return self.srascreener.run(srr, db)
@@ -50,17 +49,8 @@ class Screener:
     return self.cdd_screener.run(contigs, db, outf)
 
   def screen_flanks(self, contigs):
-    rfd, wfd = os.pipe()
-    stdout = os.fdopen(wfd, 'w')
-    for i in contigs:
-      i.extract_flanks(stdout)
-    stdout.close()
-    stdin = os.fdopen(rfd, 'r')
-    self.flankdb.make_db_stdin(stdin)
-    stdin.close()
-    mp = self.srascreener.run(self.srr, self.flankdb.path)
-    for i in mp.alignments:
-      print(i.qry.name, i.ref.name)
+    self.flankdb.mux(contigs)
+    self.flankdb.demux(self.srascreener.run(self.srr, self.flankdb.path))
 
   def bud(self, contigs):
     self.screen_flanks(contigs)

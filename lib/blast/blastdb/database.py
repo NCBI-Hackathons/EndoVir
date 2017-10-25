@@ -37,12 +37,6 @@ class BlastDatabase:
     print(cmd)
     p = subprocess.Popen(cmd, stdin=stdout)
 
-  #def get_process_stdin(self):
-    #cmd = [self.cmd, '-dbtype', self.typ, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
-    #print(cmd)
-    #p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
-    #return p
-
   def setup(self, src):
     if os.path.exists(self.dbdir):
       if not self.dbtool.exists(os.path.join(self.dbdir, self.title)):

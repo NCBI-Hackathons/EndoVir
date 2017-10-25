@@ -43,7 +43,6 @@ class Buddy:
     db_flanks = lib.blast.blastdb.makeblastdb.Makeblastdb(dbdir=self.wd, name=self.flank_db, typ='nucl')
     p = db_flanks.make_db_from_stdin()
     for i in contigs:
-      #print(f.add_sequence(i, stream=True))
       p.stdin.write(str.encode(f.add_sequence(i, stream=True)))
     p.stdin.flush()
     p.stdin.close()
