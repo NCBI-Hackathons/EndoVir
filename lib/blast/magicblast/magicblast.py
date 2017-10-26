@@ -33,4 +33,3 @@ class Magicblast:
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1, universal_newlines=True)
     parser.parse(p.stdout)
     return parser
-#    self.vdbdump.run(srr, self.parser.alignments)

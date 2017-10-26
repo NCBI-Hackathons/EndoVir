@@ -21,7 +21,6 @@ class FlankDb(database.BlastDatabase):
     rfd, wfd = os.pipe()
     stdout = os.fdopen(wfd, 'w')
     for i in contigs:
-      print(i)
       contigs[i].extract_flanks(stdout)
       self.refs[i.split(':')[0]] = []
     stdout.close()
@@ -34,5 +33,6 @@ class FlankDb(database.BlastDatabase):
       if i.ref.name.split(':')[0] in self.refs:
         self.refs[i.ref.name.split(':')[0]].append(i.qry.name)
 
+    print(len(srr_parser.alignments))
     for i in self.refs:
       print(i, len(self.refs[i]))

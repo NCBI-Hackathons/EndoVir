@@ -25,11 +25,11 @@ class VdbdumpFastqParser(fastq_parser.FastqParser):
         headerline = i.strip().decode()[1:]
         header = headerline.split(' ')[0]
       if line_count == 2:
-        seq = i.strip().decode()[alignments[row_idx].qry.start:alignments[row_idx].qry.start+alignments[row_idx].qry.length+1]
+        seq = i.strip().decode()[alignments[row_idx].qry.start:alignments[row_idx].qry.start+alignments[row_idx].qry.aln_length+1]
       if line_count == 4:
         qual = i.strip().decode()
         if len(qual) > 0:
-          qual = qual[alignments[row_idx].qry.start:alignments[row_idx].qry.start+alignments[row_idx].qry.length+1]
+          qual = qual[alignments[row_idx].qry.start:alignments[row_idx].qry.start+alignments[row_idx].qry.aln_length+1]
         else:
           qual = len(seq) * self.qual_placeholder
         self.sequences[header] = sequence.FastqSequence(header, seq, qual)

@@ -21,7 +21,7 @@ class Flanker(lib.fasta.parser.FastaParser):
       self.location = location
       self.contig = contig
 
-  def __init__(self, flank_len=500):
+  def __init__(self, flank_len):
     super().__init__()
     self.len_flank = flank_len
     self.lhs = lib.fasta.sequence.FastaSequence()

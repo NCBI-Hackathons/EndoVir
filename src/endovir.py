@@ -25,6 +25,7 @@ class Endovir:
     self.dbs_path =  ''
     self.wd = os.getcwd() if wd == None else wd
     self.screens = {}
+    self.flank_len = 500
     self.dbs_dirname = 'dbs'
     self.db_sources = {
       'virusdb' : {'src' : 'ftp://ftp.ncbi.nlm.nih.gov/refseq/release/viral/viral.1.1.genomic.fna.gz',
@@ -66,7 +67,8 @@ class Endovir:
         c = virus_contig.VirusContig(i+"_"+str(len(ctgs)),
                                      s.assembler.parser.sequences[j].sequence,
                                      i,
-                                     s.assembler.parser.sequences[j].header)
+                                     s.assembler.parser.sequences[j].header,
+                                     self.flank_len)
         ctgs[c.name] = c
       s.bud(ctgs)
 

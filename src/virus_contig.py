@@ -25,23 +25,20 @@ class VirusContig(lib.sequence.sequence.Sequence):
       self.srr = srr
       self.contig = contig
 
-  def __init__(self, name, seq, src_srr, src_contig):
+  def __init__(self, name, seq, src_srr, src_contig, flank_len):
     super().__init__(name, seq)
     self.src = self.Source(src_srr, src_contig)
     self.assembly = self.Assembly()
-    self.flanker = flanker.Flanker()
+    self.flanker = flanker.Flanker(flank_len)
     self.iteration = 0
 
   def extend(self, reads):
+    print(self.src.srr, self.src.contig, len(reads))
     #assmeble self.seq +  reads
     #update self.length, self.assembly, sefl.flanks
-    pass
 
   def extract_flanks(self, stdout):
     self.flanker.extract_flanks(self)
     if len(self.flanker.rhs.sequence) > 0:
       stdout.write(self.flanker.rhs.get_sequence())
     stdout.write(self.flanker.lhs.get_sequence())
-
-  def screen_flanks(self):
-    pass

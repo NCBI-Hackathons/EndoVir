@@ -12,6 +12,7 @@ sys.path.insert(1, os.path.join(sys.path[0], '../'))
 
 import lib.blast.blastdb.flankdb
 import lib.blast.magicblast.magicblast
+import lib.blast.magicblast.magicblast_flank_parser
 import lib.megahit.megahit
 import lib.blast.rps.rpstblastn
 import lib.vdbdump.vdbdump
@@ -50,9 +51,9 @@ class Screener:
   def cdd_screen(self, contigs, db, outf):
     return self.cdd_screener.run(contigs, db, outf)
 
-  def screen_flanks(self, contigs):
-    self.flankdb.mux(contigs)
-    self.flankdb.demux(self.srascreener.run(self.srr, self.flankdb.path))
-
   def bud(self, contigs):
-    self.screen_flanks(contigs)
+    self.flankdb.mux(contigs)
+    self.flankdb.demux(self.srascreener.run(self.srr, self.flankdb.path, parser=lib.blast.magicblast.magicblast_flank_parser.MagicblastFlankParser()))
+    for i in contigs:
+      if i in self.flankdb.refs:
+        contigs[i].extend(self.flankdb.refs[i])
