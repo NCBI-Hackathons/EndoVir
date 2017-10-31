@@ -26,6 +26,6 @@ class VdbDump:
     opts = [self.cmd, '--format', self.format]
     for i in range(0, len(alignments), self.batch_size):
       cmd = opts + ['-R', ','.join(str(x.qry.sra_rowid) for x in alignments[i:i+self.batch_size]), srr]
-#      print(cmd)
+      #print(cmd)
       vd = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1)
       self.parser.parse(vd.stdout, alignments)

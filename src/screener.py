@@ -52,8 +52,11 @@ class Screener:
     return self.cdd_screener.run(contigs, db, outf)
 
   def bud(self, contigs):
-    self.flankdb.mux(contigs)
-    self.flankdb.demux(self.srascreener.run(self.srr, self.flankdb.path, parser=lib.blast.magicblast.magicblast_flank_parser.MagicblastFlankParser()))
-    for i in contigs:
-      if i in self.flankdb.refs:
-        contigs[i].extend(self.flankdb.refs[i])
+    while True:
+      self.flankdb.mux(contigs)
+      self.flankdb.demux(self.srascreener.run(self.srr, self.flankdb.path, parser=lib.blast.magicblast.magicblast_flank_parser.MagicblastFlankParser()))
+      for i in contigs:
+        if i in self.flankdb.refs:
+          contigs[i].extend(self.assembler, self.flankdb.refs[i])
+        contigs[i].iteration += 1
+      break

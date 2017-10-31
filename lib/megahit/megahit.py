@@ -31,3 +31,7 @@ class Megahit:
     megahit = subprocess.call(cmd)
     self.parser.parse(fil=os.path.join(outdir, prefix+self.suffix))
     return os.path.join(outdir, prefix+self.suffix)
+
+  @classmethod
+  def new(cls, wd):
+    return cls(wd)

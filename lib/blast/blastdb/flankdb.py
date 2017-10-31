@@ -31,8 +31,8 @@ class FlankDb(database.BlastDatabase):
   def demux(self, srr_parser):
     for i in srr_parser.alignments:
       if i.ref.name.split(':')[0] in self.refs:
-        self.refs[i.ref.name.split(':')[0]].append(i.qry.name)
+        self.refs[i.ref.name.split(':')[0]].append(i)
 
-    print(len(srr_parser.alignments))
-    for i in self.refs:
-      print(i, len(self.refs[i]))
+    #print(len(srr_parser.alignments))
+    #for i in self.refs:
+      #print(i, len(self.refs[i]))

@@ -68,7 +68,8 @@ class Endovir:
                                      s.assembler.parser.sequences[j].sequence,
                                      i,
                                      s.assembler.parser.sequences[j].header,
-                                     self.flank_len)
+                                     self.flank_len,
+                                     self.wd)
         ctgs[c.name] = c
       s.bud(ctgs)
 
