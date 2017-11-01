@@ -1,7 +1,5 @@
+#  magicblast_alignment.py
 #
-#  untitled.py
-#
-#  Copyright 2017 USYD
 #  Author: Jan Piotr Buchmann <jan.buchmann@sydney.edu.au>
 #  Description:
 #
@@ -33,9 +31,7 @@ class MagicblastAlignment:
       if self.strand == 1:
         self.aln_length *= 1
 
-  #def __init__(self, qry, ref, pident, qbeg, qend, rbeg, rend, qstrand, rstrand):
   def __init__(self, cols):
     self.qry = self.Query(cols[0], cols[6], cols[7], cols[13])
     self.ref = self.Reference(cols[1], cols[7], cols[8], cols[14])
     self.pident = float(cols[2])
-    #self.sra_rowid = self.qry.name.split('.')[1]

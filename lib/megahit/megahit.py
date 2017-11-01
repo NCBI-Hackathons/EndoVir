@@ -32,6 +32,8 @@ class Megahit:
     self.parser.parse(fil=os.path.join(outdir, prefix+self.suffix))
     return os.path.join(outdir, prefix+self.suffix)
 
-  @classmethod
-  def new(cls, wd):
-    return cls(wd)
+  def run_pipe(self, reads, prefix=None, outdir='megahit_out', cpu_threads=2):
+    pass
+
+  def new(self):
+    return Megahit()

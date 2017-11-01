@@ -23,7 +23,7 @@ class Screener:
 
   def __init__(self, wd, srr, virus_db, cdd_db):
     if not os.path.exists(os.path.join(wd, srr)):
-      os.makedir(os.path.join(wd, srr))
+      os.mkdir(os.path.join(wd, srr))
     self.wd = os.path.join(wd, srr)
     self.srr = srr
     self.virus_db = virus_db
@@ -57,6 +57,7 @@ class Screener:
       self.flankdb.demux(self.srascreener.run(self.srr, self.flankdb.path, parser=lib.blast.magicblast.magicblast_flank_parser.MagicblastFlankParser()))
       for i in contigs:
         if i in self.flankdb.refs:
+          print(i, len(self.flankdb.refs[i]))
           contigs[i].extend(self.assembler, self.flankdb.refs[i])
         contigs[i].iteration += 1
       break

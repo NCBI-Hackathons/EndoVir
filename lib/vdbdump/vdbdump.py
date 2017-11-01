@@ -20,12 +20,15 @@ class VdbDump:
     self.cmd = 'vdb-dump'
     self.format = 'fastq'
     self.batch_size = 10000
-    self.parser = vdbdump_fastq_parser.VdbdumpFastqParser()
 
-  def run(self, srr, alignments):
+  def run(self, srr, alignments, parser=vdbdump_fastq_parser.VdbdumpFastqParser()):
     opts = [self.cmd, '--format', self.format]
-    for i in range(0, len(alignments), self.batch_size):
+    print("Reads to dump:", len(alignments))
+    batch_size = self.batch_size
+    for i in range(0, len(alignments), batch_size):
+      print("In geenrator:", len([x.qry.sra_rowid for x in alignments[i:i+self.batch_size]]))
       cmd = opts + ['-R', ','.join(str(x.qry.sra_rowid) for x in alignments[i:i+self.batch_size]), srr]
-      #print(cmd)
+      print(cmd)
       vd = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1)
-      self.parser.parse(vd.stdout, alignments)
+      parser.parse(vd.stdout, alignments[i:i+batch_size])
+    return parser
