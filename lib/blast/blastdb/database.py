@@ -21,7 +21,7 @@ class BlastDatabase:
     self.typ  = typ
     self.dbtool = blastdbcmd.Blastdbcmd()
     self.path = os.path.join(self.dbdir, self.title)
-    self.cmd  = [cmd, '-parse_seqids', '-hash_index']
+    self.cmd  = [cmd]
 
   def make_db(self, fil=None):
     if fil == None:

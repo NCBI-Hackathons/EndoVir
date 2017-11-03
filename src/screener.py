@@ -12,12 +12,11 @@ sys.path.insert(1, os.path.join(sys.path[0], '../'))
 
 import lib.blast.blastdb.flankdb
 import lib.blast.magicblast.magicblast
+import lib.blast.magicblast.magicblast_parser
 import lib.blast.magicblast.magicblast_flank_parser
 import lib.megahit.megahit
 import lib.blast.rps.rpstblastn
 import lib.vdbdump.vdbdump
-
-import bud
 
 class Screener:
 
@@ -28,36 +27,39 @@ class Screener:
     self.srr = srr
     self.virus_db = virus_db
     self.cdd_db = cdd_db
-    self.asm = self.srr
     if os.path.exists(os.path.join(self.wd, 'asm')):
       shutil.rmtree(os.path.join(self.wd, 'asm'))
     self.asm_dir = os.path.join(self.wd, 'asm')
-    self.asm_contigs = None
     self.assembler = lib.megahit.megahit.Megahit()
     self.vdbdump = lib.vdbdump.vdbdump.VdbDump()
-    self.srascreener = lib.blast.magicblast.magicblast.Magicblast()
     self.cdd_screener = lib.blast.rps.rpstblastn.RpstBlastn()
-    self.flankdb_dir = 'flanks'
-    self.flankdb = lib.blast.blastdb.flankdb.FlankDb(dbdir=os.path.join(self.wd, self.flankdb_dir),
+    self.flankdb = lib.blast.blastdb.flankdb.FlankDb(dbdir=os.path.join(self.wd, 'flanks'),
                                                      dbname='flanks')
     self.contigs = {}
 
   def screen_srr(self, srr, db):
-    return self.srascreener.run(srr, db)
+    srr_screener = lib.blast.magicblast.magicblast.Magicblast()
+    mbp = lib.blast.magicblast.magicblast_parser.MagicblastParser()
+    mbp.parse(srr_screener.run(srr, db))
+    return mbp.alignments
 
   def assemble(self, sequences):
-    return self.assembler.run(sequences, prefix=self.asm, outdir=self.asm_dir)
+    return self.assembler.run(sequences, prefix=self.srr, outdir=self.asm_dir)
 
   def cdd_screen(self, contigs, db, outf):
     return self.cdd_screener.run(contigs, db, outf)
 
-  def bud(self, contigs):
+  def bud(self, contigs, flank_len):
     while True:
       self.flankdb.mux(contigs)
-      self.flankdb.demux(self.srascreener.run(self.srr, self.flankdb.path, parser=lib.blast.magicblast.magicblast_flank_parser.MagicblastFlankParser()))
+      srr_screener = lib.blast.magicblast.magicblast.Magicblast()
+      fp = lib.blast.magicblast.magicblast_flank_parser.MagicblastFlankParser()
+      alignments = fp.parse(srr_screener.run(self.srr, self.flankdb.path),contigs)
+      self.flankdb.demux(alignments)
       for i in contigs:
         if i in self.flankdb.refs:
-          print(i, len(self.flankdb.refs[i]))
+          print("Contig {0}: extending reads: {1}".format(i, len(self.flankdb.refs[i])))
           contigs[i].extend(self.assembler, self.flankdb.refs[i])
         contigs[i].iteration += 1
-      break
+        if contigs[i].iteration == 3:
+          return

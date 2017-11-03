@@ -23,7 +23,8 @@ class Megahit:
     self.parser.reset()
     cmd = [self.path, '--read', reads,
                       '--num-cpu-threads', str(cpu_threads),
-                      '--min-contig-len', str(self.min_contig_len)]
+                      '--min-contig-len', str(self.min_contig_len),
+                      '--keep-tmp-files']
     if prefix == None:
       prefix = reads
     cmd += ['--out-prefix', prefix, '--out-dir', outdir]

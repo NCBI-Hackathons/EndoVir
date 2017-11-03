@@ -13,3 +13,4 @@ class Makeblastdb(database.BlastDatabase):
 
   def __init__(self, dbdir, name, typ):
     super().__init__(dbdir=dbdir, name=name, typ=typ, cmd='makeblastdb')
+    self.cmd  = [cmd, '-parse_seqids', '-hash_index']

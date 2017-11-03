@@ -24,12 +24,11 @@ class Magicblast:
     self.word_size = 20
     self.perc_identity = 60
 
-  def run(self, srr, db, parser=magicblast_parser.MagicblastParser()):
+  def run(self, srr, db):
     cmd = [self.path, '-db',  db,
                       '-sra', srr,
                       '-num_threads', str(self.num_threads),
                       '-outfmt', self.outfmt]
     print(cmd)
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1, universal_newlines=True)
-    parser.parse(p.stdout)
-    return parser
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1, universal_newlines=True)
+    return proc.stdout

@@ -15,6 +15,7 @@ sys.path.insert(1, os.path.join(sys.path[0], '../'))
 import lib.blast.blastdb.makeblastdb
 import lib.blast.blastdb.makeprofiledb
 
+
 import screener
 import virus_contig
 
@@ -41,7 +42,7 @@ class Endovir:
 
   def set_wd(self):
     if not os.path.isdir(self.wd):
-      os.makedir(self.wd)
+      os.mkdir(self.wd)
 
   def setup(self):
     self.set_wd()
@@ -49,32 +50,33 @@ class Endovir:
 
   def setup_databases(self):
     if not os.path.isdir(os.path.join(self.wd, self.dbs_dirname)):
-      os.makedir(os.path.join(self.wd, self.dbs_dirname))
+      os.mkdir(os.path.join(self.wd, self.dbs_dirname))
     for i in self.db_sources:
       print("Setup Blast DB {0}".format(i), file=sys.stderr)
       self.dbs[i] = self.db_sources[i]['db']
       self.dbs[i].setup(src=self.db_sources[i]['src'])
 
   def screen(self, srrs=[]):
-    ctgs = {}
+    vrs_ctgs = {}
     for i in srrs:
       print("Screening {0}".format(i), file=sys.stderr)
       s = screener.Screener(self.wd, i, self.dbs['virusdb'], self.dbs['cdd'])
-      sra_screen = s.screen_srr(s.srr, s.virus_db.path)
-      vdb_parser = s.vdbdump.run(s.srr, sra_screen.alignments)
-      vrs_contigs = s.assemble(vdb_parser.dump_to_file())
-      for j in s.cdd_screen(vrs_contigs, s.cdd_db.path, os.path.join(s.wd,'rpst')):
-        c = virus_contig.VirusContig("ctg_"+str(len(ctgs)),
+      srr_alignments = s.screen_srr(s.srr, s.virus_db.path)
+      vdb_parser = s.vdbdump.run(s.srr, srr_alignments)
+      contigs = s.assemble(vdb_parser.dump_to_file())
+      for j in s.cdd_screen(contigs, s.cdd_db.path, os.path.join(s.wd,'rpst')):
+        c = virus_contig.VirusContig("ctg_"+str(len(vrs_ctgs)),
                                      s.assembler.parser.sequences[j].sequence,
                                      i,
                                      s.assembler.parser.sequences[j].header,
                                      self.flank_len,
                                      s.wd)
-        ctgs[c.name] = c
-      s.bud(ctgs)
+        vrs_ctgs[c.name] = c
+      s.bud(vrs_ctgs, self.flank_len)
 
 def main():
-  srrs = ['SRR5150787']
+  #srrs = ['SRR5150787']
+  srrs = ['SRR5832142']
   ev = Endovir(wd='analysis')
   ev.setup()
   ev.screen(srrs)

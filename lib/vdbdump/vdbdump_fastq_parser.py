@@ -43,3 +43,6 @@ class VdbdumpFastqParser(fastq_parser.FastqParser):
 
   def new(self):
     return VdbdumpFastqParser()
+
+  def reset(self):
+    self.sequences = {}
