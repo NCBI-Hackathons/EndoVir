@@ -14,12 +14,14 @@ class FastaParser:
   def __init__(self):
     self.sequences = {}
     self.doFhClose = False
+    self.src = sys.stdin
 
-  def parse(self, fil=None, stream=False):
-    src = sys.stdin
+  def parse(self, src=None, fil=None, stream=False):
     if fil != None:
       src = open(fil, 'r')
       self.doFhClose = True
+    if src == None:
+      print('Fasta parser. Error. No source to parse')
     seq = ''
     header = ''
     for i in src:
@@ -42,10 +44,10 @@ class FastaParser:
     fh.close()
     return fname
 
-  def add_sequence(self, seq, stream=False):
-    self.sequences[seq.header] = seq
+  def add_sequence(self, seq, stream):
     if stream == True:
       print(seq.get_sequence())
+    self.sequences[seq.header] = seq
 
   def reset(self):
     self.sequences = {}

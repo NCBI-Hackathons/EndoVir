@@ -32,7 +32,10 @@ class MagicblastFlankParser(magicblast_parser.MagicblastParser):
     cnt = cols[1].split(':')[0]
     if cnt in contigs:
       if contigs[cnt].rhs == None:
-        self.alignments.append(magicblast_alignment.MagicblastAlignment(cols))
+        if rbeg > 10 and rend < self.flank_len - 10:
+          pass # skip nested mappes
+        else:
+          self.alignments.append(magicblast_alignment.MagicblastAlignment(cols))
       else:
         if cols[1].split(':')[1] ==  'rhs':
           if rbeg > contigs[cnt].flank_len - qlen and qend < qlen-10:
@@ -49,7 +52,6 @@ class MagicblastFlankParser(magicblast_parser.MagicblastParser):
     read_count = 0
     for i in src:
       self.identify_overlaps(i.strip().split('\t'), contigs)
-      #self.alignments.append(magicblast_alignment.MagicblastAlignment(i.strip().split('\t')))
       read_count  += 1
-    print("Init reads:", read_count)
+    print("Overlapping reads: {}/{}".format(len(self.alignments), read_count))
     return self.alignments

@@ -35,3 +35,4 @@ class MagicblastAlignment:
     self.qry = self.Query(cols[0], cols[6], cols[7], cols[13])
     self.ref = self.Reference(cols[1], cols[7], cols[8], cols[14])
     self.pident = float(cols[2])
+    self.btop = cols[16]

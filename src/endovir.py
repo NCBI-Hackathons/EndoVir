@@ -40,6 +40,7 @@ class Endovir:
                       }
     self.dbs = {}
 
+
   def set_wd(self):
     if not os.path.isdir(self.wd):
       os.mkdir(self.wd)
@@ -70,13 +71,18 @@ class Endovir:
                                      i,
                                      s.assembler.parser.sequences[j].header,
                                      self.flank_len,
-                                     s.wd)
+                                     s.wd,
+                                     s.flankdb)
         vrs_ctgs[c.name] = c
-      s.bud(vrs_ctgs, self.flank_len)
+        print("Prepared {} for budding".format(c.name))
+      print("Budding {} contigs".format(len(vrs_ctgs)))
+      s.bud(vrs_ctgs)
 
 def main():
-  #srrs = ['SRR5150787']
-  srrs = ['SRR5832142']
+  srrs = ['SRR5150787']
+  #srrs = ['SRR5832142']
+  #p = read_pool.ReadPool('SRR5150787')
+  #p.init()
   ev = Endovir(wd='analysis')
   ev.setup()
   ev.screen(srrs)
