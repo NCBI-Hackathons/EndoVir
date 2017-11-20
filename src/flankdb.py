@@ -34,8 +34,15 @@ class FlankDb(lib.blast.blastdb.makeblastdb.Makeblastdb):
   def demux(self, alignments):
     for i in alignments:
       if i.ref.name.split(':')[0] in self.refs:
-        #self.refs[i.ref.name.split(':')[0]].append(i)
         self.refs[i.ref.name.split(':')[0]].append(i)
+    for i in self.refs:
+      self.refs[i].sort(key=lambda x: x.ref.start)
+      for j in self.refs[i]:
+        if j.isLhsFlank:
+          print(i, "L", end='\t')
+        if j.isRhsFlank:
+          print(i, "R", end='\t' )
+        print(j.ref.name, j.btop, j.ref.start,j.ref.strand,  j.qry.name, j.qry.start, j.qry.length, j.qry.strand)
 
   def extract_contig_flanks(self, contig):
     if contig.length <= contig.flank_len:

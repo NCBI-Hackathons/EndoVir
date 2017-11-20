@@ -28,8 +28,7 @@ class Process:
     print(self.cmd)
     self.ph = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, bufsize=1, universal_newlines=True)
     if stdin != None:
-      self.use_stdin(stdin.encode())
-    #self.ph.stdin.close()
+      self.use_stdin(stdin)
     return self.ph
 
   def use_stdin(self, data):

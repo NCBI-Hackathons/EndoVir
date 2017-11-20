@@ -32,3 +32,12 @@ class VdbDump:
       vd = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1)
       parser.parse(vd.stdout, alignments[i:i+batch_size])
     return parser
+
+  def dump_to_stream(self, srr, alignments, stream, fmt='fasta'):
+    opts = [self.cmd, '--format', fmt]
+    batch_size = self.batch_size
+    for i in range(0, len(alignments), batch_size):
+      cmd = opts + ['-R', ','.join(str(x.qry.sra_rowid) for x in alignments[i:i+self.batch_size]), srr]
+      print(cmd)
+      vd = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1)
+      stream.write(vd.stdout.read().decode())

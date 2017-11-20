@@ -32,18 +32,11 @@ class VirusContig(lib.sequence.sequence.Sequence):
 
     #print(self.src, self.srr, self.flank_len, self.wd)
 
-  def extend(self):
+  def extend(self, alignments):
+    vdbdump = lib.vdbdump.vdbdump.VdbDump()
+    for i in alignments:
+      print(i)
     pass
-    #vdb_parser.dump_to_file(fout='ext.fq')
-    #ext_asm = os.path.join(self.wd, 'asm.reads.'+str(self.iteration)+'.fifo')
-    #ext_asm_fh  = open(ext_asm, 'w')
-    #for i in vdb_parser.sequences:
-        #ext_asm_fh.write(vdb_parser.sequences[i].get_sequence())
-    #ext_asm_fh.write(">"+self.name+'\n'+self.sequence+'\n')
-    #ext_asm_fh.close()
-    #asm = assembler.new()
-    #assembly = asm.run(ext_asm, prefix=self.name, outdir=os.path.join(self.wd, 'asm'+str(self.iteration)))
-    #self.asses(assembly)
 
 
   #def identify_overlaps(self, cols):

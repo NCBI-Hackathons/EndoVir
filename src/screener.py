@@ -16,6 +16,7 @@ import lib.blast.magicblast.magicblast_flank_parser
 import lib.megahit.megahit
 import lib.blast.rps.rpstblastn
 import lib.vdbdump.vdbdump
+import lib.process.process
 import flankdb
 
 class Screener:
@@ -55,10 +56,29 @@ class Screener:
       fp = lib.blast.magicblast.magicblast_flank_parser.MagicblastFlankParser()
       alignments = fp.parse(srr_screener.run(self.srr, self.flankdb.path),contigs)
       self.flankdb.demux(alignments)
-      for i in  self.flankdb.refs:
-        for j in self.flankdb.refs[i][:3]:
-          print(i, j.btop, j.qry.name, j.qry.start, j.ref.name, j.ref.start)
       #for i in contigs:
+        #if i in self.flankdb.refs:
+          #contigs[i].extend(self.flankdb.refs[i])
+      #b = lib.process.process.Process('blastn')
+      #b.set_arguments([('-db', self.flankdb.path)])
+      #rp, wp = os.pipe()
+      #stdout = os.fdopen(wp, 'w')
+      #vp = self.vdbdump.dump_to_stream(self.srr, alignments, stdout)
+      #stdout.close()
+      #stdin = os.fdopen(rp, 'r')
+      #bh = b.run(stdin=stdin.read())
+      #stdin.close()
+      #for i in bh.stdout:
+        #print(i)
+
+      #for i in  self.flankdb.refs:
+        ##reblast for flank overlap
+        ##1. make flank db
+        ##2. if n
+        #for j in self.flankdb.refs[i]:
+          #print(i, j)
+        #print("----------")
+      ##for i in contigs:
       #  if i in self.flankdb.refs:
       #    print("Contig {0}: extending reads: {1}".format(i, len(self.flankdb.refs[i])))
       #    contigs[i].extend(self.assembler, self.flankdb.refs[i])

@@ -39,13 +39,18 @@ class MagicblastFlankParser(magicblast_parser.MagicblastParser):
       else:
         if cols[1].split(':')[1] ==  'rhs':
           if rbeg > contigs[cnt].flank_len - qlen and qend < qlen-10:
-            self.alignments.append(magicblast_alignment.MagicblastAlignment(cols))
+            a = magicblast_alignment.MagicblastAlignment(cols)
+            a.isRhsFlank = True
+            self.alignments.append(a)
             #print("extend right")
         else:
           if rbeg <= 10 and qbeg >= 10:
-            self.alignments.append(magicblast_alignment.MagicblastAlignment(cols))
+            a = magicblast_alignment.MagicblastAlignment(cols)
+            a.isLhsFlank = True
+            self.alignments.append(a)
             #print("extend right")
       #print("======================")
+
 
   def parse(self, src, contigs):
     self.alignments = []
