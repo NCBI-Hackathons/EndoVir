@@ -12,6 +12,7 @@ import pathlib
 sys.path.insert(1, os.path.join(sys.path[0], '../'))
 import lib.blast.magicblast
 import lib.process.process
+import lib.vdbdump.vdbdump
 import lib.sequence.sequence
 import lib.fasta.parser
 
@@ -26,57 +27,64 @@ class VirusContig(lib.sequence.sequence.Sequence):
     self.iteration = 0
     self.lhs = None
     self.rhs = None
+    self.lhs_extensions = {}
+    self.lhs_ext_length = 0
+    self.lhs_ext = None
+    self.rhs_extensions = {}
+    self.rhs_ext_length = 0
+    self.rhs_ext = None
     self.wd = os.path.join(screen_dir, self.name)
     if not os.path.exists(self.wd):
       os.mkdir(self.wd)
 
-    #print(self.src, self.srr, self.flank_len, self.wd)
+  def revcomp_seq(self, seq, beg, end):
+    revcomp_seq = seq.translate(str.maketrans("ACTG", "TGAC"))
+    return revcomp_seq[::-1][beg:end]
 
-  def extend(self, alignments):
-    vdbdump = lib.vdbdump.vdbdump.VdbDump()
-    for i in alignments:
-      print(i)
-    pass
+  def extend(self):
+    #This flank business needs an own class later
+    print(self.name)
+    ext_alns = []
+    if self.lhs_ext != None:
+      ext_alns.append(self.lhs_ext)
+    if self.rhs_ext != None:
+      ext_alns.append(self.rhs_ext)
+    vdb = lib.vdbdump.vdbdump.VdbDump()
+    reads = vdb.rowids_to_reads(self.srr, ext_alns)
+    if self.rhs_ext != None and (self.rhs_ext.qry.sra_rowid in reads):
+      print("RHS: Qry", self.rhs_ext.qry.sra_rowid,
+                        self.rhs_ext.qry.start,
+                        self.rhs_ext.qry.stop,
+                        self.rhs_ext.qry.length,
+                        self.rhs_ext.qry.strand,
+                        "Ref",
+                        self.rhs_ext.ref.start,
+                        self.rhs_ext.ref.stop,
+                        self.rhs_ext.ref.strand)
+      if self.rhs_ext.ref.strand == 1 and self.rhs_ext.qry.strand == 0:
+        print("RHS: Extending {} as revcomp".format(self.rhs_ext.qry.sra_rowid))
+        print(self.revcomp_seq(reads[self.rhs_ext.qry.sra_rowid],
+                                      self.rhs_ext.qry.length-self.rhs_ext.qry.start,
+                                      self.rhs_ext.qry.length))
+        print("Bpoint: contig: {}, read: {}".format(self.rhs_ext.ref.stop+self.rhs_ext.ref.aln_length,
+                                                    self.rhs_ext.qry.length-self.rhs_ext.qry.start))
+      else:
+        print("RHS: Extending {} ".format(self.rhs_ext.qry.sra_rowid))
 
 
-  #def identify_overlaps(self, cols):
-    #qbeg = int(cols[6])
-    #qend = int(cols[7])
-    #rbeg = int(cols[8])
-    #rend = int(cols[9])
-    #qlen = int(cols[15])
-    #if cols[13] == 'minus':    # query is minus, reference is plus
-      #qbeg, qend = qend, qbeg
-    #if cols[14] == 'minus':  # Reference is minus , query is plus
-      #rbeg, rend = rend, rbeg
-    #if self.hasBothFlanks == False:
-        #if rbeg > 10 and rend < self.flank_len - 10:
-          #pass
-        #else:
-          #self.alignments.append(magicblast_alignment.MagicblastAlignment(cols))
-    #else:
-      #if cols[1].split(':')[1] ==  'rhs':
-        #if rbeg > contigs[cnt].flank_len - qlen and qend < qlen-10:
-          #self.alignments.append(magicblast_alignment.MagicblastAlignment(cols))
-          ##print("extend right")
-      #else:
-        #if rbeg <= 10 and qbeg >= 10:
-          #self.alignments.append(magicblast_alignment.MagicblastAlignment(cols))
-          ##print("extend right")
-    ##print("======================")
-
-  #def parse(self, src, contigs):
-    #self.alignments = []
-    #read_count = 0
-    #for i in src:
-      #self.identify_overlaps(i.strip().split('\t'), contigs)
-      ##self.alignments.append(magicblast_alignment.MagicblastAlignment(i.strip().split('\t')))
-      #read_count  += 1
-    #print("Init reads:", read_count)
-    #return self.alignments
-
-  #def bud(self):
-    #self.screen_flanks()
+    if self.lhs_ext != None and (self.lhs_ext.qry.sra_rowid in reads):
+      print("LHS: Qry: ", self.lhs_ext.qry.sra_rowid,
+                          self.lhs_ext.qry.start,
+                          self.lhs_ext.qry.stop,
+                          self.lhs_ext.qry.length,
+                          self.lhs_ext.qry.strand,
+                          "Ref",
+                          self.lhs_ext.ref.start,
+                          self.lhs_ext.ref.stop,
+                          self.lhs_ext.ref.strand)
+      #if self.rhs_ext.ref.strand == 0 and self.rhs_ext.qry.strand == 1:
+       # print("RHS: Extending {} as revcomp".format(self.rhs_ext.qry.sra_rowid))
+    print(reads)
 
   #def update(self, assembly):
     #p = lib.fasta.parser.FastaParser()

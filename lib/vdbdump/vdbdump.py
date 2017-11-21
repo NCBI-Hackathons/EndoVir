@@ -41,3 +41,16 @@ class VdbDump:
       print(cmd)
       vd = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1)
       stream.write(vd.stdout.read().decode())
+
+  def rowids_to_reads(self, srr, alignments):
+    opts = [self.cmd, '--format', 'tab', '-C', 'NAME,READ']
+    batch_size = self.batch_size
+    reads = {}
+    for i in range(0, len(alignments), batch_size):
+      cmd = opts + ['-R', ','.join(str(x.qry.sra_rowid) for x in alignments[i:i+self.batch_size]), srr]
+      print(cmd)
+      vd = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1, universal_newlines=True)
+      for i in vd.stdout:
+        fields = i.strip().split('\t')
+        reads[fields[0]] = fields[1]
+    return reads

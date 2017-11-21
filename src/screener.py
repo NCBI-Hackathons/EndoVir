@@ -56,9 +56,9 @@ class Screener:
       fp = lib.blast.magicblast.magicblast_flank_parser.MagicblastFlankParser()
       alignments = fp.parse(srr_screener.run(self.srr, self.flankdb.path),contigs)
       self.flankdb.demux(alignments)
-      #for i in contigs:
-        #if i in self.flankdb.refs:
-          #contigs[i].extend(self.flankdb.refs[i])
+      for i in contigs:
+        if i in self.flankdb.refs:
+          contigs[i].extend()
       #b = lib.process.process.Process('blastn')
       #b.set_arguments([('-db', self.flankdb.path)])
       #rp, wp = os.pipe()
