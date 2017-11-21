@@ -66,11 +66,16 @@ class VirusContig(lib.sequence.sequence.Sequence):
         print(self.revcomp_seq(reads[self.rhs_ext.qry.sra_rowid],
                                       self.rhs_ext.qry.length-self.rhs_ext.qry.start,
                                       self.rhs_ext.qry.length))
-        print("Bpoint: contig: {}, read: {}".format(self.rhs_ext.ref.stop+self.rhs_ext.ref.aln_length,
+        print("Bpoint: contig: {}, read: {}".format(self.name,
+                                                    self.rhs_ext.ref.stop+self.rhs_ext.ref.aln_length,
                                                     self.rhs_ext.qry.length-self.rhs_ext.qry.start))
       else:
         print("RHS: Extending {} ".format(self.rhs_ext.qry.sra_rowid))
-
+        print(reads[self.rhs_ext.qry.sra_rowid][self.rhs_ext.qry.stop:])
+        print("Bpoint: contig {}: {}, read {}: {}".format(self.name,
+                                                          self.rhs_ext.ref.stop,
+                                                          self.rhs_ext.qry.sra_rowid,
+                                                          self.rhs_ext.qry.stop))
 
     if self.lhs_ext != None and (self.lhs_ext.qry.sra_rowid in reads):
       print("LHS: Qry: ", self.lhs_ext.qry.sra_rowid,
