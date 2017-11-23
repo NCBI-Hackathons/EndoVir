@@ -22,7 +22,7 @@ class BlastHit:
     self.title = title
     self.length = length
     self.num = hitnum
-    self.hid = hashlib.md5(title.encode()).hexdigest()
+    self.hid = hashlib.md5((title+accession).encode()).hexdigest()
     self.intervals = itree.Itree(interval.Interval(0, length, "Hit"+str(0))) # interval trees at some point, (see [0])?
 
 

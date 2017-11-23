@@ -13,11 +13,41 @@ sys.path.insert(1, os.path.join(sys.path[0], '../'))
 import lib.blast.magicblast.magicblast
 import lib.blast.magicblast.magicblast_parser
 import lib.blast.magicblast.magicblast_flank_parser
+import lib.blast.blastn.blastn
 import lib.megahit.megahit
 import lib.blast.rps.rpstblastn
 import lib.vdbdump.vdbdump
 import lib.process.process
 import flankdb
+import flank_chk
+class NamePipe:
+
+  def __init__(self, name):
+    self.path = name + '.pipe'
+    self.fhread = None
+    self.fhwrite = None
+
+  def create(self):
+    os.mkfifo(self.path)
+    print("Created pipe")
+
+  def open_write(self):
+    self.fhwrite = open(self.path, 'w')
+
+  def write(self, data):
+    self.fhwrite.write(data)
+
+  def close_write(self):
+    self.fhwrite.close()
+
+  def open_read(self):
+    self.fhread = open(self.path, 'r', 0)
+
+  def close_read(self):
+    self.fhread.close()
+
+  def remove(self):
+    os.unlink(self.name)
 
 class Screener:
 
@@ -51,40 +81,26 @@ class Screener:
 
   def bud(self, contigs):
     while True:
+      efp = NamePipe('extflank')
       self.flankdb.mux(contigs)
       srr_screener = lib.blast.magicblast.magicblast.Magicblast()
       fp = lib.blast.magicblast.magicblast_flank_parser.MagicblastFlankParser()
       alignments = fp.parse(srr_screener.run(self.srr, self.flankdb.path),contigs)
       self.flankdb.demux(alignments)
+      rfd, wfd = os.pipe()
+      stdout = os.fdopen(wfd, 'w')
       for i in contigs:
         if i in self.flankdb.refs:
-          contigs[i].extend()
-      #b = lib.process.process.Process('blastn')
-      #b.set_arguments([('-db', self.flankdb.path)])
-      #rp, wp = os.pipe()
-      #stdout = os.fdopen(wp, 'w')
-      #vp = self.vdbdump.dump_to_stream(self.srr, alignments, stdout)
-      #stdout.close()
-      #stdin = os.fdopen(rp, 'r')
-      #bh = b.run(stdin=stdin.read())
-      #stdin.close()
-      #for i in bh.stdout:
-        #print(i)
-
-      #for i in  self.flankdb.refs:
-        ##reblast for flank overlap
-        ##1. make flank db
-        ##2. if n
-        #for j in self.flankdb.refs[i]:
-          #print(i, j)
-        #print("----------")
-      ##for i in contigs:
-      #  if i in self.flankdb.refs:
-      #    print("Contig {0}: extending reads: {1}".format(i, len(self.flankdb.refs[i])))
-      #    contigs[i].extend(self.assembler, self.flankdb.refs[i])
-        #contigs[i].iteration += 1
-        #return
+          contigs[i].extend(stdout)
+      stdout.close()
+      stdin = os.fdopen(rfd, 'r')
+      self.check_flank_overlaps(self.flankdb.path, stdin, contigs)
+      stdin.close()
       sys.exit()
 
-  def check_contig_overlaps(self):
-    pass
+  def check_flank_overlaps(self, flank_db, stdin, contigs):
+    blastn = lib.blast.blastn.blastn.BlastN()
+    ph = blastn.run(flank_db, stdin)
+    fc = flank_chk.FlankChecker()
+    fc.parse(ph.stdout)
+    fc.check(contigs)

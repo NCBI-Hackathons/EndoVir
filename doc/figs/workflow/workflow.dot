@@ -1,0 +1,50 @@
+digraph {
+  node [shape=diamond]; "sra"; "refseq"; // databases
+  node [shape=circle]; "contigs"; "extended_flanks";  // data/output
+  node [shape=box]; "mapper"; "assembler"; "domain_screen";  // tools
+  {node [label="mapper"] mapper; budmapper;}
+  {node [label="domain_screener"] domain_screenn; domain_screen;}
+  rankdir="LR"
+  splines="ortho";
+  sra -> mapper;
+  refseq -> mapper;
+  sra -> budmapper;
+  domain_screen -> contigs;
+  subgraph cluster0
+  {
+    label="Init";
+    mapper -> assembler;
+    assembler -> domain_screen;
+  }
+
+  subgraph cluster1
+  {
+    label="DBs";
+    sra;
+    refseq;
+  }
+
+  subgraph cluster2
+  {
+    label="BUD";
+    domain_screenn -> contigs;
+    contigs -> ExtractFlanks;
+    annealer -> contigs;
+    flank_extender -> extended_flanks;
+    extended_flanks -> overlap_checker;
+    subgraph cluster3
+    {
+      label="Flank screener";
+      ExtractFlanks -> budmapper;
+      budmapper -> flank_extender;
+    }
+    subgraph cluster4
+    {
+      label="Check flanks";
+      overlap_checker -> extender;
+      extender -> domain_screenn;
+      overlap_checker -> annealer;
+
+    }
+  }
+}

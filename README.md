@@ -22,6 +22,8 @@ between the external tools, thereby reducing the usage of intermediate files as
 much as possible. In addition, only the Python standard libraries should be
 used.
 
+## Diagram
+![Endovir diagram](doc/figs/workflow.small.png)
 ## Pipeline approach
 
 The pipline has three major steps (in `src`):

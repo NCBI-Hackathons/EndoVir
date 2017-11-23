@@ -9,7 +9,7 @@ import os
 import sys
 
 sys.path.insert(1, os.path.join(sys.path[0], '../../'))
-import lib.fasta.sequence
+import lib.sequence
 import lib.blast.blastdb.database
 
 
@@ -39,11 +39,11 @@ class FlankDb(lib.blast.blastdb.makeblastdb.Makeblastdb):
 
   def extract_contig_flanks(self, contig):
     if contig.length <= contig.flank_len:
-      contig.lhs = self.name+":lhs"
-      return ">{}\n{}\n".format(contig.name+":lhs", contig.subseq(0, contig.length))
+      contig.lhs = lib.sequence.sequence.Sequence(self.name+":lhs", contig.subseq(0, contig.length))
+      return ">{}\n{}\n".format(contig.lhs.name, contig.lhs.sequence)
     else:
-      contig.lhs = contig.name+":lhs"
-      contig.rhs = contig.name+":rhs"
-      return ">{}\n{}\n>{}\n{}\n".format(contig.name+":lhs", contig.subseq(0, contig.flank_len),
-                                         contig.name+":rhs", contig.subseq(contig.length-contig.flank_len,
+      contig.lhs = lib.sequence.sequence.Sequence(contig.name+":lhs", contig.subseq(0, contig.flank_len))
+      contig.rhs = lib.sequence.sequence.Sequence(contig.name+":rhs", contig.subseq(contig.length-contig.flank_len,
                                                              contig.flank_len))
+      return ">{}\n{}\n>{}\n{}\n".format(contig.lhs.name, contig.lhs.sequence,
+                                         contig.rhs.name, contig.rhs.sequence)

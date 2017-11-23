@@ -81,8 +81,6 @@ class Endovir:
 def main():
   srrs = ['SRR5150787']
   #srrs = ['SRR5832142']
-  #p = read_pool.ReadPool('SRR5150787')
-  #p.init()
   ev = Endovir(wd='analysis')
   ev.setup()
   ev.screen(srrs)

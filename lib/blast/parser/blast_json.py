@@ -28,10 +28,6 @@ class BlastParser:
     self.edges = {}
     self.hsp_count = 0
 
-##process = subprocess.Popen(args, stdout=subprocess.PIPE)
-#samfile = pysam.Samfile("/dev/fd/%d" % process.stdout.fileno(), "rb")
-# or fifo
-
   def parse(self, stdin):
     blast_result = json.load(stdin)
     for i in blast_result['BlastOutput2']:
@@ -48,6 +44,7 @@ class BlastParser:
 
   def add_hits(self, hits, bl_query):
     for i in hits:
+      print(i)
       bl_hit = self.add_hit(hit.BlastHit(i['description'][0]['id'],
                                          i['description'][0]['accession'],
                                          i['description'][0]['title'],
@@ -75,6 +72,7 @@ class BlastParser:
     return self.querymap[query.qid]
 
   def add_hit(self, hit):
+    print(hit.hid)
     if hit.hid not in self.hitmap:
       self.hitmap[hit.hid] = hit
     return self.hitmap[hit.hid]

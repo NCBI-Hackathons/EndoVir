@@ -28,7 +28,7 @@ class VdbDump:
     parser.reset()
     for i in range(0, len(alignments), batch_size):
       cmd = opts + ['-R', ','.join(str(x.qry.sra_rowid) for x in alignments[i:i+self.batch_size]), srr]
-      print(cmd)
+      print(cmd, file=sys.stderr)
       vd = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1)
       parser.parse(vd.stdout, alignments[i:i+batch_size])
     return parser
@@ -38,7 +38,7 @@ class VdbDump:
     batch_size = self.batch_size
     for i in range(0, len(alignments), batch_size):
       cmd = opts + ['-R', ','.join(str(x.qry.sra_rowid) for x in alignments[i:i+self.batch_size]), srr]
-      print(cmd)
+      print(cmd, file=sys.stderr)
       vd = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1)
       stream.write(vd.stdout.read().decode())
 
@@ -48,7 +48,7 @@ class VdbDump:
     reads = {}
     for i in range(0, len(alignments), batch_size):
       cmd = opts + ['-R', ','.join(str(x.qry.sra_rowid) for x in alignments[i:i+self.batch_size]), srr]
-      print(cmd)
+      print(cmd, file=sys.stderr)
       vd = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1, universal_newlines=True)
       for i in vd.stdout:
         fields = i.strip().split('\t')

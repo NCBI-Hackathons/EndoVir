@@ -66,7 +66,7 @@ class MagicblastFlankParser(magicblast_parser.MagicblastParser):
     self.alignments = []
     read_count = 0
     for i in src:
-      print(i)
+      #print(i)
       self.identify_overlaps(i.strip().split('\t'), contigs)
       read_count  += 1
     print("Overlapping reads: {}/{}".format(len(self.alignments), read_count))
