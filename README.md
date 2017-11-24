@@ -11,6 +11,19 @@ the same SRA to extend the initial sequence until non-virus sequences/domians ar
 encountered. This inidicates that either en exogenous virts has been identified
 or an endogenosu virus within a the host genome.
 
+
+### Preparation
+Prepare work enviroment:
+ - `git clone https://github.com/NCBI-Hackathons/EndoVir.git`
+ - `cd Endovir`
+ - `mkdir -p work/analysis/dbs`
+ - `cd work/analysis/dbs`
+ - `wget ftp://ftp.ncbi.nlm.nih.gov/pub/mmdb/cdd/little_endian/Cdd_LE.tar.gz`
+ - `tar -xzvf Cdd_LE.tar.gz`
+
+### Run
+Change into your working directory `work`
+ - `python3.6 ../src/endovir.py`
 ### Design
 The underlying design of `endovir` will facilitate the use of external tools, e.g.
 assemblers or parser, without changing the BUD routine itself. Further, the

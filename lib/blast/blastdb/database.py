@@ -9,7 +9,8 @@ import os
 import sys
 import gzip
 import subprocess
-#import ftplib
+import tarfile
+import urllib.request
 
 from . import blastdbcmd
 
@@ -53,4 +54,20 @@ class BlastDatabase:
       self.make_db(src, self.title)
 
   def fetch_db(self, src, title):
-    print("DB fetch placeholder for {0} to make db {1}".format(src, title))
+    print("Fetching database {} from {}".format(title, src))
+
+    db = open(self.path, 'w')
+    for i in src:
+      dbgz = open('dbgz', 'wb')
+      response = urllib.request.urlopen(i)
+      dbgz.write(response.read())
+      dbgz.close()
+      print("lalallala")
+      if title == 'cdd':
+        t = tarfile.Tarfile('dbgz')
+        t.extractall(self.dbdir)
+      else:
+        f = gzip.open('dbgz.gz', 'rb')
+        db.write(f.read().decode())
+    db.close()
+    #print("DB fetch placeholder for {0} to make db {1}".format(src, title))
