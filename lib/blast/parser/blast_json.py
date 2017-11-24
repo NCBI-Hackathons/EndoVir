@@ -44,7 +44,6 @@ class BlastParser:
 
   def add_hits(self, hits, bl_query):
     for i in hits:
-      print(i)
       bl_hit = self.add_hit(hit.BlastHit(i['description'][0]['id'],
                                          i['description'][0]['accession'],
                                          i['description'][0]['title'],

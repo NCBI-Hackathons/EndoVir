@@ -19,6 +19,7 @@ class FlankChecker(lib.blast.parser.blast_json.BlastParser):
     super().__init__()
 
   def check(self, contigs):
+    print(contigs)
     for i in self.hitmap:
       print(i, self.hitmap[i].accession)
     for i in self.hspmap:
