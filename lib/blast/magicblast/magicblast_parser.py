@@ -17,5 +17,6 @@ class MagicblastParser:
   def parse(self, src):
     self.alignments = []
     for i in src:
-      cols = i.strip().split('\t')
-      self.alignments.append(magicblast_alignment.MagicblastAlignment(i.strip().split('\t')))
+      if i[0] != '#':
+        cols = i.strip().split('\t')
+        self.alignments.append(magicblast_alignment.MagicblastAlignment(i.strip().split('\t')))

@@ -40,6 +40,7 @@ class MagicblastAlignment:
         self.aln_length *= -1
 
   def __init__(self, cols):
+    print(cols)
     self.qry = self.Query(cols[0], cols[6], cols[7], cols[13], cols[15])
     self.ref = self.Reference(cols[1], cols[8], cols[9], cols[14])
 
