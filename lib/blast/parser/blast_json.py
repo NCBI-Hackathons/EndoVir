@@ -71,7 +71,6 @@ class BlastParser:
     return self.querymap[query.qid]
 
   def add_hit(self, hit):
-    print(hit.hid)
     if hit.hid not in self.hitmap:
       self.hitmap[hit.hid] = hit
     return self.hitmap[hit.hid]

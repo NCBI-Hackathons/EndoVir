@@ -12,8 +12,8 @@ encountered. This inidicates that either en exogenous virts has been identified
 or an endogenosu virus within a the host genome.
 
 
-### Preparation
-Prepare work enviroment:
+### Setup
+Setup analysis enviroment:
  - `git clone https://github.com/NCBI-Hackathons/EndoVir.git`
  - `cd Endovir`
  - `mkdir -p work/analysis/dbs`
@@ -21,9 +21,17 @@ Prepare work enviroment:
  - `wget ftp://ftp.ncbi.nlm.nih.gov/pub/mmdb/cdd/little_endian/Cdd_LE.tar.gz`
  - `tar -xzvf Cdd_LE.tar.gz`
 
+#### Install external tools:
+All external tools have to be currentlyin `$PATH`. Please see the corresponding
+README files for installation instructions.
+  - [MagicBLAST 1.3.0](ftp://ftp.ncbi.nlm.nih.gov/blast/executables/magicblast)
+  - [sra-toolkit](https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software)
+  - [MEGAHIT](https://github.com/voutcn/megahit)
+
 ### Run
 Change into your working directory `work`
  - `python3.6 ../src/endovir.py`
+
 ### Design
 The underlying design of `endovir` will facilitate the use of external tools, e.g.
 assemblers or parser, without changing the BUD routine itself. Further, the

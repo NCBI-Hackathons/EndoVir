@@ -23,4 +23,11 @@ class FlankChecker(lib.blast.parser.blast_json.BlastParser):
     for i in self.hitmap:
       print(i, self.hitmap[i].accession)
     for i in self.hspmap:
-      print(i, self.hspmap[i].query.title, self.hspmap[i].hit.accession)
+      if  self.hspmap[i].query.title[:5] != self.hspmap[i].hit.accession[:5]:
+        print(i, self.hspmap[i].query.title, self.hspmap[i].hit.accession,
+              self.hspmap[i].score, self.hspmap[i].positive, self.hspmap[i].alength,
+                self.hspmap[i].identity, self.hspmap[i].query_from,
+                self.hspmap[i].query_to, self.hspmap[i].hit_from, self.hspmap[i].hit_to,
+                self.hspmap[i].query_strand, self.hspmap[i].hit_strand)
+
+#  1 Expanding BLAST parser to compare alignment directions
