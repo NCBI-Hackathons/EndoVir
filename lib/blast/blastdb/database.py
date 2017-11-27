@@ -63,7 +63,6 @@ class BlastDatabase:
       response = urllib.request.urlopen(i)
       dbgz.write(response.read())
       dbgz.close()
-      print("lalallala")
       f = gzip.open('dbgz', 'rb')
       db.write(f.read().decode())
       os.unlink('dbgz')

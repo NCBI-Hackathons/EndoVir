@@ -40,8 +40,8 @@ class VirusContig(lib.sequence.sequence.Sequence):
       os.mkdir(self.wd)
 
   def revcomp_seq(self, seq, beg, end):
-    revcomp_seq = seq.translate(str.maketrans("ACTG", "TGAC"))
-    return revcomp_seq[::-1][beg:end]
+    revcomp_seq = seq[beg:end+1][::-1]
+    return revcomp_seq.translate(str.maketrans("ACTG", "TGAC"))
 
   def extend(self, stdout):
     #This flank business needs an own class later
@@ -61,19 +61,22 @@ class VirusContig(lib.sequence.sequence.Sequence):
       bpoint_r = 0
       if self.rhs_ext.ref.strand == 1 and self.rhs_ext.qry.strand == 0:
         isRevComp = True
+        bpoint_f = self.rhs_ext.ref.stop + self.rhs_ext.ref.aln_length + 1
+        bpoint_r = self.rhs_ext.qry.length - self.rhs_ext.qry.start + 1
         extseq = self.revcomp_seq(reads[self.rhs_ext.qry.sra_rowid],
-                                  self.rhs_ext.qry.length-self.rhs_ext.qry.start+1,
+                                  bpoint_r,
                                   self.rhs_ext.qry.length)
-        stdout.write(self.anneal_extension('rhs', self.revcomp_seq(reads[self.rhs_ext.qry.sra_rowid],
-                                     self.rhs_ext.qry.length-self.rhs_ext.qry.start+1,
+        stdout.write(self.anneal_extension('rhs', self.revcomp_seq(
+                                     reads[self.rhs_ext.qry.sra_rowid],
+                                     bpoint_r,
                                      self.rhs_ext.qry.length)))
-        bpoint_f = self.rhs_ext.ref.stop + self.rhs_ext.ref.aln_length+1
-        bpoint_r = self.rhs_ext.qry.length-self.rhs_ext.qry.start + 1
+
       else:
-        extseq = reads[self.rhs_ext.qry.sra_rowid][self.rhs_ext.qry.stop+1:]
-        stdout.write(self.anneal_extension('rhs', reads[self.rhs_ext.qry.sra_rowid][self.rhs_ext.qry.stop+1:]))
         bpoint_f = self.rhs_ext.ref.stop + 1
         bpoint_r = self.rhs_ext.qry.stop + 1
+        extseq = reads[self.rhs_ext.qry.sra_rowid][bpoint_r:]
+        stdout.write(self.anneal_extension('rhs',
+                     reads[self.rhs_ext.qry.sra_rowid][bpoint_r:]))
       print("\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}".format(self.name,
                                                       'rhs',
                                                       bpoint_f,
@@ -88,21 +91,23 @@ class VirusContig(lib.sequence.sequence.Sequence):
       bpoint_f = 0
       bpoint_r = 0
       if self.lhs_ext.ref.strand == 0 and self.lhs_ext.qry.strand == 1:
-        isRevComp = True
         print("DOUBLE CHECK THIS")
+        isRevComp = True
+        bpoint_f = self.lhs_ext.ref.start - 1
+        bpoint_r = self.rhs_ext.qry.length - self.rhs_ext.qry.start - 1
         extseq = self.revcomp_seq(reads[self.lhs_ext.qry.sra_rowid],
-                                  self.lhs_ext.qry.length-self.rhs_ext.qry.end+1,
-                                  self.lhs_ext.qry.length)
-        stdout.write(self.anneal_extension('lhs', self.revcomp_seq(reads[self.lhs_ext.qry.sra_rowid],
-                                                      self.lhs_ext.qry.length-self.rhs_ext.qry.end+1,
+                                  bpoint_r,   self.lhs_ext.qry.length)
+        stdout.write(self.anneal_extension('lhs', self.revcomp_seq(
+                                                      reads[self.lhs_ext.qry.sra_rowid],
+                                                      bpoint_r,
                                                       self.lhs_ext.qry.length)))
-        bpoint_f = self.lhs_ext.ref.start - 1
-        bpoint_r = self.lhs_ext.qry.start - 1
+
       else:
-        extseq = reads[self.lhs_ext.qry.sra_rowid][:self.lhs_ext.qry.start-1]
-        stdout.write(self.anneal_extension('lhs', reads[self.lhs_ext.qry.sra_rowid][:self.lhs_ext.qry.start-1]))
-        bpoint_f = self.lhs_ext.ref.start - 1
-        bpoint_r = self.lhs_ext.qry.start - 1
+        bpoint_f = self.lhs_ext.ref.start
+        bpoint_r = self.lhs_ext.qry.start-1
+        extseq = reads[self.lhs_ext.qry.sra_rowid][:bpoint_r]
+        stdout.write(self.anneal_extension('lhs', reads[self.lhs_ext.qry.sra_rowid][:bpoint_r]))
+
       print("\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}".format(self.name,
                                                       'lhs',
                                                       bpoint_f,
@@ -113,24 +118,16 @@ class VirusContig(lib.sequence.sequence.Sequence):
                                                       extseq))
   def anneal_extension(self, flank, extseq):
     if flank == 'lhs':
-      #self.lhs_ext_seq = lib.sequence.sequence.Sequence("ctg_{}_{}".format(self.name, flank),
-                                                    #extseq + self.lhs.sequence)
-      return ">{}_{}_ext\n{}\n".format(self.name, flank, extseq+self.lhs.sequence)
-      #print(self.lhs_ext_seq.name, self.lhs_ext_seq.sequence)
+      self.lhs_ext_seq = lib.sequence.sequence.Sequence("{}:{}_ext".format(self.name, flank),
+                                                    extseq+self.lhs.sequence)
+      return ">{}\n{}\n".format(self.lhs_ext_seq.name, self.lhs_ext_seq.sequence)
     if flank == 'rhs':
-      #self.rhs_ext_seq = lib.sequence.sequence.Sequence("ctg_{}_{}".format(self.name, flank),
-       #                                             self.rhs.sequence + extseq)
-      #print(self.rhs_ext_seq.name, self.rhs_ext_seq.sequence)
-      return ">{}_{}_ext\n{}\n".format(self.name, flank, extseq+self.rhs.sequence)
+      self.rhs_ext_seq = lib.sequence.sequence.Sequence("{}:{}_ext".format(self.name, flank),
+                                                    self.rhs.sequence+extseq)
+      return ">{}\n{}\n".format(self.rhs_ext_seq.name, self.rhs_ext_seq.sequence)
 
-  #def update(self, assembly):
-    #p = lib.fasta.parser.FastaParser()
-    #p.parse(assembly)
-    #for i in p.sequences:
-      #self.sequence = p.sequences[i].sequence
-      #self.length = len(self.sequence)
-      #print("Update Iteration {0}:\nContig: {1}\tlen:{2}".format(self.iteration, self.name, self.length))
-
+  def update_rhs(self, ext_ctg):
+    pass
   #def asses(self, assembly):
     #print("Asses Iteration {0}:\nContig: {1}\tlen:{2}".format(self.iteration, self.name, self.length))
     #self.update(assembly)

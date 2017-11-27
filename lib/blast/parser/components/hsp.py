@@ -23,6 +23,8 @@ class Hsp:
     self.hit_to = int(blast_hsp.get('hit_to', 0)) - 1
     self.query_from = int(blast_hsp.get('query_from', 0)) - 1
     self.query_to = int(blast_hsp.get('query_to', 0)) - 1
+    self.hseq = blast_hsp.get('hseq')
+    self.qseq = blast_hsp.get('qseq')
     self.hid = count
     self.query = query
     self.hit = hit

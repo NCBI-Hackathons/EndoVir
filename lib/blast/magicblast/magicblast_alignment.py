@@ -15,8 +15,8 @@ class MagicblastAlignment:
       self.name = name
       self.length = int(qlen)
       self.sra_rowid = name.split('.')[1]
-      self.start = int(start)
-      self.stop  = int(stop)
+      self.start = int(start) - 1
+      self.stop  = int(stop) - 1
       if strand == 'plus':
         self.strand = 0
       else:
@@ -29,8 +29,8 @@ class MagicblastAlignment:
 
     def __init__(self, name, start, stop, strand):
       self.name = name
-      self.start = int(start)
-      self.stop  = int(stop)
+      self.start = int(start) - 1
+      self.stop  = int(stop) - 1
       if strand == 'plus':
         self.strand = 0
       else:

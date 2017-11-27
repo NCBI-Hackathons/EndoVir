@@ -18,7 +18,7 @@ class Magicblast:
 
   def __init__(self, path='magicblast'):
     self.path = path
-    self.num_threads = 2
+    self.num_threads = 4
     self.outfmt = 'tabular'
     self.out = 'magicblast_out'
     self.word_size = 20
