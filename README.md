@@ -49,7 +49,7 @@ README files for installation instructions.
 
 ### Run
 Change into your working directory `work`
- - `cd ../../work`
+ - `cd $ENDOVIR/work`
  - `python3.6 ../src/endovir.py`
 
 ### Design
