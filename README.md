@@ -43,9 +43,12 @@ README files for installation instructions.
   - [SOAPdenovo]
   - [SPADES]*
     source ~/.bashrc
+   
+   
 
 ### Run
 Change into your working directory `work`
+ - `cd ../../work`
  - `python3.6 ../src/endovir.py`
 
 ### Design
