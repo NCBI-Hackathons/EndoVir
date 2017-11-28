@@ -81,9 +81,13 @@ class Endovir:
 
 def main():
   srrs = ['SRR5150787']
+  testdir = 'analysis'
   #srrs = ['SRR5832142']
-  ev = Endovir(wd='analysis')
+  print("Running test in {} using {}".format(testdir, srrs[0]), file=sys.stderr)
+  ev = Endovir(wd=testdir)
+  print("Checking databases", file=sys.stderr)
   ev.setup()
+  print("Starting screen", file=sys.stderr)
   ev.screen(srrs)
   return 0
 
