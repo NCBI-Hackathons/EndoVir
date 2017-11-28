@@ -61,7 +61,7 @@ class FlankChecker(lib.blast.parser.blast_json.BlastParser):
 
   def merge_lhs(self, qry, qry_break, hit, hit_break):
     lhs_ext = qry.rhs_ext_seq.sequence[:qry_break] + hit.sequence[hit_break:]
-    print(rhs_ext)
+    #print(rhs_ext)
 
   def update_rhs(self, ctg):
     pass

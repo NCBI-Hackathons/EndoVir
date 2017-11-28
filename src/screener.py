@@ -83,6 +83,7 @@ class Screener:
   def bud(self, contigs):
     while True:
       efp = NamePipe('extflank')
+      time.sleep(1) # lmem06 test: time to get the pipe working.
       self.flankdb.mux(contigs)
       srr_screener = lib.blast.magicblast.magicblast.Magicblast()
       fp = lib.blast.magicblast.magicblast_flank_parser.MagicblastFlankParser()
