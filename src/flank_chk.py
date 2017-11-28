@@ -46,7 +46,7 @@ class FlankChecker(lib.blast.parser.blast_json.BlastParser):
         elif qry_loc == hit_loc:
           raise NotImplementedError("Posiblle diff ori not implemented. Same flank from two contigs overlap.")
         else:
-          if qry_loc == 'rhs'
+          if qry_loc == 'rhs':
             self.merge_rhs(contigs[qry_ctg], self.hspmap[i].query_to,
                            contigs[hit_ctg], self.hspmap[i].hit_from)
           else:
