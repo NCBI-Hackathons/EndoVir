@@ -82,9 +82,9 @@ class Screener:
 
   def bud(self, contigs):
     while True:
-      efp = NamePipe('extflank')
       time.sleep(1) # lmem06 test: time to get the pipe working.
-      self.flankdb.mux(contigs)
+      while self.flankdb.mux(contigs) != True:
+        time.sleep(0.01)
       srr_screener = lib.blast.magicblast.magicblast.Magicblast()
       fp = lib.blast.magicblast.magicblast_flank_parser.MagicblastFlankParser()
       alignments = fp.parse(srr_screener.run(self.srr, self.flankdb.path),contigs)

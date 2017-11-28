@@ -30,6 +30,7 @@ class FlankDb(lib.blast.blastdb.makeblastdb.Makeblastdb):
     stdin = os.fdopen(rfd, 'r')
     self.make_db_stdin(stdin)
     stdin.close()
+    return True
 
   def demux(self, alignments):
     for i in alignments:
