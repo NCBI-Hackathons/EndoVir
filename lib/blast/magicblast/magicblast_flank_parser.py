@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-#
 #  magicblast_flank_parser.py
 #
 #  Author: Jan Piotr Buchmann <jan.buchmann@sydney.edu.au>
@@ -8,67 +5,60 @@
 #
 #  Version: 0.0
 
-
-import sys
 from . import magicblast_parser
 from . import magicblast_alignment
 
 class MagicblastFlankParser(magicblast_parser.MagicblastParser):
 
-  def __init__(self):
+  def __init__(self, flankmap):
     super().__init__()
-    self.results = None
+    self.flankmap = flankmap
+    self.overlaps = {}
 
-  def identify_overlaps(self, cols, contigs):
-    qbeg = int(cols[6])
-    qend = int(cols[7])
-    rbeg = int(cols[8])
-    rend = int(cols[9])
-    qlen = int(cols[15])
-    if cols[13] == 'minus':    # query is minus (rt), reference is plus
-      qbeg, qend = qend, qbeg
-    if cols[14] == 'minus':  # Reference is minus (rt) , query is plus
-      rbeg, rend = rend, rbeg
-    cnt = cols[1].split(':')[0]
-    if cnt in contigs:
-      if contigs[cnt].rhs == None:
-        if rbeg > 10 and rend < self.flank_len - 10:
-          pass # skip nested read mappings
-        else:
-          a = magicblast_alignment.MagicblastAlignment(cols)
-          contigs[cnt].lhs_extensions[a.sra_rowid] = 0
-          self.alignments.append(a)
-      else:
-        if cols[1].split(':')[1] ==  'rhs':
-          if rbeg > contigs[cnt].flank_len - qlen and qend < qlen-10:
-            a = magicblast_alignment.MagicblastAlignment(cols)
-            a.isRhsFlank = True
-            if rbeg + qlen > contigs[cnt].rhs_ext_length:
-              contigs[cnt].rhs_ext_length = rbeg + qlen
-              contigs[cnt].rhs_ext = a
-            contigs[cnt].rhs_extensions[a.qry.sra_rowid]= 0
-            self.alignments.append(a)
-            #print("extend right")
-        else:
-          if rbeg <= 10 and qbeg >= 10:
-            a = magicblast_alignment.MagicblastAlignment(cols)
-            a.isLhsFlank = True
-            if rbeg + qlen > contigs[cnt].lhs_ext_length:
-              contigs[cnt].lhs_ext_length = rbeg + qlen
-              contigs[cnt].lhs_ext = a
-            contigs[cnt].lhs_extensions[a.qry.sra_rowid] = 0
-            self.alignments.append(a)
-            #print("extend right")
-      #print("======================")
+  """
+    This is a  weak test considering partial mappings onto the flank
+  """
+  def check_single_overlap(self, flank, alignment):
+    if alignment.qry.get_ordered_coords()[0] < 1:
+      if flank.update_extension(alignment):
+        self.overlaps[flank.name] = alignment
+        #print("{}: LHS Overlap {} :: Len: {}".format(flank.name,
+                                                     #flank.overlap.rowid,
+                                                     #flank.overlap.length))
 
+    if alignment.qry.get_ordered_coords()[1] < alignment.qry.length:
+      if flank.update_extension(alignment):
+        self.overlaps[flank.name] = alignment
+        #print("{}: RHS Overlap {} :: Len: {}".format(flank.name,
+                                                     #flank.overlap.rowid,
+                                                     #flank.overlap.length))
+
+  def identify_overlaps(self, cols, flank):
+    a = magicblast_alignment.MagicblastAlignment(cols)
+    #print("Aligned:", a.ref.name, a.qry.name, a.qry.aln_length, a.qry.aln_length, flank.contig.hasRhsFlank)
+    #print("Qry\t{}\t{}\t{}\t{}".format(a.qry.start, a.qry.stop, a.qry.strand, a.qry.length))
+    #print("Ref\t{}\t{}\t{}".format(a.ref.start, a.ref.stop, a.ref.strand))
+    if not flank.contig.hasRhsFlank:
+      if flank.name not in self.extensions:
+        self.overlaps[flank.name] = None
+      self.check_single_overlap(flank, a)
+    else:
+      if flank.has_overlap(a):
+        self.overlaps[flank.name] = a
 
   def parse(self, src, contigs):
-    self.alignments = []
+    alignments = []
     read_count = 0
     for i in src:
-      #print(i)
+      #print(i.rstrip())
       if i[0] != '#':
-        self.identify_overlaps(i.strip().split('\t'), contigs)
-        read_count  += 1
-    print("Overlapping reads: {}/{}".format(len(self.alignments), read_count))
-    return self.alignments
+        cols = i.strip().split('\t')
+        if cols[1] in self.flankmap:
+          if self.flankmap[cols[1]].contig.name in contigs:
+            self.identify_overlaps(cols, self.flankmap[cols[1]])
+        read_count += 1
+    for i in self.overlaps:
+      print(i, self.overlaps[i].qry.sra_rowid)
+      alignments.append(self.overlaps[i])
+    print("Overlapping reads: {}/{}".format(len(alignments), read_count))
+    return alignments

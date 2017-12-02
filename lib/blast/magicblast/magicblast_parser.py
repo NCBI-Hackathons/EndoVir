@@ -6,8 +6,7 @@
 #  Version: 0.0
 
 
-import sys
-from . import magicblast_alignment
+from .import magicblast_alignment
 
 class MagicblastParser:
 
@@ -18,5 +17,4 @@ class MagicblastParser:
     self.alignments = []
     for i in src:
       if i[0] != '#':
-        cols = i.strip().split('\t')
         self.alignments.append(magicblast_alignment.MagicblastAlignment(i.strip().split('\t')))

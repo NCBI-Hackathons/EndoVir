@@ -32,6 +32,7 @@ digraph {
     annealer -> contigs;
     flank_extender -> extended_flanks;
     extended_flanks -> overlap_checker;
+
     subgraph cluster3
     {
       label="Flank screener";

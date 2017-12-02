@@ -20,13 +20,11 @@ class Magicblast:
     self.path = path
     self.num_threads = 4
     self.outfmt = 'tabular'
-    self.out = 'magicblast_out'
-    self.word_size = 20
-    self.perc_identity = 60
 
   def run(self, srr, db):
     cmd = [self.path, '-db',  db,
                       '-sra', srr,
+                      '-no_unaligned',
                       '-num_threads', str(self.num_threads),
                       '-outfmt', self.outfmt]
     print(cmd)

@@ -11,10 +11,10 @@
 import os
 import sys
 import argparse
+
 sys.path.insert(1, os.path.join(sys.path[0], '../'))
 import lib.blast.blastdb.makeblastdb
 import lib.blast.blastdb.makeprofiledb
-
 
 import screener
 import virus_contig
@@ -23,22 +23,22 @@ class Endovir:
 
   def __init__(self, wd=None):
     self.analysis_path = ''
-    self.dbs_path =  ''
-    self.wd = os.getcwd() if wd == None else wd
+    self.dbs_path = ''
+    self.wd = os.getcwd() if wd is None else wd
     self.screens = {}
     self.flank_len = 500
     self.dbs_dirname = 'dbs'
     self.db_sources = {
       'virusdb' : {'src' : ['ftp://ftp.ncbi.nlm.nih.gov/refseq/release/viral/viral.1.1.genomic.fna.gz',
                             'ftp://ftp.ncbi.nlm.nih.gov/refseq/release/viral/viral.2.1.genomic.fna.gz'],
-                      'db'  : lib.blast.blastdb.makeblastdb.Makeblastdb(name='viral.genomic.refseq.fna',
-                                                                  dbdir=os.path.join(self.wd, self.dbs_dirname),
-                                                                  typ='nucl')},
-          'cdd'    : {'src' : ['ftp://ftp.ncbi.nlm.nih.gov/pub/mmdb/cdd/cdd.tar.gz'],
-                      'db'  : lib.blast.blastdb.makeprofiledb.Makeprofiledb(name='Cdd',
-                                                                      dbdir=os.path.join(self.wd, self.dbs_dirname),
-                                                                      typ='rps')}
-                      }
+                   'db' : lib.blast.blastdb.makeblastdb.Makeblastdb(name='viral.genomic.refseq.fna',
+                                                                    dbdir=os.path.join(self.wd, self.dbs_dirname),
+                                                                    typ='nucl')},
+      'cdd' : {'src' : ['ftp://ftp.ncbi.nlm.nih.gov/pub/mmdb/cdd/cdd.tar.gz'],
+               'db' : lib.blast.blastdb.makeprofiledb.Makeprofiledb(name='Cdd',
+                                                                    dbdir=os.path.join(self.wd, self.dbs_dirname),
+                                                                    typ='rps')}
+    }
     self.dbs = {}
 
 
@@ -66,7 +66,7 @@ class Endovir:
       srr_alignments = s.screen_srr(s.srr, s.virus_db.path)
       vdb_parser = s.vdbdump.run(s.srr, srr_alignments)
       contigs = s.assemble(vdb_parser.dump_to_file())
-      for j in s.cdd_screen(contigs, s.cdd_db.path, os.path.join(s.wd,'rpst')):
+      for j in s.cdd_screen(contigs, s.cdd_db.path, os.path.join(s.wd, 'rpst')):
         c = virus_contig.VirusContig("ctg_"+str(len(vrs_ctgs)),
                                      s.assembler.parser.sequences[j].sequence,
                                      i,
@@ -80,15 +80,21 @@ class Endovir:
       s.bud(vrs_ctgs)
 
 def main():
-  srrs = ['SRR5150787']
-  testdir = 'analysis'
-  #srrs = ['SRR5832142']
-  print("Running test in {} using {}".format(testdir, srrs[0]), file=sys.stderr)
-  ev = Endovir(wd=testdir)
+  ap = argparse.ArgumentParser(description='Endovir')
+  ap.add_argument('-srr', type=str,
+                  help='SRR number, e.g. SRR5150787'),
+  ap.add_argument('--wd', type=str, default='analysis',
+                  help='Working directory for analysis')
+  ap.add_argument('--max_cpu', '-p', type=int, default=1,
+                  help='Max number of cores to use. NOT YET IMPLEMENTED')
+  args = ap.parse_args()
+  #srrs = ['SRR5150787', 'SRR5832142']
+  print("Running test in {} using {}".format(args.wd, args.srr), file=sys.stderr)
+  e = Endovir(wd=args.wd)
   print("Checking databases", file=sys.stderr)
-  ev.setup()
+  e.setup()
   print("Starting screen", file=sys.stderr)
-  ev.screen(srrs)
+  e.screen([args.srr])
   return 0
 
 if __name__ == '__main__':

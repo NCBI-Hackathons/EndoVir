@@ -17,34 +17,19 @@ class FlankDb(lib.blast.blastdb.makeblastdb.Makeblastdb):
 
   def __init__(self, dbdir, dbname):
     super().__init__(dbdir=dbdir, name=dbname, typ='nucl')
-    self.refs = {}
+    self.flankmap = {}
 
-  def mux(self, contigs):
-    self.refs = {}
+  def collect_flanks(self, contigs):
+    self.flankmap = {}
     rfd, wfd = os.pipe()
     stdout = os.fdopen(wfd, 'w')
     for i in contigs:
-      stdout.write(self.extract_contig_flanks(contigs[i]))
-      self.refs[i.split(':')[0]] = []
+      stdout.write(contigs[i].get_flanks())
+      self.flankmap[contigs[i].lhs_flank.name] = contigs[i].lhs_flank
+      if contigs[i].hasRhsFlank:
+        self.flankmap[contigs[i].rhs_flank.name] = contigs[i].rhs_flank
     stdout.close()
     stdin = os.fdopen(rfd, 'r')
     self.make_db_stdin(stdin)
     stdin.close()
     return True
-
-  def demux(self, alignments):
-    for i in alignments:
-      if i.ref.name.split(':')[0] in self.refs:
-        self.refs[i.ref.name.split(':')[0]].append(i)
-
-
-  def extract_contig_flanks(self, contig):
-    if contig.length <= contig.flank_len:
-      contig.lhs = lib.sequence.sequence.Sequence(self.name+":lhs", contig.subseq(0, contig.length))
-      return ">{}\n{}\n".format(contig.lhs.name, contig.lhs.sequence)
-    else:
-      contig.lhs = lib.sequence.sequence.Sequence(contig.name+":lhs", contig.subseq(0, contig.flank_len))
-      contig.rhs = lib.sequence.sequence.Sequence(contig.name+":rhs", contig.subseq(contig.length-contig.flank_len,
-                                                             contig.flank_len))
-      return ">{}\n{}\n>{}\n{}\n".format(contig.lhs.name, contig.lhs.sequence,
-                                         contig.rhs.name, contig.rhs.sequence)

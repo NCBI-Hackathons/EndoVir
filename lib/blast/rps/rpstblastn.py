@@ -17,11 +17,13 @@ class RpstBlastn:
     self.path = 'rpstblastn'
     self.outfmt = 15
     self.max_eval = 0.001
+    self.num_threads = 4
     self.parser = blast_json.BlastParser()
 
   def run(self, query, db, outf='rpst_out'):
     cmd = [self.path, '-query', query,
                       '-db', db,
+                      '-num_threads', str(self.num_threads),
                       '-evalue', str(self.max_eval),
                       '-outfmt', str(self.outfmt)]
     print("Log", cmd)

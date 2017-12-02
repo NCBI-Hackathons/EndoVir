@@ -45,23 +45,17 @@ class FlankChecker(lib.blast.parser.blast_json.BlastParser):
           raise NotImplementedError("Repeat analysis not implemneted. Overlap longer than flank len.")
         elif qry_loc == hit_loc:
           raise NotImplementedError("Posiblle diff ori not implemented. Same flank from two contigs overlap.")
-        else:
-          if qry_loc == 'rhs':
-            self.merge_rhs(contigs[qry_ctg], self.hspmap[i].query_to,
-                           contigs[hit_ctg], self.hspmap[i].hit_from)
+        elif qry_loc != hit_loc:
+          if contigs[qry_ctg].lhs_ext == None:
+            contigs[qry_ctg].extend_rhs(self.hspmap[i].query_to, contigs[hit_ctg], self.hspmap[i].hit_to)
+          elif contigs[qry_ctg].rhs_ext == None:
+            contigs[hit_ctg].extend_rhs(self.hspmap[i].hit_to, contigs[qry_ctg], self.hspmap[i].query_to)
           else:
-            self.merge_lhs(contigs[qry_ctg], self.hspmap[i].query_to,
-                           contigs[hit_ctg], self.hspmap[i].hit_from)
-#          contigs[qry_ctg].update_rhs(contigs[hit_ctg], )
+            contigs[qry_ctg].extend_rhs(self.hspmap[i].query_to, contigs[hit_ctg], self.hspmap[i].hit_to)
+        else:
+          print(contigs[qry_ctg].name, qry_loc,  contigs[qry_ctg].name, hit_loc)
+          raise NotImplementedError("Non-envisioned case.")
         print("------")
 
-  def merge_rhs(self, qry, qry_break, hit, hit_break):
-    rhs_ext = qry.rhs_ext_seq.sequence[:qry_break] + hit.sequence[hit_break:]
-    print(rhs_ext)
-
-  def merge_lhs(self, qry, qry_break, hit, hit_break):
-    lhs_ext = qry.rhs_ext_seq.sequence[:qry_break] + hit.sequence[hit_break:]
-    #print(rhs_ext)
-
-  def update_rhs(self, ctg):
-    pass
+    def update_contig_list(self):
+      pass

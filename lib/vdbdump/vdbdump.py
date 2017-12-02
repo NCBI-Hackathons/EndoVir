@@ -21,6 +21,9 @@ class VdbDump:
     self.format = 'fastq'
     self.batch_size = 10000
 
+  def show_log(self, size):
+    print(print("Running vdb-dump: {rows}", file=sys.stderr))
+
   def run(self, srr, alignments, parser=vdbdump_fastq_parser.VdbdumpFastqParser()):
     opts = [self.cmd, '--format', self.format]
     print("Reads to dump:", len(alignments), file=sys.stderr)
@@ -44,12 +47,12 @@ class VdbDump:
       vd = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1)
       stream.write(vd.stdout.read().decode())
 
-  def rowids_to_reads(self, srr, alignments):
+  def rowids_to_reads(self, srr, rowids):
     opts = [self.cmd, '--format', 'tab', '-C', 'NAME,READ']
     batch_size = self.batch_size
     reads = {}
-    for i in range(0, len(alignments), batch_size):
-      cmd = opts + ['-R', ','.join(str(x.qry.sra_rowid) for x in alignments[i:i+self.batch_size]), srr]
+    for i in range(0, len(rowids), batch_size):
+      cmd = opts + ['-R', ','.join(str(x) for x in rowids[i:i+self.batch_size]), srr]
       #print(cmd, file=sys.stderr)
       print("Running vdb-dump", file=sys.stderr)
       vd = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1, universal_newlines=True)

@@ -8,8 +8,8 @@ import os
 import sys
 import shutil
 import  time
-sys.path.insert(1, os.path.join(sys.path[0], '../'))
 
+sys.path.insert(1, os.path.join(sys.path[0], '../'))
 import lib.blast.magicblast.magicblast
 import lib.blast.magicblast.magicblast_parser
 import lib.blast.magicblast.magicblast_flank_parser
@@ -17,38 +17,9 @@ import lib.blast.blastn.blastn
 import lib.megahit.megahit
 import lib.blast.rps.rpstblastn
 import lib.vdbdump.vdbdump
-import lib.process.process
+
 import flankdb
 import flank_chk
-
-class NamePipe:
-
-  def __init__(self, name):
-    self.path = name + '.pipe'
-    self.fhread = None
-    self.fhwrite = None
-
-  def create(self):
-    os.mkfifo(self.path)
-    print("Created pipe")
-
-  def open_write(self):
-    self.fhwrite = open(self.path, 'w')
-
-  def write(self, data):
-    self.fhwrite.write(data)
-
-  def close_write(self):
-    self.fhwrite.close()
-
-  def open_read(self):
-    self.fhread = open(self.path, 'r', 0)
-
-  def close_read(self):
-    self.fhread.close()
-
-  def remove(self):
-    os.unlink(self.name)
 
 class Screener:
 
@@ -80,24 +51,28 @@ class Screener:
   def cdd_screen(self, contigs, db, outf):
     return self.cdd_screener.run(contigs, db, outf)
 
+  def find_extensions(self, contigs):
+    pass
+
   def bud(self, contigs):
     while True:
-      time.sleep(1) # lmem06 test: time to get the pipe working.
-      while self.flankdb.mux(contigs) != True:
-        time.sleep(0.01)
-      srr_screener = lib.blast.magicblast.magicblast.Magicblast()
-      fp = lib.blast.magicblast.magicblast_flank_parser.MagicblastFlankParser()
-      alignments = fp.parse(srr_screener.run(self.srr, self.flankdb.path),contigs)
-      self.flankdb.demux(alignments)
+      while self.flankdb.collect_flanks(contigs) != True:
+        time.sleep(0.0001)
+      mb = lib.blast.magicblast.magicblast.Magicblast()
+      fp = lib.blast.magicblast.magicblast_flank_parser.MagicblastFlankParser(self.flankdb.flankmap)
+      extensions = fp.parse(mb.run(self.srr, self.flankdb.path), contigs)
+      reads = self.vdbdump.rowids_to_reads(self.srr, [x.qry.sra_rowid for x in extensions])
+      print(reads)
       rfd, wfd = os.pipe()
       stdout = os.fdopen(wfd, 'w')
       for i in contigs:
-        if i in self.flankdb.refs:
-          contigs[i].extend(stdout)
+        ext = contigs[i].get_extensions(reads)
+        print(ext)
+        stdout.write(ext)
       stdout.close()
-      stdin = os.fdopen(rfd, 'r')
-      self.check_flank_overlaps(self.flankdb.path, stdin, contigs)
-      stdin.close()
+      #stdin = os.fdopen(rfd, 'r')
+      #self.check_flank_overlaps(self.flankdb.path, stdin, contigs)
+      #stdin.close()
       sys.exit()
 
   def check_flank_overlaps(self, flank_db, stdin, contigs):
