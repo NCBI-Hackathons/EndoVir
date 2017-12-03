@@ -14,6 +14,10 @@ class RhsFlank(flank.Flank):
     self.ref_overlap = 20
     self.qry_overlap = 20
 
+  def calculate_coordinates(self, contig):
+    self.start = contig.length - contig.flank_len
+    self.stop = contig.length
+
   def get_fasta_sequence(self):
     return ">{}\n{}\n".format(self.name, self.contig.sequence[-self.length:])
 
@@ -23,6 +27,10 @@ class RhsFlank(flank.Flank):
   def update_extension(self, alignment):
     if self.calc_extension_length(alignment) > self.overlap.length:
       self.overlap.update(alignment, self.calc_extension_length(alignment))
+      if self.overlap.isRevCompl:
+        self.stop = self.start + alignment.ref.start + 1
+      else:
+        self.stop = self.start + alignment.ref.stop + 1
       return True
     return False
 

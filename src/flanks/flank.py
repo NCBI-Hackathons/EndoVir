@@ -31,9 +31,12 @@ class Flank:
     self.length = ctg.flank_len
     self.side = side
     self.name = "{}_{}".format(self.contig.name, self.side)
+    self.start = 0
+    self.stop = 0
     self.ref_overlap = 5
     self.qry_overlap = 20
     self.overlap = self.Overlap()
+    self.calculate_coordinates(ctg)
 
   def has_extension(self):
     if self.overlap.alignment is None:
@@ -44,9 +47,6 @@ class Flank:
     if self.check_overlap(alignment):
       return True
     return False
-
-  def mk_revcompl(self, seq, beg, end):
-    return seq[beg:end+1][::-1].translate(str.maketrans("ACTG", "TGAC"))
 
   def check_overlap(self, alignment):
     raise NotImplementedError("Require  check_overlap() implementation")
@@ -59,3 +59,6 @@ class Flank:
 
   def calc_extension_length(self, alignment):
     raise NotImplementedError("Require calc_extension_length() implementation")
+
+  def calculate_coordinates(self, contig):
+    raise NotImplementedError("Require calculate_coordinates() implementation")

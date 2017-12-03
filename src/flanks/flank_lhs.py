@@ -14,6 +14,10 @@ class LhsFlank(flank.Flank):
     self.ref_overlap = 5
     self.qry_overlap = 20
 
+  def calculate_coordinates(self, contig):
+    self.start = 0
+    self.stop = contig.flank_len
+
   def get_fasta_sequence(self):
     return ">{}\n{}\n".format(self.name, self.contig.sequence[:self.length])
 
@@ -23,6 +27,7 @@ class LhsFlank(flank.Flank):
   def update_extension(self, alignment):
     if self.calc_extension_length(alignment) > self.overlap.length:
       self.overlap.update(alignment, self.calc_extension_length(alignment))
+      self.stop = alignment.ref.stop + 1
       return True
     return False
 
@@ -31,42 +36,3 @@ class LhsFlank(flank.Flank):
        alignment.qry.get_ordered_coords()[0] > self.qry_overlap:
       return self.update_extension(alignment)
     return False
-
-  def get_extension(self, reads):
-    if self.overlap.isRevCompl:
-      print("DOUBLE CHECK THIS")
-      print(">{}\n{}\n".format(self.name, self.contig.sequence[:self.overlap.alignment.ref.stop]))
-      print(">{}\n{}\n".format(self.overlap.alignment.qry.sra_rowid,
-                               self.mk_revcompl(reads[self.overlap.alignment.qry.sra_rowid],
-                                  self.overlap.alignment.qry.stop,
-                                  self.overlap.alignment.qry.length)))
-
-      extseq = self.mk_revcompl(reads[self.overlap.alignment.qry.sra_rowid],
-                                self.overlap.alignment.qry.stop,
-                                self.overlap.alignment.qry.length)
-      extseq += self.contig.sequence[:self.overlap.alignment.ref.stop]
-      print("{}: {} - {}".format(self.overlap.alignment.qry.sra_rowid,
-                                 self.overlap.alignment.qry.stop,
-                                 self.overlap.alignment.qry.length))
-
-      print("{}: {} - {}".format(self.name, self.overlap.alignment.ref.stop, self.length))
-      return self.Extension("{}_ext".format(self.name),
-                            extseq,
-                            self.overlap.alignment.ref.stop,
-                            self.overlap.alignment.qry.stop)
-    print(">{}\n{}\n".format(self.name, self.contig.sequence[:self.overlap.alignment.ref.stop]))
-    print(">{}\n{}\n".format(self.overlap.alignment.qry.sra_rowid,
-                             reads[self.overlap.alignment.qry.sra_rowid][:self.overlap.alignment.qry.start]))
-
-
-    extseq = reads[self.overlap.alignment.qry.sra_rowid][:self.overlap.alignment.qry.start]
-    extseq += self.contig.sequence[:self.overlap.alignment.ref.stop]
-    print("{}: {} - {}".format(self.overlap.alignment.qry.sra_rowid,
-                                 self.overlap.alignment.ref.stop,
-                                 self.overlap.alignment.qry.stop))
-
-    print("{}: {} - {}".format(self.name, self.overlap.alignment.ref.stop, self.length))
-    return self.Extension("{}_ext".format(self.name),
-                          extseq,
-                          self.overlap.alignment.ref.start,
-                          self.overlap.alignment.qry.start)
