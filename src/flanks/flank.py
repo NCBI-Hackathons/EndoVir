@@ -13,13 +13,6 @@ import lib.sequence.sequence
 
 class Flank:
 
-  class Extension(lib.sequence.sequence.Sequence):
-
-    def __init__(self, name, seq, flank_to, read_to):
-      super().__init__(name, seq)
-      self.flank_to = flank_to
-      self.read_to = read_to
-
   class Overlap:
 
     def __init__(self):

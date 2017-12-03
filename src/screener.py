@@ -67,8 +67,10 @@ class Screener:
       stdout = os.fdopen(wfd, 'w')
       for i in contigs:
         ext = contigs[i].get_extensions(reads)
-        print(ext)
-        stdout.write(ext)
+        fout = open(ext.name+".fa", 'w')
+        fout.write(">{}\n{}\n".format(ext.name, ext.sequence))
+        fout.close()
+        stdout.write(">{}\n{}\n".format(ext.name, ext.sequence))
       stdout.close()
       #stdin = os.fdopen(rfd, 'r')
       #self.check_flank_overlaps(self.flankdb.path, stdin, contigs)

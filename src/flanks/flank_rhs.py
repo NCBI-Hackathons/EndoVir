@@ -31,34 +31,3 @@ class RhsFlank(flank.Flank):
        (alignment.qry.get_ordered_coords()[1] < alignment.qry.length - self.qry_overlap):
       return self.update_extension(alignment)
     return False
-
-  def get_extension(self, reads):
-    if self.overlap.isRevCompl:
-      print("DOUBLE CHECK THIS")
-      print(">{}\n{} - {}\n".format(self.name, -self.length, self.overlap.alignment.ref.stop))
-      print(">{}\n{} - {}\n".format(self.overlap.alignment.qry.sra_rowid,
-                                    self.overlap.alignment.qry.
-                                    start, self.overlap.alignment.qry.length))
-      print(">{}\n{}\n".format(self.overlap.alignment.qry.sra_rowid, self.mk_revcompl(reads[self.overlap.alignment.qry.sra_rowid],
-                                  self.overlap.alignment.qry.start,
-                                  self.overlap.alignment.qry.length)))
-
-      extseq = self.contig.sequence[-self.length:self.overlap.alignment.ref.stop] \
-               + self.mk_revcompl(reads[self.overlap.alignment.qry.sra_rowid],
-                                  self.overlap.alignment.qry.start,
-                                  self.overlap.alignment.qry.length)
-      print(extseq)
-
-      return self.Extension("{}_ext".format(self.name),
-                            extseq,
-                            self.overlap.alignment.ref.stop,
-                            self.overlap.alignment.qry.start)
-
-    print(">{}\n{}\n".format(self.overlap.alignment.qry.sra_rowid,
-                             reads[self.overlap.alignment.qry.sra_rowid][self.overlap.alignment.qry.start:]))
-    extseq = self.contig.sequence[self.contig.length-self.length:self.contig.length-self.length+self.overlap.alignment.ref.stop] \
-              + reads[self.overlap.alignment.qry.sra_rowid][self.overlap.alignment.qry.start+1:]
-    return self.Extension("{}_ext".format(self.name),
-                          extseq,
-                          self.overlap.alignment.ref.stop,
-                          self.overlap.alignment.qry.start)
