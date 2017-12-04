@@ -56,21 +56,23 @@ class VirusContig(lib.sequence.sequence.Sequence):
         print("DOUBLE CHECK THIS")
         print("Extension:sequence\tfrom\tto")
         print("\t{}\t{}\t{}".format(flank.name, flank.start, flank.stop))
-        print("\t{}\t{}\t{}".format(flank.overlap.alignment.qry.sra_rowid, 0, flank.overlap.alignment.qry.start-1))
+        print("\t{}\t{}\t{}".format(flank.overlap.alignment.qry.sra_rowid, 0,
+                                    flank.overlap.alignment.qry.start))
         flk = self.sequence[flank.start:flank.stop]
         ext = self.revcomp_seq(reads[flank.overlap.alignment.qry.sra_rowid], 0, flank.overlap.alignment.qry.start-1)
         print(flk)
         print(ext)
-        return lib.sequence.sequence.Sequence(self.name+flank.name, flk+ext)
+        self.extension_map[self.name+flank.name] = lib.sequence.sequence.Sequence(self.name+flank.name, flk+ext)
+      else:
+        print("Extension:sequence\tfrom\tto")
+        print("\t{}\t{}\t{}".format(flank.name, flank.start, flank.stop))
+        print("\t{}\t{}\t{}".format(flank.overlap.alignment.qry.sra_rowid, 0, flank.overlap.alignment.qry.stop))
+        flk = self.sequence[flank.start:flank.stop]
 
-      print("Extension:sequence\tfrom\tto")
-      print("\t{}\t{}\t{}".format(flank.name, flank.start, flank.stop))
-      print("\t{}\t{}\t{}".format(flank.overlap.alignment.qry.sra_rowid, 0, flank.overlap.alignment.qry.start-1))
-      flk = self.sequence[flank.start:flank.stop]
-      print(flk)
-      ext = reads[flank.overlap.alignment.qry.sra_rowid][flank.overlap.alignment.qry.stop:]
-      print(ext)
-      return lib.sequence.sequence.Sequence(self.name+flank.name, flk+ext)
+        ext = reads[flank.overlap.alignment.qry.sra_rowid][flank.overlap.alignment.qry.stop:]
+        print(flk)
+        print(ext)
+        self.extension_map[self.name+flank.name] = lib.sequence.sequence.Sequence(self.name+flank.name, flk+ext)
 
 
   def extend_lhs(self, flank, reads):
@@ -92,21 +94,23 @@ class VirusContig(lib.sequence.sequence.Sequence):
         flk = self.sequence[flank.start:flank.stop]
         print(ext)
         print(flk)
-        return lib.sequence.sequence.Sequence(self.name+flank.name, ext+flk)
-
-      print("\t{}\t{}\t{}".format(flank.overlap.alignment.qry.sra_rowid, 0, self.overlap.alignment.qry.start))
+        self.extension_map[self.name+flank.name] = lib.sequence.sequence.Sequence(self.name+flank.name, ext+flk)
+        return ">{}\n{}\n".format(self.name+flank.name, ext+flk)
+      print("\t{}\t{}\t{}".format(flank.overlap.alignment.qry.sra_rowid, 0, flank.overlap.alignment.qry.start))
       print("\t{}\t{}\t{}".format(flank.name, flank.start, flank.stop))
-      ext = reads[self.overlap.alignment.qry.sra_rowid][:self.overlap.alignment.qry.start]
+      ext = reads[flank.overlap.alignment.qry.sra_rowid][:flank.overlap.alignment.qry.start]
       flk = self.sequence[flank.start:flank.stop]
       print(ext)
       print(flk)
-      return lib.sequence.sequence.Sequence(self.name+flank.name, ext+flk)
+      self.extension_map[self.name+flank.name] = lib.sequence.sequence.Sequence(self.name+flank.name, ext+flk)
+      return ">{}\n{}\n".format(self.name+flank.name, ext+flk)
 
-  def get_extensions(self, reads):
+
+  def extend(self, reads):
     if self.rhs_flank.has_extension():
-      return self.extend_rhs(self.rhs_flank, reads)
-    #if self.lhs_flank.has_extension():
-    #  return self.extend_lhs(self.rhs_flank, reads)
+      self.extend_rhs(self.rhs_flank, reads)
+    if self.lhs_flank.has_extension():
+      self.extend_lhs(self.lhs_flank, reads)
 
   def get_flanks(self):
     if self.hasRhsFlank:

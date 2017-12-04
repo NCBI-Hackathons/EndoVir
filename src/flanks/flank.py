@@ -19,10 +19,13 @@ class Flank:
       self.length = 0
       self.alignment = None
       self.isRevCompl = False
+      self.start = 0
+      self.start = 0
 
     def update(self, alignment, length):
       self.length = length
       self.alignment = alignment
+
       if self.alignment.qry.strand != self.alignment.ref.strand:
         self.isRevCompl = True
 
