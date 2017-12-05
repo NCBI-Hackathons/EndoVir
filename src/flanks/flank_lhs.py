@@ -27,7 +27,8 @@ class LhsFlank(flank.Flank):
   def update_extension(self, alignment):
     if self.calc_extension_length(alignment) > self.overlap.length:
       self.overlap.update(alignment, self.calc_extension_length(alignment))
-      self.stop = alignment.ref.stop + 1
+      self.stop = alignment.ref.stop
+      self.start = alignment.ref.start
       return True
     return False
 

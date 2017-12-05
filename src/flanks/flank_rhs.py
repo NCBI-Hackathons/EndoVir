@@ -28,9 +28,9 @@ class RhsFlank(flank.Flank):
     if self.calc_extension_length(alignment) > self.overlap.length:
       self.overlap.update(alignment, self.calc_extension_length(alignment))
       if self.overlap.isRevCompl:
-        self.stop = self.start + alignment.ref.start + 1
+        self.stop = self.start + alignment.ref.start
       else:
-        self.stop = self.start + alignment.ref.stop + 1
+        self.stop = self.start + alignment.ref.stop
       return True
     return False
 
@@ -39,3 +39,7 @@ class RhsFlank(flank.Flank):
        (alignment.qry.get_ordered_coords()[1] < alignment.qry.length - self.qry_overlap):
       return self.update_extension(alignment)
     return False
+
+  def shift(self, amount):
+    self.start += amount
+    self.stop += amount

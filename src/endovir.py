@@ -72,8 +72,7 @@ class Endovir:
                                      i,
                                      s.assembler.parser.sequences[j].header,
                                      self.flank_len,
-                                     s.wd,
-                                     s.flankdb)
+                                     s.wd)
         vrs_ctgs[c.name] = c
         print("Prepared {} for budding".format(c.name))
       print("Budding {} contigs".format(len(vrs_ctgs)))

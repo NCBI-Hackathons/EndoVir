@@ -21,11 +21,10 @@ import flanks.flank_rhs
 
 class VirusContig(lib.sequence.sequence.Sequence):
 
-  def __init__(self, name, seq, srr, src, flank_len, screen_dir, flankdb):
+  def __init__(self, name, seq, srr, src, flank_len, screen_dir):
     super().__init__(name, seq)
     self.src = src
     self.srr = srr
-    self.flankdb = flankdb
     self.flank_len = flank_len
     self.iteration = 0
     self.hasRhsFlank = True
@@ -33,7 +32,7 @@ class VirusContig(lib.sequence.sequence.Sequence):
     self.lhs_flank = flanks.flank_lhs.LhsFlank(self)
     self.rhs_flank = flanks.flank_rhs.RhsFlank(self)
     self.update_flanks()
-    self.extension_map = {}
+    self.hasExtension = False
 
   def update_flanks(self):
     if self.length <= self.flank_len:
@@ -41,76 +40,90 @@ class VirusContig(lib.sequence.sequence.Sequence):
       self.rhs_flank.length = 0
       self.lhs_flank.length = self.length
 
+  def log_flank_extension(self, overlap):
+    print("Extension: {} : {} : {} : {}".format(self.srr,
+                                                overlap.alignment.ref.name,
+                                                overlap.alignment.qry.sra_rowid,
+                                                overlap.isRevCompl))
   def revcomp_seq(self, seq, beg, end):
-    print(seq, beg, end)
     return seq[beg:end+1][::-1].translate(str.maketrans("ACTG", "TGAC"))
 
   def extend_rhs(self, flank, reads):
     if flank.overlap.alignment.qry.sra_rowid in reads:
-      print("Extension: {} : {} : {} : {}".format(self.srr,
-                                                  flank.overlap.alignment.ref.name,
-                                                  flank.overlap.alignment.qry.sra_rowid,
-                                                  flank.overlap.isRevCompl))
+      self.log_flank_extension(flank.overlap)
 
       if flank.overlap.isRevCompl:
         print("DOUBLE CHECK THIS")
-        print("Extension:sequence\tfrom\tto")
-        print("\t{}\t{}\t{}".format(flank.name, flank.start, flank.stop))
-        print("\t{}\t{}\t{}".format(flank.overlap.alignment.qry.sra_rowid, 0,
-                                    flank.overlap.alignment.qry.start))
+        print("Flank: {}\t{}".format(flank.start, flank.stop))
+        print("Read:  {}\t{}".format(0, flank.overlap.alignment.qry.start))
         flk = self.sequence[flank.start:flank.stop]
-        ext = self.revcomp_seq(reads[flank.overlap.alignment.qry.sra_rowid], 0, flank.overlap.alignment.qry.start-1)
-        print(flk)
-        print(ext)
-        self.extension_map[self.name+flank.name] = lib.sequence.sequence.Sequence(self.name+flank.name, flk+ext)
-      else:
-        print("Extension:sequence\tfrom\tto")
-        print("\t{}\t{}\t{}".format(flank.name, flank.start, flank.stop))
-        print("\t{}\t{}\t{}".format(flank.overlap.alignment.qry.sra_rowid, 0, flank.overlap.alignment.qry.stop))
-        flk = self.sequence[flank.start:flank.stop]
+        ext = self.revcomp_seq(reads[flank.overlap.alignment.qry.sra_rowid],
+                                0,
+                                flank.overlap.alignment.qry.start + 1)
+        self.sequence = self.sequence[:flank.stop+1] + ext
+        extend_shift = len(self.sequence) - self.length
+        print(extend_shift, len(self.sequence), self.length)
+        self.length = len(self.sequence)
+        print(extend_shift)
+        return ">{}\n{}\n".format(self.name+"_"+flank.side,
+                                  self.sequence[-(extend_shift+flank.length):])
 
-        ext = reads[flank.overlap.alignment.qry.sra_rowid][flank.overlap.alignment.qry.stop:]
-        print(flk)
-        print(ext)
-        self.extension_map[self.name+flank.name] = lib.sequence.sequence.Sequence(self.name+flank.name, flk+ext)
-
+      print("Flank: {}\t{}".format(flank.start, flank.stop))
+      print("Read:  {}\t{}".format(flank.overlap.alignment.qry.start,
+                                   flank.overlap.alignment.qry.stop))
+      self.sequence = self.sequence[:flank.stop+1] + \
+                      reads[flank.overlap.alignment.qry.sra_rowid][flank.overlap.alignment.qry.start:]
+      extend_shift = len(self.sequence) - self.length
+      print(extend_shift, len(self.sequence), self.length)
+      self.length = len(self.sequence)
+      return ">{}\n{}\n".format(self.name+"_"+flank.side,
+                                self.sequence[-(extend_shift+flank.length):])
 
   def extend_lhs(self, flank, reads):
     if flank.overlap.alignment.qry.sra_rowid in reads:
-      print("Extension: {} : {} : {} : {}".format(self.srr,
-                                                  flank.overlap.alignment.ref.name,
-                                                  flank.overlap.alignment.qry.sra_rowid,
-                                                  flank.overlap.isRevCompl))
+      self.log_flank_extension(flank.overlap)
       if flank.overlap.isRevCompl:
         print("DOUBLE CHECK THIS")
-        print("Extension:sequence\tfrom\tto")
-        print("\t{}\t{}\t{}".format(flank.overlap.alignment.qry.sra_rowid,
-                                    flank.overlap.alignment.qry.stop,
-                                    flank.overlap.alignment.qry.length))
-        print("\t{}\t{}\t{}".format(flank.name, flank.start, flank.stop))
+        print("Flank: {}\t{}".format(flank.start, flank.stop))
+        print("Read:  {}\t{}".format(flank.overlap.alignment.qry.start,
+                                     flank.overlap.alignment.qry.stop))
+
         ext = self.revcomp_seq(reads[flank.overlap.alignment.qry.sra_rowid],
                                      flank.overlap.alignment.qry.stop,
                                      flank.overlap.alignment.qry.length)
-        flk = self.sequence[flank.start:flank.stop]
-        print(ext)
-        print(flk)
-        self.extension_map[self.name+flank.name] = lib.sequence.sequence.Sequence(self.name+flank.name, ext+flk)
-        return ">{}\n{}\n".format(self.name+flank.name, ext+flk)
-      print("\t{}\t{}\t{}".format(flank.overlap.alignment.qry.sra_rowid, 0, flank.overlap.alignment.qry.start))
-      print("\t{}\t{}\t{}".format(flank.name, flank.start, flank.stop))
-      ext = reads[flank.overlap.alignment.qry.sra_rowid][:flank.overlap.alignment.qry.start]
-      flk = self.sequence[flank.start:flank.stop]
-      print(ext)
-      print(flk)
-      self.extension_map[self.name+flank.name] = lib.sequence.sequence.Sequence(self.name+flank.name, ext+flk)
-      return ">{}\n{}\n".format(self.name+flank.name, ext+flk)
+        self.sequence = ext + self.sequence[flank.start:]
+        extend_shift = len(self.sequence) - self.length
+        print(extend_shift, len(self.sequence), self.length)
+        self.rhs_flank.shift(self.extend_shift)
+        self.length = len(self.sequence)
+        return ">{}\n{}\n".format(self.name+"_"+flank.side,
+                                  self.seqeunce[:extend_shift + flank.length])
+      print("Flank: {}\t{}".format(flank.start, flank.stop))
+      print("Read:  {}\t{}".format(flank.overlap.alignment.qry.start,
+                                   flank.overlap.alignment.qry.stop))
+      self.sequence = reads[flank.overlap.alignment.qry.sra_rowid][:flank.overlap.alignment.qry.start] \
+                      + self.sequence[flank.start:]
+      extend_shift = len(self.sequence) - self.length
+      print(extend_shift, len(self.sequence), self.length)
+      self.rhs_flank.shift(extend_shift)
+      self.length = len(self.sequence)
+      return ">{}\n{}\n".format(self.name+"_"+flank.side,
+                                self.sequence[:extend_shift + flank.length])
 
-
-  def extend(self, reads):
-    if self.rhs_flank.has_extension():
-      self.extend_rhs(self.rhs_flank, reads)
+  def get_extensions(self, reads):
+    extensions = ''
     if self.lhs_flank.has_extension():
-      self.extend_lhs(self.lhs_flank, reads)
+      extensions += self.extend_lhs(self.lhs_flank, reads)
+      self.hasExtension = True
+    if self.rhs_flank.has_extension():
+      extensions += self.extend_rhs(self.rhs_flank, reads)
+      self.hasExtension = True
+    return extensions
+
+  # query is hit
+  # flank is query
+  def anneal_lhs(self, overlap, hsp):
+    print(overlap.name, hsp)
 
   def get_flanks(self):
     if self.hasRhsFlank:

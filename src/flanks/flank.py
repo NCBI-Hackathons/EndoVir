@@ -15,19 +15,29 @@ class Flank:
 
   class Overlap:
 
-    def __init__(self):
+    def __init__(self, name, flank):
       self.length = 0
       self.alignment = None
       self.isRevCompl = False
+      self.name = name
+      self.flank = flank
       self.start = 0
-      self.start = 0
+      self.stop = 0
 
     def update(self, alignment, length):
       self.length = length
       self.alignment = alignment
-
       if self.alignment.qry.strand != self.alignment.ref.strand:
         self.isRevCompl = True
+
+    def get_contig(self):
+      return self.flank.contig
+
+  class Extension:
+
+    def __init__(self):
+      self.start = 0
+      self.stop = 0
 
   def __init__(self, ctg, side):
     self.contig = ctg
@@ -38,7 +48,7 @@ class Flank:
     self.stop = 0
     self.ref_overlap = 5
     self.qry_overlap = 20
-    self.overlap = self.Overlap()
+    self.overlap = self.Overlap(self.name+"_ol", self)
     self.calculate_coordinates(ctg)
 
   def has_extension(self):

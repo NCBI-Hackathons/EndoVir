@@ -15,38 +15,40 @@ import lib.blast.parser.blast_json
 
 class FlankChecker(lib.blast.parser.blast_json.BlastParser):
 
-  class FlankOverlap:
+  class ContigOverlap:
 
     def __init__(self):
       self.lhs = None
       self.lhs_start = 0
       self.lhs_stop = 0
+      self.lhs_strand = 0
 
       self.rhs = None
       self.rhs_start = 0
       self.rhs_stop= 0
+      self.rhs_strand = 0
 
   def __init__(self):
     super().__init__()
     self.checked = {}
 
-  def check(self, contigs):
+  def check(self, contigs, lnk):
     print(contigs)
     for i in self.hspmap:
-      if  self.hspmap[i].query.title[:5] != self.hspmap[i].hit.accession[:5]:
-        print(i, self.hspmap[i].score,
-                 self.hspmap[i].alength,
-                 self.hspmap[i].identity)
-        print("\t", self.hspmap[i].query.title,
-                    self.hspmap[i].query_from,
-                    self.hspmap[i].query_to,
-                    self.hspmap[i].query_strand,
-                    self.hspmap[i].qseq)
-        print("\t", self.hspmap[i].hit.accession,
-                    self.hspmap[i].hit_from,
-                    self.hspmap[i].hit_to,
-                    self.hspmap[i].hit_strand,
-                    self.hspmap[i].hseq)
+          print(i,
+                self.hspmap[i].score,
+                self.hspmap[i].alength,
+                self.hspmap[i].identity)
+          print("\t", self.hspmap[i].query.title,
+                      self.hspmap[i].query_from,
+                      self.hspmap[i].query_to,
+                      self.hspmap[i].query_strand,
+                      self.hspmap[i].qseq)
+          print("\t", self.hspmap[i].hit.accession,
+                      self.hspmap[i].hit_from,
+                      self.hspmap[i].hit_to,
+                      self.hspmap[i].hit_strand,
+                      self.hspmap[i].hseq)
         #qry_ctg, qry_ext = self.hspmap[i].query.title.split(':')
         #qry_loc = qry_ext.split("_")[0]
         #hit_ctg, hit_loc = self.hspmap[i].hit.accession.split(':')
