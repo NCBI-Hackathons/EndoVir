@@ -1,36 +1,73 @@
 \documentclass[border=10pt]{standalone}
+\usepackage{cmbright}
+\usepackage[T1]{fontenc}
 \usepackage{tikz}
-\usetikzlibrary{shapes.geometric, positioning}
-
+\usepackage{pgfplots}
+  \pgfplotsset{compat=1.15}
+\usetikzlibrary{shapes.geometric, positioning, calc,shadings}
 \tikzset{%
-  db/.style = {cylinder, draw},
-  tool/.style = {rectangle, draw},
+  db/.style = {cylinder, draw, fill=white, inner sep=2pt},
+  tool/.style = {rectangle, draw, fill=white, inner sep=2pt},
   data/.style = {},
   func/.style = {},
-  fake/.style = {}
+  fake/.style = {},
+  partLabel/.style = {font=\bfseries,
+                      fill=gray!10,rounded corners, draw=black!50, dashed},
+  every legend to name picture/.style={west}
 }
 
 
+%% https://tex.stackexchange.com/questions/62262/legend-in-tikzpicture
+%%
+% argument #1: any options
+\newenvironment{customlegend}[1][]{%
+    \begingroup
+    % inits/clears the lists (which might be populated from previous
+    % axes):
+    \csname pgfplots@init@cleared@structures\endcsname
+    \pgfplotsset{#1}%
+}{%
+    % draws the legend:
+    \csname pgfplots@createlegend\endcsname
+    \endgroup
+}%
+
+% makes \addlegendimage available (typically only available within an
+% axis environment):
+\def\addlegendimage{\csname pgfplots@addlegendimage\endcsname}
+
+%%--------------------------------
+
+% definition to insert numbers
+\pgfkeys{/pgfplots/number in legend/.style={%
+        /pgfplots/legend image code/.code={%
+            \node at (0.125,-0.0225){#1}; % <= changed x value
+        },%
+    },
+}
+\pgfdeclareplotmark{db}{\node [cylinder, draw, fill=white] {       };}
 \begin{document}
-  \begin{tikzpicture}
+  \def\blockdist{0.3}
+  \def\edgedist{2.5}
+  \begin{tikzpicture}[>=latex]
     \pgfdeclarelayer{background}
     \pgfdeclarelayer{foreground}
     \pgfsetlayers{background,main,foreground}
 
     \node (mapper)    [tool] {magicBLAST};
-    \node (refseq)    [db,  above = of mapper] {RefSeq};
-    \node (sra)       [db,  below = of mapper] {SRA};
-    \node (fmapper)   [tool, below = of sra]             {Map flanks};
-    \node (asm)       [tool, right = of mapper]             {Assembler};
-    \node (mscreen)   [tool, right = of asm]                {Motif screen};
-    \node (reject)    [data, right = of mscreen]            {Rejected contigs};
-    \node (flanker)   [func, right = of fmapper]               {Flanker};
-    \node (ctgs)      [data, right = of flanker]            {Contigs};
-    \node (cscreen)   [tool, below = of ctgs]                {Motif screen};
-    \node (overlaps)  [func, left = of fmapper]             {Overlaper};
-    \node (extend)    [func, below = of overlaps]           {Extender};
-    \node (ctgChk)    [func, right = of extend]             {Check contigs};
-    \node (ctgMerge)  [func, below = of cscreen]               {Merge overlaps};
+    \node (refseq)    [db,  above = of mapper]    {RefSeq};
+    \node (sra)       [db,  below = of mapper]    {SRA};
+    \node (fmapper)   [tool, below = of sra]      {magicBLAST};
+    \node (asm)       [tool, right = of mapper]   {Assembler};
+    \node (mscreen)   [tool, right = of asm]      {Motif screen};
+    \node (reject)    [data, right = of mscreen]  {Rejected contigs};
+    \node (flanker)   [func, right = of fmapper]  {Flanker};
+    \node (ctgs)      [data, right = of flanker]  {Contigs};
+    \node (cscreen)   [tool, below = of ctgs]     {Motif screen};
+    \node (overlaps)  [func, left = of fmapper]   {Overlaper};
+    \node (extend)    [func, below = of overlaps] {Extender};
+    \node (ctgChk)    [func, right = of extend]   {Check contigs};
+    \node (ctgMerge)  [func, below = of cscreen]  {Merge overlaps};
 
 
     \path[->] (refseq)    edge (mapper)
@@ -50,15 +87,29 @@
               (ctgMerge)  edge (cscreen)
               (cscreen)   edge (ctgs);
 
-    %\begin{pgfonlayer}{background}
-      %\path (mapper.west |- mapper.north)+(-0.5,0.3) node (a) {};
-      %\path (mapper.south -| wa.east)+(+0.5,-0.3) node (b) {};
-      %\path (vote.east |- asrs.east)+(+0.5,-0.5) node (c) {};
+    \path[partLabel] (asm.north) +(0,+2*\blockdist) node (inital_desc) {Initial run};
+    \path[partLabel](flanker.north) +(0,+2*\blockdist) node (bud) {BUD};
+    \begin{pgfonlayer}{background}
+      \path (mapper.west |- mapper.north)+(-0.3, \blockdist) node (a) {};
+      \path (mscreen.south -| mscreen.east)+(+0.3,-0.3) node (b) {};
 
-      %\path[fill=yellow!20,rounded corners, draw=black!50, dashed]
-          %(a) rectangle (c);
-      %\path (asr1.north west)+(-0.2,0.2) node (a) {};
-    %\end{pgfonlayer}
 
+      \path (overlaps.west |- overlaps.north)+(-0.3, \blockdist) node (c) {};
+      \path (ctgMerge.south -| ctgMerge.east)+(+0.3, -0.3) node (d) {};
+      \path[partLabel]
+          (a) rectangle (b);
+      \path[partLabel]
+          (c) rectangle (d);
+    \end{pgfonlayer}
+\begin{customlegend}[legend cell align=left, %<= to align cells
+legend entries={ % <= in the following there are the entries
+External tools,
+Database,
+},
+legend style={at={(10,-5)},font=\footnotesize}] % <= to define position and font legend
+% the following are the "images" and numbers in the legend
+    \addlegendimage{area legend}
+    \addlegendimage{mark=db}
+\end{customlegend}
   \end{tikzpicture}
 \end{document}
