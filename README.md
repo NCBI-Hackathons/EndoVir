@@ -35,7 +35,7 @@ README files for installation instructions.
     tar -xvzf sratoolkit.2.8.2-1-centos_linux64.tar.gz
     export PATH=$PATH:$ENDOVIR/tools/sratoolkit.2.8.2-1-centos_linux64/bin/ >> ~/.bashrc (check to make sure this is the right path)
   - [MEGAHIT](https://github.com/voutcn/megahit)
-     git clone https://github.com/voutcn/megahit.git 
+     git clone https://github.com/voutcn/megahit.git
      cd megahit
      make (-j n, where n is the # of cores you want to use)
      export PATH=$PATH:$ENDOVIR/tools/megahit >> ~/.bashrc (check to make sure this is the right path)
@@ -44,8 +44,8 @@ README files for installation instructions.
   - [SOAPdenovo]
   - [SPADES]*
     source ~/.bashrc
-   
-   
+
+
 
 ### Run
 Change into your working directory `work`
@@ -64,7 +64,7 @@ much as possible. In addition, only the Python standard libraries should be
 used.
 
 ## Diagram
-![Endovir diagram](doc/figs/workflow/workflow.small.png)
+![Endovir diagram](doc/figs/workflow/workflow_readme.png)
 ## Pipeline approach
 
 The pipline has three major steps (in `src`):
