@@ -38,22 +38,34 @@ class Linker:
   def overlap_to_flank(self, overlap):
     if overlap.name in self.overlap_map:
       return self.overlap_map[self.overlap_map.name].flank
+    return None
 
   def overlap_to_contig(self, overlap):
-    return self.flank_to_contig(self.overlap_to_flank(overlap))
+    if overlap.name in self.overlap_map:
+      return self.flank_to_contig(self.overlap_to_flank(overlap))
+    return None
 
   def flank_to_contig(self, flank):
     if flank.name in self.flank_map:
       return self.flank_map[flank.name].contig
+    return None
 
-  def get_flank(self, flank_name):
-    return self.flank_map.get(flank_name)
+  def get_flank(self, name):
+    if name in self.flank_map:
+      return self.flank_map[name]
+    if name in self.overlap_map:
+      return self.overlap_map[name].flank
 
   def get_overlap(self, overlap_name):
     return self.overlap_map.get(overlap_name)
 
-  def get_contig(self, contig_name):
-     return self.contig_map.get(contig_name)
+  def get_contig(self, name):
+    if name in self.contig_map:
+      return self.contig_map[contig]
+    if name in self.overlap_map:
+      return  self.overlap_map[name].flank.contig
+    if name in self.flank_map:
+      return  self.flank_map[name].contig
 
 class Screener:
 
@@ -105,20 +117,20 @@ class Screener:
       reads = self.vdbdump.rowids_to_reads(self.srr, [x.qry.sra_rowid for x in extensions])
       rfd, wfd = os.pipe()
       stdout = os.fdopen(wfd, 'w')
-      fh = open('exts.fa', 'w')
       for i in contigs:
         ext = contigs[i].get_extensions(reads)
         if contigs[i].hasExtension:
-          fh.write(ext)
+          fh = open(os.path.join(contigs[i].wd, contigs[i].name+'.fa'), 'w')
+          fh.write(">{}\n{}\n".format(contigs[i].name, contigs[i].sequence))
+          fh.close()
           stdout.write(ext)
-      fh.close()
       stdout.close()
-      #stdin = os.fdopen(rfd, 'r')
-      #blastn = lib.blast.blastn.blastn.BlastN()
-      #ph = blastn.run(self.flankdb.path, stdin)
-      #stdin.close()
-      #self.check_flank_overlaps(ph, contigs, lnk)
-      #stdin.close()
+      stdin = os.fdopen(rfd, 'r')
+      blastn = lib.blast.blastn.blastn.BlastN()
+      ph = blastn.run(self.flankdb.path, stdin)
+      stdin.close()
+      self.check_flank_overlaps(ph, contigs, lnk)
+      stdin.close()
       sys.exit()
 
   def check_flank_overlaps(self, blast_proc, contigs, lnk):

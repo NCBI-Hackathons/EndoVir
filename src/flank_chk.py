@@ -30,45 +30,36 @@ class FlankChecker(lib.blast.parser.blast_json.BlastParser):
 
   def __init__(self):
     super().__init__()
-    self.checked = {}
+    self.updates = {}
 
   def check(self, contigs, lnk):
-    print(contigs)
     for i in self.hspmap:
-          print(i,
-                self.hspmap[i].score,
-                self.hspmap[i].alength,
-                self.hspmap[i].identity)
-          print("\t", self.hspmap[i].query.title,
-                      self.hspmap[i].query_from,
-                      self.hspmap[i].query_to,
-                      self.hspmap[i].query_strand,
-                      self.hspmap[i].qseq)
-          print("\t", self.hspmap[i].hit.accession,
-                      self.hspmap[i].hit_from,
-                      self.hspmap[i].hit_to,
-                      self.hspmap[i].hit_strand,
-                      self.hspmap[i].hseq)
-        #qry_ctg, qry_ext = self.hspmap[i].query.title.split(':')
-        #qry_loc = qry_ext.split("_")[0]
-        #hit_ctg, hit_loc = self.hspmap[i].hit.accession.split(':')
-        #if self.hspmap[i].query_strand != self.hspmap[i].hit_strand:
-          #raise NotImplementedError("Simple diff ori not implemented. Check alignment")
-        #elif self.hspmap[i].alength >= contigs[qry_ctg].flank_len:
-          #raise NotImplementedError("Repeat analysis not implemneted. Overlap longer than flank len.")
-        #elif qry_loc == hit_loc:
-          #raise NotImplementedError("Posiblle diff ori not implemented. Same flank from two contigs overlap.")
-        #elif qry_loc != hit_loc:
-          #if contigs[qry_ctg].lhs_ext == None:
-            #contigs[qry_ctg].extend_rhs(self.hspmap[i].query_to, contigs[hit_ctg], self.hspmap[i].hit_to)
-          #elif contigs[qry_ctg].rhs_ext == None:
-            #contigs[hit_ctg].extend_rhs(self.hspmap[i].hit_to, contigs[qry_ctg], self.hspmap[i].query_to)
-          #else:
-            #contigs[qry_ctg].extend_rhs(self.hspmap[i].query_to, contigs[hit_ctg], self.hspmap[i].hit_to)
-        #else:
-          #print(contigs[qry_ctg].name, qry_loc,  contigs[qry_ctg].name, hit_loc)
-          #raise NotImplementedError("Non-envisioned case.")
-        #print("------")
+      flkA = lnk.get_flank(self.hspmap[i].query.title)
+      flkB = lnk.get_flank(self.hspmap[i].hit.accession)
+      if flkA.name != flkB.name:
+        print(i, self.hspmap[i].score, self.hspmap[i].alength, self.hspmap[i].identity)
+        print("\t", self.hspmap[i].query.title,
+                    self.hspmap[i].query_from,
+                    self.hspmap[i].query_to,
+                    self.hspmap[i].query_strand,
+                    self.hspmap[i].qseq)
+        print("\t", self.hspmap[i].hit.accession,
+                    self.hspmap[i].hit_from,
+                    self.hspmap[i].hit_to,
+                    self.hspmap[i].hit_strand,
+                    self.hspmap[i].hseq)
+        if self.hspmap[i].query_strand == self.hspmap[i].hit_strand:
+          print(flkA.start,flkA.stop)
+          c = self.ContigOverlap()
+          c.rhs_start = flkA.start + self.hspmap[i].query_from
+          c.rhs_stop  = flkA.stop + self.hspmap[i].query_to
+          c.lhs_start = self.hspmap[i].hit_from
+          c.lhs_stop  = self.hspmap[i].hit_to
+          if flkA.side == 'rhs':
+            flkA.contig.anneal_rhs(flkB.contig, c)
+          if flkB.side == 'rhs':
+            flkB.contig.anneal_rhs(flkA.contig, c)
 
-    def update_contig_list(self):
-      pass
+  def update(self):
+    if self.hspmap[i].query.title in self.updates:
+      c = self.ContigOverlap()

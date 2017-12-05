@@ -75,3 +75,6 @@ class Flank:
 
   def calculate_coordinates(self, contig):
     raise NotImplementedError("Require calculate_coordinates() implementation")
+
+  def shift(self, amount):
+    raise NotImplementedError("Require shift() implementation")

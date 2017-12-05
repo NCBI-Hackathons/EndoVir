@@ -7,6 +7,7 @@
 
 import os
 import sys
+import shutil
 import pathlib
 
 sys.path.insert(1, os.path.join(sys.path[0], '../'))
@@ -19,6 +20,13 @@ import lib.fasta.parser
 import flanks.flank_lhs
 import flanks.flank_rhs
 
+class AnnealUpdate:
+
+  def __init__(self):
+    self.contig = ''
+    self.shift = 0
+
+
 class VirusContig(lib.sequence.sequence.Sequence):
 
   def __init__(self, name, seq, srr, src, flank_len, screen_dir):
@@ -28,11 +36,19 @@ class VirusContig(lib.sequence.sequence.Sequence):
     self.flank_len = flank_len
     self.iteration = 0
     self.hasRhsFlank = True
-#    self.wd = os.path.join(screen_dir, self.name)
+    self.wd = self.mk_wd(os.path.join(screen_dir, self.name))
     self.lhs_flank = flanks.flank_lhs.LhsFlank(self)
     self.rhs_flank = flanks.flank_rhs.RhsFlank(self)
     self.update_flanks()
     self.hasExtension = False
+
+
+  def mk_wd(self, path):
+    if os.path.exists(path):
+      shutil.rmtree(path)
+    if not os.path.isdir(path):
+      os.mkdir(path)
+    return path
 
   def update_flanks(self):
     if self.length <= self.flank_len:
@@ -56,7 +72,6 @@ class VirusContig(lib.sequence.sequence.Sequence):
         print("DOUBLE CHECK THIS")
         print("Flank: {}\t{}".format(flank.start, flank.stop))
         print("Read:  {}\t{}".format(0, flank.overlap.alignment.qry.start))
-        flk = self.sequence[flank.start:flank.stop]
         ext = self.revcomp_seq(reads[flank.overlap.alignment.qry.sra_rowid],
                                 0,
                                 flank.overlap.alignment.qry.start + 1)
@@ -65,18 +80,18 @@ class VirusContig(lib.sequence.sequence.Sequence):
         print(extend_shift, len(self.sequence), self.length)
         self.length = len(self.sequence)
         print(extend_shift)
-        return ">{}\n{}\n".format(self.name+"_"+flank.side,
+        return ">{}\n{}\n".format(flank.overlap.name,
                                   self.sequence[-(extend_shift+flank.length):])
 
       print("Flank: {}\t{}".format(flank.start, flank.stop))
       print("Read:  {}\t{}".format(flank.overlap.alignment.qry.start,
                                    flank.overlap.alignment.qry.stop))
       self.sequence = self.sequence[:flank.stop+1] + \
-                      reads[flank.overlap.alignment.qry.sra_rowid][flank.overlap.alignment.qry.start:]
+                      reads[flank.overlap.alignment.qry.sra_rowid][flank.overlap.alignment.qry.stop:]
       extend_shift = len(self.sequence) - self.length
       print(extend_shift, len(self.sequence), self.length)
       self.length = len(self.sequence)
-      return ">{}\n{}\n".format(self.name+"_"+flank.side,
+      return ">{}\n{}\n".format(flank.overlap.name,
                                 self.sequence[-(extend_shift+flank.length):])
 
   def extend_lhs(self, flank, reads):
@@ -96,8 +111,9 @@ class VirusContig(lib.sequence.sequence.Sequence):
         print(extend_shift, len(self.sequence), self.length)
         self.rhs_flank.shift(self.extend_shift)
         self.length = len(self.sequence)
-        return ">{}\n{}\n".format(self.name+"_"+flank.side,
+        return ">{}\n{}\n".format(flank.overlap.name,
                                   self.seqeunce[:extend_shift + flank.length])
+
       print("Flank: {}\t{}".format(flank.start, flank.stop))
       print("Read:  {}\t{}".format(flank.overlap.alignment.qry.start,
                                    flank.overlap.alignment.qry.stop))
@@ -107,7 +123,7 @@ class VirusContig(lib.sequence.sequence.Sequence):
       print(extend_shift, len(self.sequence), self.length)
       self.rhs_flank.shift(extend_shift)
       self.length = len(self.sequence)
-      return ">{}\n{}\n".format(self.name+"_"+flank.side,
+      return ">{}\n{}\n".format(flank.overlap.name,
                                 self.sequence[:extend_shift + flank.length])
 
   def get_extensions(self, reads):
@@ -120,10 +136,14 @@ class VirusContig(lib.sequence.sequence.Sequence):
       self.hasExtension = True
     return extensions
 
-  # query is hit
-  # flank is query
-  def anneal_lhs(self, overlap, hsp):
-    print(overlap.name, hsp)
+
+  def anneal_rhs(self, rsh_ctg, overlap):
+    print(overlap.rhs_start, overlap.rhs_stop, overlap.lhs_start, overlap.lhs_stop)
+    self.sequence = self.sequence[:overlap.rhs_stop+1] + rsh_ctg.sequence[overlap.lhs_stop:]
+
+    nend = len(sequence)
+    print(self.name, rsh_ctg.name, nend)
+    return {rsh_ctg.name : self.name}
 
   def get_flanks(self):
     if self.hasRhsFlank:
