@@ -17,7 +17,7 @@ class BlastN:
 
   def __init__(self, path='blastn'):
     self.path = path
-    self.num_threads = 2
+    self.num_threads = 4
     self.outfmt = 15
 
   def run(self, db, query):

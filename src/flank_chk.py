@@ -49,16 +49,15 @@ class FlankChecker(lib.blast.parser.blast_json.BlastParser):
                     self.hspmap[i].hit_strand,
                     self.hspmap[i].hseq)
         if self.hspmap[i].query_strand == self.hspmap[i].hit_strand:
-          print(flkA.start,flkA.stop)
-          c = self.ContigOverlap()
-          c.rhs_start = flkA.start + self.hspmap[i].query_from
-          c.rhs_stop  = flkA.stop + self.hspmap[i].query_to
-          c.lhs_start = self.hspmap[i].hit_from
-          c.lhs_stop  = self.hspmap[i].hit_to
           if flkA.side == 'rhs':
-            flkA.contig.anneal_rhs(flkB.contig, c)
-          if flkB.side == 'rhs':
-            flkB.contig.anneal_rhs(flkA.contig, c)
+            c = self.ContigOverlap()
+            c.lhs_start = self.hspmap[i].query_from
+            c.lhs_stop  = self.hspmap[i].query_to
+            c.rhs_start = self.hspmap[i].hit_from
+            c.rhs_stop  = self.hspmap[i].hit_to
+            flkA.contig.anneal_rhs(flkB, c)
+          #if flkA.side == 'lhs':
+            #flkA.contig.anneal_lhs(flkB.contig, c)
 
   def update(self):
     if self.hspmap[i].query.title in self.updates:

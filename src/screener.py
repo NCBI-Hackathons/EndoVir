@@ -14,6 +14,7 @@ import lib.blast.magicblast.magicblast
 import lib.blast.magicblast.magicblast_parser
 import lib.blast.magicblast.magicblast_flank_parser
 import lib.blast.blastn.blastn
+import lib.blast.blastdb.makeblastdb
 import lib.megahit.megahit
 import lib.blast.rps.rpstblastn
 import lib.vdbdump.vdbdump
@@ -117,11 +118,15 @@ class Screener:
       reads = self.vdbdump.rowids_to_reads(self.srr, [x.qry.sra_rowid for x in extensions])
       rfd, wfd = os.pipe()
       stdout = os.fdopen(wfd, 'w')
+      contig = lib.blast.blastdb.makeblastdb
       for i in contigs:
         ext = contigs[i].get_extensions(reads)
         if contigs[i].hasExtension:
           fh = open(os.path.join(contigs[i].wd, contigs[i].name+'.fa'), 'w')
           fh.write(">{}\n{}\n".format(contigs[i].name, contigs[i].sequence))
+          fh.close()
+          fh = open(contigs[i].name+'_ext.fa', 'w')
+          fh.write(ext)
           fh.close()
           stdout.write(ext)
       stdout.close()

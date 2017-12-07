@@ -33,12 +33,6 @@ class Flank:
     def get_contig(self):
       return self.flank.contig
 
-  class Extension:
-
-    def __init__(self):
-      self.start = 0
-      self.stop = 0
-
   def __init__(self, ctg, side):
     self.contig = ctg
     self.length = ctg.flank_len
@@ -76,5 +70,5 @@ class Flank:
   def calculate_coordinates(self, contig):
     raise NotImplementedError("Require calculate_coordinates() implementation")
 
-  def shift(self, amount):
+  def update_coordinates(self, amount):
     raise NotImplementedError("Require shift() implementation")

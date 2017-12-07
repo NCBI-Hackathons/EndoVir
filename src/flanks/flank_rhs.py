@@ -18,6 +18,7 @@ class RhsFlank(flank.Flank):
     self.start = contig.length - contig.flank_len
     self.stop = contig.length
 
+
   def get_fasta_sequence(self):
     return ">{}\n{}\n".format(self.name, self.contig.sequence[-self.length:])
 
@@ -40,6 +41,6 @@ class RhsFlank(flank.Flank):
       return self.update_extension(alignment)
     return False
 
-  def shift(self, amount):
-    self.start += amount
-    self.stop += amount
+  def update_coordinates(self):
+    self.start = self.contig.length - self.length
+    self.stop = self.contig.length

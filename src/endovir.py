@@ -80,7 +80,7 @@ class Endovir:
 
 def main():
   ap = argparse.ArgumentParser(description='Endovir')
-  ap.add_argument('-srr', type=str,
+  ap.add_argument('-srr', type=str, default='SRR5150787',
                   help='SRR number, e.g. SRR5150787'),
   ap.add_argument('--wd', type=str, default='analysis',
                   help='Working directory for analysis')
@@ -88,7 +88,10 @@ def main():
                   help='Max number of cores to use. NOT YET IMPLEMENTED')
   args = ap.parse_args()
   #srrs = ['SRR5150787', 'SRR5832142']
-  print("Running test in {} using {}".format(args.wd, args.srr), file=sys.stderr)
+  if args.srr == 'SRR5150787':
+    print("Running test in {} using {}".format(args.wd, args.srr), file=sys.stderr)
+  else:
+    print("Analyzing  {} using {}.".format(args.srr, args.wd), file=sys.stderr)
   e = Endovir(wd=args.wd)
   print("Checking databases", file=sys.stderr)
   e.setup()

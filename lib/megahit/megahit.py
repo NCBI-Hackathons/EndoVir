@@ -19,7 +19,7 @@ class Megahit:
     self.min_contig_len = 400
     self.parser = parser.FastaParser()
 
-  def run(self, reads, prefix=None, outdir='megahit_out', cpu_threads=2):
+  def run(self, reads, prefix=None, outdir='megahit_out', cpu_threads=4):
     self.parser.reset()
     cmd = [self.path, '--read', reads,
                       '--num-cpu-threads', str(cpu_threads),
