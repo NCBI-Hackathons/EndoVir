@@ -64,7 +64,7 @@ much as possible. In addition, only the Python standard libraries should be
 used.
 
 ## Diagram
-![Endovir diagram](doc/figs/workflow/workflow_readme.png)
+![Endovir diagram](doc/readme_fig/workflow.readme.png)
 ## Pipeline approach
 
 The pipline has three major steps (in `src`):

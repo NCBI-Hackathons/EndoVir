@@ -1,24 +1,30 @@
-\documentclass[13pt, border=10pt, font]{standalone}
+\documentclass[12pt]{standalone}
 \usepackage{cmbright}
 \usepackage[T1]{fontenc}
 \usepackage{tikz}
 \usepackage{pgfplots}
-%  \pgfplotsset{compat=1.15}
-\usetikzlibrary{shapes, positioning, calc,shadings}
-\tikzset{%
+\usetikzlibrary{shapes.geometric, positioning, calc, shadings}
+  \tikzset{%
   db/.style = {cylinder, draw, fill=white, inner sep=2pt},
   tool/.style = {rectangle, draw, fill=white, inner sep=2pt},
   data/.style = {},
   func/.style = {},
   fake/.style = {},
+  path/.style = {thick},
+  dna/.style = {draw, very thick},
+  pipe/.style = {draw, very thick, dashed},
   partLabel/.style = {font=\bfseries,
                       fill=gray!10,rounded corners, draw=black!50, dashed},
   every legend to name picture/.style={west}
-}
-\pgfdeclareplotmark{db}{\node [cylinder, draw=black] {};}
+  }
+  \pgfdeclareplotmark{db}{\node [cylinder, draw=black] {};}
+
+  \definecolor{struc}{rgb}{0.8,0.09,0.01}
+  \definecolor{func}{rgb}{0.17,0.48,0.71}
+  \definecolor{rightfl}{rgb}{0.14,0.75,0.4}
+  \definecolor{leftfl}{rgb}{0.64,0.06,0.06}
 
 %% https://tex.stackexchange.com/questions/62262/legend-in-tikzpicture
-%%
 % argument #1: any options
 \newenvironment{customlegend}[1][]{%
     \begingroup
@@ -45,11 +51,9 @@
         },%
     },
 }
-
 \begin{document}
-  \def\blockdist{0.3}
-  \def\edgedist{2.5}
-  \begin{tikzpicture}[>=latex,shorten >=2pt,shorten <=2pt]
+  -\begin{tikzpicture}[>=latex,shorten >=2pt,shorten <=2pt, thick, scale=2, every node/.style={transform shape}]
+    \def\blockdist{0.3}
     \pgfdeclarelayer{background}
     \pgfdeclarelayer{foreground}
     \pgfsetlayers{background,main,foreground}
@@ -70,40 +74,24 @@
     \node (ctgMerge)  [func, below = of cscreen]  {Contig merger};
 
 
-    \path[->] (refseq)    edge (mapper)
-              (sra)       edge (mapper)
-                          edge (fmapper)
-              (mapper)    edge (asm)
-              (asm)       edge (mscreen)
-              (mscreen)   edge (reject)
-                          edge (ctgs)
-              (ctgs)      edge (flanker)
-              (flanker)   edge (fmapper)
-              (fmapper)   edge (overlaps)
-              (overlaps)  edge (extend)
-              (extend)    edge (ctgChk)
-              (ctgChk)    edge (cscreen)
-                          edge (ctgMerge)
-              (ctgMerge)  edge (cscreen)
-              (cscreen)   edge (ctgs);
+    \path[->] (refseq)    edge [path] (mapper)
+              (sra)       edge [path] (mapper)
+                          edge [path] (fmapper)
+              (mapper)    edge [path] (asm)
+              (asm)       edge [path] (mscreen)
+              (mscreen)   edge [path] (reject)
+                          edge [path] (ctgs)
+              (ctgs)      edge [pipe] (flanker)
+              (flanker)   edge [pipe] (fmapper)
+              (fmapper)   edge [pipe] (overlaps)
+              (overlaps)  edge [pipe] (extend)
+              (extend)    edge [pipe] (ctgChk)
+              (ctgChk.east)    edge [pipe] (cscreen)
+                          edge [pipe] (ctgMerge.west)
+              (ctgMerge)  edge [pipe] (cscreen)
+              (cscreen)   edge [path] (ctgs)
+              (cscreen.east)   edge [path] (reject);
 
-
-\def \n {1}
-\def \r {3}
-\def\myarray{{"ctgs","flanker"}}
-
-\foreach \i in {0,...,\n}
-{
-  %\pgfmathparse{\myarray[\i]}\pgfmathresult
-  \node[draw, circle] at ({360/\n * (\pgfmathparse{\myarray[\i]}\pgfmathresult, )}:\r) {$\i$};
-}
-    %\def numnodes \n {8}
-    %\def r {3}
-    %\foreach \x in {1,...,\n}
-    %{
-      %\node[draw, rectangle]
-
-    %}
     \path[partLabel] (asm.north) +(0,+2*\blockdist) node (inital_desc) {Initial run};
     \path[partLabel](flanker.north) +(0,+2*\blockdist) node (bud) {BUD};
     \begin{pgfonlayer}{background}
@@ -119,14 +107,15 @@
           (c) rectangle (d);
     \end{pgfonlayer}
     \begin{customlegend}[legend cell align=left, %<= to align cells
-%                        legend columns=-1,
                          legend entries={ % <= in the following there are the entries
                                            External tools,
-                                           Database},
-                         legend style={at={(10,-5)},font=\footnotesize}] % <= to define position and font legend
+                                           Database,
+                                           Piping (no disk I/O)},
+                         legend style={at={($(d.east)+(4,2)$)},font=\footnotesize}] % <= to define position and font legend
     % the following are the "images" and numbers in the legend
         \addlegendimage{area legend}
         \addlegendimage{mark=db, draw=white}
+        \addlegendimage{style=dashed, color=black}
     \end{customlegend}
   \end{tikzpicture}
 \end{document}
