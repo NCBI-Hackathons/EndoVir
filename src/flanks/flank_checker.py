@@ -63,7 +63,20 @@ class FlankChecker(lib.blast.parser.blast_json.BlastParser):
                       self.hspmap[i].hseq)
 
           if self.hspmap[i].query_strand == self.hspmap[i].hit_strand:
-            if flkA.side == 'rhs':
+            #if flkA.side == 'rhs':
+              #c = self.ContigOverlap()
+              #c.lhs_name = self.hspmap[i].query.title
+              #c.lhs_start = self.hspmap[i].query_from
+              #c.lhs_stop  = self.hspmap[i].query_to
+              #c.rhs_name = self.hspmap[i].hit.accession
+              #c.rhs_start = self.hspmap[i].hit_from
+              #c.rhs_stop  = self.hspmap[i].hit_to
+              #upd = flkA.contig.anneal_rhs(flkB, c)
+              #self.updates[flkB.name] = upd
+              #if flkB.contig.name in contigs:
+                #del(contigs[flkB.contig.name])
+              #del(self.hspmap[i])
+            if flkA.side == 'lhs':
               c = self.ContigOverlap()
               c.lhs_name = self.hspmap[i].query.title
               c.lhs_start = self.hspmap[i].query_from
@@ -71,13 +84,13 @@ class FlankChecker(lib.blast.parser.blast_json.BlastParser):
               c.rhs_name = self.hspmap[i].hit.accession
               c.rhs_start = self.hspmap[i].hit_from
               c.rhs_stop  = self.hspmap[i].hit_to
-              upd = flkA.contig.anneal_rhs(flkB, c)
+              upd = flkA.contig.anneal_lhs(flkB, c)
               self.updates[flkB.name] = upd
               if flkB.contig.name in contigs:
                 del(contigs[flkB.contig.name])
               del(self.hspmap[i])
-            #if flkA.side == 'lhs':
-            #flkA.contig.anneal_lhs(flkB.contig, c)
+          else:
+            raise NotImplementedError("Not yet implemented. How aobut now?")
     print(contigs)
 
   def update(self):

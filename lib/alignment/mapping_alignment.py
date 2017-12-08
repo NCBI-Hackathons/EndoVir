@@ -6,7 +6,7 @@
 #  Version: 0.0
 
 
-class MagicblastAlignment:
+class MappingAlignment:
 
   class Query:
 
@@ -42,4 +42,3 @@ class MagicblastAlignment:
     self.qry = self.Query(cols[0], cols[6], cols[7], cols[13], cols[15])
     self.ref = self.Reference(cols[1], cols[8], cols[9], cols[14])
     self.pident = float(cols[2])
-    self.btop = cols[16]

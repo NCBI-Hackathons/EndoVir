@@ -20,7 +20,7 @@ import lib.blast.rps.rpstblastn
 import lib.vdbdump.vdbdump
 
 import flankdb
-import flank_chk
+from flanks import flank_checker
 
 class Linker:
 
@@ -136,9 +136,10 @@ class Screener:
       stdin.close()
       self.check_flank_overlaps(ph, contigs, lnk)
       stdin.close()
-      sys.exit()
+      if len(contigs) == 1:
+        break
 
   def check_flank_overlaps(self, blast_proc, contigs, lnk):
-    fc = flank_chk.FlankChecker()
+    fc = flank_checker.FlankChecker()
     fc.parse(blast_proc.stdout)
     fc.check(contigs, lnk)

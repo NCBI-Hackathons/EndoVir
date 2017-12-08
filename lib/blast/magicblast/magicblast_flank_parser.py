@@ -5,8 +5,12 @@
 #
 #  Version: 0.0
 
+import os
+import sys
+sys.path.insert(1, os.path.join(sys.path[0], '../'))
+print(sys.path)
 from . import magicblast_parser
-from . import magicblast_alignment
+from lib.alignment import magicblast_alignment
 
 class MagicblastFlankParser(magicblast_parser.MagicblastParser):
 

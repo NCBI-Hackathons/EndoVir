@@ -5,8 +5,10 @@
 #  https://ncbi.github.io/magicblast/doc/output.html
 #  Version: 0.0
 
-
-from .import magicblast_alignment
+import os
+import sys
+sys.path.insert(1, os.path.join(sys.path[0], '../...'))
+import lib.alignment.magicblast_alignment
 
 class MagicblastParser:
 
@@ -17,4 +19,4 @@ class MagicblastParser:
     self.alignments = []
     for i in src:
       if i[0] != '#':
-        self.alignments.append(magicblast_alignment.MagicblastAlignment(i.strip().split('\t')))
+        self.alignments.append(lib.alignment.magicblast_alignment.MagicblastAlignment(i.strip().split('\t')))

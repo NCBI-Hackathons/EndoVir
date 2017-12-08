@@ -86,18 +86,15 @@ class VirusContig(lib.sequence.sequence.Sequence):
       if flank.overlap.isRevCompl:
         print("DOUBLE CHECK THIS")
         self.log_overlap_coords(flank)
-        ext = self.revcomp_seq(reads[flank.overlap.alignment.qry.sra_rowid],
-                                0,
-                                flank.overlap.alignment.qry.start+1)
+        ext = self.revcomp_seq(reads[flank.overlap.alignment.qry.sra_rowid], 0,
+                               flank.overlap.alignment.qry.start+1)
         self.update_sequence(self.sequence[:flank.stop+1] + ext)
-        return ">{}\n{}\n".format(flank.overlap.name,
-                                  self.sequence[-flank.length:])
+        return ">{}\n{}\n".format(flank.overlap.name, self.sequence[-flank.length:])
 
       self.log_overlap_coords(flank)
       self.update_sequence(self.sequence[:flank.stop+1] + \
                       reads[flank.overlap.alignment.qry.sra_rowid][flank.overlap.alignment.qry.stop:])
-      return ">{}\n{}\n".format(flank.overlap.name,
-                                self.sequence[-flank.length:])
+      return ">{}\n{}\n".format(flank.overlap.name, self.sequence[-flank.length:])
 
   def extend_lhs(self, flank, reads):
     if flank.overlap.alignment.qry.sra_rowid in reads:
@@ -110,12 +107,10 @@ class VirusContig(lib.sequence.sequence.Sequence):
                                      flank.overlap.alignment.qry.length)
 
         self.update_sequence(ext + self.sequence[flank.start:])
-        return ">{}\n{}\n".format(flank.overlap.name,
-                                  self.seqeunce[:flank.length])
+        return ">{}\n{}\n".format(flank.overlap.name, self.seqeunce[:flank.length])
       self.update_sequence(reads[flank.overlap.alignment.qry.sra_rowid][:flank.overlap.alignment.qry.start+1] \
                             + self.sequence[flank.start:])
-      return ">{}\n{}\n".format(flank.overlap.name,
-                                self.sequence[:flank.length])
+      return ">{}\n{}\n".format(flank.overlap.name, self.sequence[:flank.length])
 
   def get_extensions(self, reads):
     extensions = ''
@@ -157,8 +152,21 @@ class VirusContig(lib.sequence.sequence.Sequence):
                                      self.length-self.rhs_flank.length+overlap.lhs_start))
 
     print("{}: from {} to {}".format(lhs_seq.name,overlap.lhs_start, lhs_seq.contig.length))
-    #return self.merge_rhs_contig(self.sequence[:self.length-self.rhs_flank.length+overlap.lhs_start]  \
-                      #+ rhs_seq.contig.sequence[overlap.rhs_stop:], rhs_seq.contig)
+    return self.merge_lhs_contig(self.sequence[:overlap.lhs_stop]  \
+                      + lhs_seq.contig.sequence[:-overlap.rhs_stop], rhs_seq.contig)
+
+  def merge_lhs_contig(self, sequence, contig):
+    print(len(sequence), self.length, len(sequence) - self.length)
+    self.length = len(self.sequence)
+    self.sequence = sequence
+    self.rhs_flank.update_coordinates()
+    fh = open(self.name+contig.name+".fa", 'w')
+    fh.write(">{}\n{}\n".format(self.name+contig.name, self.sequence))
+    contig.rhs_flank.overlap.name = self.rhs_flank.overlap.name
+    self.rhs_flank.overlap = contig.rhs_flank.overlap
+    cu = ContigUpdate(self.rhs_flank, len(sequence) - self.length)
+    print("-------------------")
+    return cu
 
 
 
