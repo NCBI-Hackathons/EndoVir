@@ -28,11 +28,11 @@ README files for installation instructions.
   - export ENDOVIR=`pwd`
   - mkdir tools
   - cd tools
-  - [MagicBLAST 1.3.0](ftp://ftp.ncbi.nlm.nih.gov/blast/executables/magicblast/LATEST/ncbi-magicblast-1.3.0-x64-linux.tar.gz       [check for updates])
+  - [MagicBLAST 1.3.0](ftp://ftp.ncbi.nlm.nih.gov/blast/executables/magicblast/LATEST/ncbi-magicblast-1.3.0-x64-linux.tar.gz)       [check for updates]
     - `wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/magicblast/LATEST/ncbi-magicblast-1.3.0-x64-linux.tar.gz`
     - `tar -xvzf ncbi-magicblast-1.3.0-x64-linux.tar.gz`
     - `export PATH=$ENDOVIR/EndoVir/tools/ncbi-magicblast-1.3.0/bin/`
-  - [sra-toolkit](https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.8.2-1/sratoolkit.2.8.2-1-centos_linux64.tar.gz [check for updates; might also want to use ubuntu])
+  - [sra-toolkit](https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.8.2-1/sratoolkit.2.8.2-1-centos_linux64.tar.gz) [check for updates; might also want to use ubuntu]
      - `wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.8.2-1/sratoolkit.2.8.2-1-centos_linux64.tar.gz`
      - `tar -xvzf sratoolkit.2.8.2-1-centos_linux64.tar.gz`
      - `export PATH=$ENDOVIR/tools/sratoolkit.2.8.2-1-centos_linux64/bin/`
