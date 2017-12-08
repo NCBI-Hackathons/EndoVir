@@ -23,7 +23,7 @@ Setup analysis enviroment:
  - `tar -xzvf Cdd_LE.tar.gz`
 
 #### Install external tools:
-All external tools have to be currentlyin `$PATH`. Please see the corresponding
+All external tools have to be currently in `$PATH`. Please see the corresponding
 README files for installation instructions.
   - `cd $ENDOVIR` (should be in EndoVir/)
   - `mkdir tools`
