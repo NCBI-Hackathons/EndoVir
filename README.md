@@ -25,9 +25,9 @@ Setup analysis enviroment:
 All external tools have to be currentlyin `$PATH`. Please see the corresponding
 README files for installation instructions.
   - cd ../../../ (should be in EndoVir/)
-  - export ENDOVIR=`pwd`
-  - mkdir tools
-  - cd tools
+  - `export ENDOVIR=$(pwd)`
+  - `mkdir tools`
+  - `cd tools`
   - [MagicBLAST 1.3.0](ftp://ftp.ncbi.nlm.nih.gov/blast/executables/magicblast/LATEST/ncbi-magicblast-1.3.0-x64-linux.tar.gz)       [check for updates]
     - `wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/magicblast/LATEST/ncbi-magicblast-1.3.0-x64-linux.tar.gz`
     - `tar -xvzf ncbi-magicblast-1.3.0-x64-linux.tar.gz`
