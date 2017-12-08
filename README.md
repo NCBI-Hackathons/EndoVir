@@ -16,6 +16,7 @@ or an endogenosu virus within a the host genome.
 Setup analysis enviroment:
  - `git clone https://github.com/NCBI-Hackathons/EndoVir.git`
  - `cd Endovir`
+ - `export ENDOVIR=$(pwd)`
  - `mkdir -p work/analysis/dbs`
  - `cd work/analysis/dbs`
  - `wget ftp://ftp.ncbi.nlm.nih.gov/pub/mmdb/cdd/little_endian/Cdd_LE.tar.gz`
@@ -24,8 +25,7 @@ Setup analysis enviroment:
 #### Install external tools:
 All external tools have to be currentlyin `$PATH`. Please see the corresponding
 README files for installation instructions.
-  - cd ../../../ (should be in EndoVir/)
-  - `export ENDOVIR=$(pwd)`
+  - `cd $ENDOVIR` (should be in EndoVir/)
   - `mkdir tools`
   - `cd tools`
   - [MagicBLAST 1.3.0](ftp://ftp.ncbi.nlm.nih.gov/blast/executables/magicblast/LATEST/ncbi-magicblast-1.3.0-x64-linux.tar.gz)       [check for updates]
