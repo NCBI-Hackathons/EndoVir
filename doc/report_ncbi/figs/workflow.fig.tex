@@ -48,22 +48,23 @@
     \node (ctgMerge)  [func, below = of cscreen]  {Contig merger};
 
 
-    \path[->] (refseq)    edge (mapper)
-              (sra)       edge (mapper)
-                          edge (fmapper)
-              (mapper)    edge (asm)
-              (asm)       edge (mscreen)
-              (mscreen)   edge (reject)
-                          edge (ctgs)
-              (ctgs)      edge (flanker)
-              (flanker)   edge (fmapper)
-              (fmapper)   edge (overlaps)
-              (overlaps)  edge (extend)
-              (extend)    edge (ctgChk)
-              (ctgChk)    edge (cscreen)
-                          edge (ctgMerge)
-              (ctgMerge)  edge (cscreen)
-              (cscreen)   edge (ctgs);
+    \path[->] (refseq)    edge [path] (mapper)
+              (sra)       edge [path] (mapper)
+                          edge [path] (fmapper)
+              (mapper)    edge [path] (asm)
+              (asm)       edge [path] (mscreen)
+              (mscreen)   edge [path] (reject)
+                          edge [path] (ctgs)
+              (ctgs)      edge [pipe] (flanker)
+              (flanker)   edge [pipe] (fmapper)
+              (fmapper)   edge [pipe] (overlaps)
+              (overlaps)  edge [pipe] (extend)
+              (extend)    edge [pipe] (ctgChk)
+              (ctgChk.east)    edge [pipe] (cscreen)
+                          edge [pipe] (ctgMerge.west)
+              (ctgMerge)  edge [pipe] (cscreen)
+              (cscreen)   edge [path] (ctgs)
+              (cscreen.east)   edge [path] (reject);
 
     \path[partLabel] (asm.north) +(0,+2*\blockdist) node (inital_desc) {Initial run};
     \path[partLabel](flanker.north) +(0,+2*\blockdist) node (bud) {BUD};
@@ -82,10 +83,12 @@
     \begin{customlegend}[legend cell align=left, %<= to align cells
                          legend entries={ % <= in the following there are the entries
                                            External tools,
-                                           Database},
-                         legend style={at={(10,-5)},font=\footnotesize}] % <= to define position and font legend
+                                           Database,
+                                           Piping (no disk I/O)},
+                         legend style={at={($(d.east)+(4,2)$)},font=\footnotesize}] % <= to define position and font legend
     % the following are the "images" and numbers in the legend
         \addlegendimage{area legend}
         \addlegendimage{mark=db, draw=white}
+        \addlegendimage{style=dashed, color=black}
     \end{customlegend}
   \end{tikzpicture}

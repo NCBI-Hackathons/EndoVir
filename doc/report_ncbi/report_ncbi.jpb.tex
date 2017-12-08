@@ -12,7 +12,7 @@
 \usepackage{multirow}
 \usepackage{ifthen}
 \usepackage{jpb.pgf}
-\lstset{basicstyle=\tiny\ttfamily,breaklines=true}
+  \lstset{basicstyle=\tiny\ttfamily,breaklines=true}
   \usetikzlibrary{shapes.geometric, positioning, calc, shadings}
   \tikzset{%
   db/.style = {cylinder, draw, fill=white, inner sep=2pt},
@@ -20,18 +20,21 @@
   data/.style = {},
   func/.style = {},
   fake/.style = {},
+  path/.style = {thick},
   dna/.style = {draw, very thick},
+  pipe/.style = {draw, very thick, dashed},
   partLabel/.style = {font=\bfseries,
                       fill=gray!10,rounded corners, draw=black!50, dashed},
   every legend to name picture/.style={west}
   }
   \pgfdeclareplotmark{db}{\node [cylinder, draw=black] {};}
+
   \definecolor{struc}{rgb}{0.8,0.09,0.01}
   \definecolor{func}{rgb}{0.17,0.48,0.71}
   \definecolor{rightfl}{rgb}{0.14,0.75,0.4}
   \definecolor{leftfl}{rgb}{0.64,0.06,0.06}
-\usepackage{inconsolata}
-\hypersetup{pdfstartview={Fit}}
+  \usepackage{inconsolata}
+  \hypersetup{pdfstartview={Fit}}
 
 
 %%% Titleslide  %%%
@@ -94,13 +97,6 @@
     \input{listings/usage.lst.tex}
   \end{frame}
 
-  \begin{frame}{Modularity}
-    \begin{itemize}
-     \item Facilitating extending and adding other tools using classes
-           which act as messenger between tool and Endovir.
-    \end{itemize}
-    \input{listings/alignment.lst.tex}
-  \end{frame}
 
   \begin{frame}{Init}
     \resizebox{\linewidth}{!}{\input{figs/init.fig.tex}}
@@ -114,11 +110,24 @@
     \input{figs/flanker.fig.tex}
   \end{frame}
 
+  \begin{frame}{Modularity}
+    \begin{itemize}
+     \item Facilitating extending and adding other tools using classes
+           which act as messenger between tool and Endovir.
+    \end{itemize}
+    \input{listings/alignment.lst.tex}
+  \end{frame}
+
+  \begin{frame}{Modularity}
+    \input{listings/alignment_base.lst.tex}
+  \end{frame}
+
   \begin{frame}{Outlook}
     \begin{itemize}
      \item Adjust tool parameters on the fly
      \item Replace SRA toolkit with NCBI's ngs-python
      \item Test on more diverse datasets
+     \item Docker
     \end{itemize}
   \end{frame}
 

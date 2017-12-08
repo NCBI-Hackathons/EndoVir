@@ -8,12 +8,10 @@
   \pgfdeclarelayer{foreground}
   \pgfsetlayers{background,main,foreground}
 
-
-
-  \begin{scope}[yshift=3em]
-    \node (db) [db, inner sep=0.5em] at (1,-1) {Flanks};
-  \node (mb) [tool, inner sep=0.5em, right = of db]  {magicBLAST};
-  \node (sra) [db, inner sep=0.5em,right = of mb] {SRA};
+  \begin{scope}[yshift=0]
+    \node (db)  [db,    inner sep=0.5em] at (1,-1)      {Flanks};
+    \node (mb)  [tool,  inner sep=0.5em, right = of db] {magicBLAST};
+    \node (sra) [db,    inner sep=0.5em, right = of mb] {SRA};
 
     \def\n {4}
     \coordinate (lf) at (-3em, \n/2/\n);
@@ -33,12 +31,12 @@
       \draw[dna, rightfl, shorten >=2pt,shorten <=2pt] (ctgB) -- (rb);
       \draw[leftfl, shorten <=2pt] ($(lb)!0.5!(ctgA)$) -- (db.north);
       \draw[rightfl, shorten <=2pt] ($(ctgB)!0.5!(rb)$) -- (db.north);
+
     }
-    \path[->, shorten >=2pt,shorten <=2pt]
+    \path[->, path, shorten >=2pt,shorten <=2pt]
       (db)  edge (mb)
       (sra) edge (mb);
     \begin{pgfonlayer}{background}
-      %\path[box] (asm.north) +(0,+2*\blockdist) node (inital_desc) {Initial run};
       \path (lb.west |- lb.north)+(-0.5, 0.5) node (a) {};
       \path (sra.south -| sra.east)+(+0.5,-0.5) node (b) {};
       \path[boxtxt] (a -| b)+(0, 0.25) node (t.east) {Screen flanks};
@@ -53,7 +51,9 @@
     \coordinate (Z) at ($ (mb.west)+(0, -1.5)$);
     \coordinate (Y) at ($ (mb.west)+(-1, -1.5)$);
     \draw[dna] (A) -- (B);
-    \draw[dna, dashed] (B) -- (Z);
+    \draw[->, path] (mb.south) -- ($(Z)!0.5!(Y) + (0,0.2)$);
+    \draw[->, path] (mb.south) -- ($(A)!0.5!(B) + (0,0.2)$);
+    \draw[dna, path, color=black!70] (A) -- (Z);
     \draw[dna] (Z) -- (Y);
 
     \def\n {4}
@@ -71,8 +71,8 @@
       \coordinate (D) at ($ (B)+(\Xa, -\y*\sp)$);
       \coordinate (V) at ($ (Z)+(-\Xa, -\y*\sp)$);
       \coordinate (W) at ($ (Y)+(-\Xa, -\y*\sp)$);
-      \draw[dna, rightfl!50] (C) - - (D);
-      \draw[dna, leftfl!50] (V) - - (W);
+      \draw[dna, rightfl!60] (C) - - (D);
+      \draw[dna, leftfl!60]  (V) - - (W);
     }
 
     \coordinate (0) at ($(L)+(0,-1)$);
@@ -94,9 +94,10 @@
 
   \begin{scope}
     \node [tool] (blast) [below = 5em of Z.west] {BLASTN};
-    \draw[->, shorten >=2pt,shorten <=2pt, thick] (db) |- (blast);
-    \draw[->, shorten <=2pt,shorten >=2pt, thick] ($(0)!0.5!(1)$) -- (blast.north);
-    \draw[->, shorten >=2pt,shorten <=2pt, thick] ($(2)!0.5!(3)$) -- (blast.north);
-    \draw[->, shorten >=2pt,shorten <=2pt, thick] ($(2)!0.5!(3)$) -- (blast.north);
+    \draw[->, path, shorten >=2pt,shorten <=2pt] (db) |- (blast);
+    \coordinate (topB) at ($(blast.north)+(0,0.4)$);
+    \draw[->, path, shorten <=2pt,shorten >=2pt] ($(0)!0.5!(1)$) |- (topB) -- (blast.north);
+    \draw[path] ($(2)!0.5!(3)$) |- (topB);
+    \draw[path] ($(2)!0.5!(3)$) |- (topB);
   \end{scope}
 \end{tikzpicture}
