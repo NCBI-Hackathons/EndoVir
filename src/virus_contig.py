@@ -20,11 +20,11 @@ import lib.fasta.parser
 import flanks.flank_lhs
 import flanks.flank_rhs
 
-class AnnealUpdate:
+class ContigUpdate:
 
-  def __init__(self, name, shift):
-    self.contig = name
-    self.shift = 0
+  def __init__(self, flank, shift):
+    self.flank = flank
+    self.shift = shift
 
 
 class VirusContig(lib.sequence.sequence.Sequence):
@@ -65,13 +65,11 @@ class VirusContig(lib.sequence.sequence.Sequence):
       rstart = 0
       rstop = flank.overlap.alignment.qry.length
 
-    print("Flank: {}\t{}\t{}\t{}".format(fstart,fstop,
-                                         self.length,
+    print("Flank: {}\t{}\t{}\t{}".format(fstart,fstop,  self.length,
                                          flank.overlap.alignment.ref.strand))
     print("Read:  {}\t{}\t{}\t{}".format(rstart,rstop,
                                          flank.overlap.alignment.qry.length,
                                          flank.overlap.alignment.qry.strand))
-
 
   def log_flank_extension(self, overlap):
     print("Extension: {} : {} : {} : {}".format(self.srr,
@@ -90,7 +88,7 @@ class VirusContig(lib.sequence.sequence.Sequence):
         self.log_overlap_coords(flank)
         ext = self.revcomp_seq(reads[flank.overlap.alignment.qry.sra_rowid],
                                 0,
-                                flank.overlap.alignment.qry.stop+1)
+                                flank.overlap.alignment.qry.start+1)
         self.update_sequence(self.sequence[:flank.stop+1] + ext)
         return ">{}\n{}\n".format(flank.overlap.name,
                                   self.sequence[-flank.length:])
@@ -135,27 +133,53 @@ class VirusContig(lib.sequence.sequence.Sequence):
                                                     self.rhs_flank.side,
                                                     rhs_seq.contig.name,
                                                     rhs_seq.side))
-    print("{} - {} - {}".format(self.length, self.rhs_flank.length, overlap.lhs_start))
+    print("LHS")
+    print("OL\tname: {}\n\tstart: {}\n\tstop: {}".format(overlap.lhs_name,
+                                                         overlap.lhs_start,
+                                                         overlap.lhs_stop))
+    print("Ctg\tname: {} len: {}".format(self.name, self.length))
+    print("Flank\tname: {} start: {} stop: {} len: {}".format(self.rhs_flank.name,
+                                                              self.rhs_flank.start,
+                                                              self.rhs_flank.stop,
+                                                              self.rhs_flank.length))
+
+    print("RHS")
+    print("OL\tname: {}\n\tstart: {}\n\tstop: {}".format(overlap.rhs_name,
+                                                         overlap.rhs_start,
+                                                         overlap.rhs_stop))
+    print("Ctg\tname: {} len: {}".format(rhs_seq.contig.name, rhs_seq.contig.length))
+    print("Flank\tname: {} start: {} stop: {} len: {}".format(rhs_seq.name,
+                                                              rhs_seq.start,
+                                                              rhs_seq.stop,
+                                                              rhs_seq.length))
+
     print("{}: from {} to {}".format(self.name, 0,
-                                   self.length-self.rhs_flank.length+overlap.lhs_start))
-    print("\n{}: from {} to {}".format(rhs_seq.name,overlap.lhs_start, rhs_seq.contig.length))
-    fh = open(self.name+".fa", 'w')
-    fh.write(">{}\n{}\n".format(self.name, self.sequence))
-    fh.close()
-    fh = open(rhs_seq.contig.name+".fa", 'w')
-    fh.write(">{}\n{}\n".format(rhs_seq.contig.name, rhs_seq.contig.sequence))
-    fh.close()
-    self.sequence = self.sequence[:self.length-self.rhs_flank.length+overlap.lhs_start]  \
-                    + rhs_seq.contig.sequence[overlap.rhs_stop:]
-    fh = open(self.name+"_"+rhs_seq.contig.name+".fa", 'w')
-    fh.write(">{}\n{}\n".format(self.name+"_"+rhs_seq.contig.name, self.sequence))
-    fh.close()
-    sys.exit()
+                                     self.length-self.rhs_flank.length+overlap.lhs_start))
+
+    print("{}: from {} to {}".format(rhs_seq.name,overlap.lhs_start, rhs_seq.contig.length))
+    return self.merge_rhs_contig(self.sequence[:self.length-self.rhs_flank.length+overlap.lhs_start]  \
+                      + rhs_seq.contig.sequence[overlap.rhs_stop:], rhs_seq.contig)
+
+    # update lhs contig with rhs contig, create update for hit results, remove rhs contig
+    # this contigs rhs will be the rhs_seq contigs rhs
 
   def get_flanks(self):
     if self.hasRhsFlank:
       return self.lhs_flank.get_fasta_sequence() + self.rhs_flank.get_fasta_sequence()
     return self.lhs_flank.get_fasta_sequence()
+
+  def merge_rhs_contig(self, sequence, contig):
+    print(len(sequence), self.length, len(sequence) - self.length)
+    self.length = len(self.sequence)
+    self.sequence = sequence
+    self.rhs_flank.update_coordinates()
+    fh = open(self.name+contig.name+".fa", 'w')
+    fh.write(">{}\n{}\n".format(self.name+contig.name, self.sequence))
+    contig.rhs_flank.overlap.name = self.rhs_flank.overlap.name
+    self.rhs_flank.overlap = contig.rhs_flank.overlap
+    cu = ContigUpdate(self.rhs_flank, len(sequence) - self.length)
+    print("-------------------")
+    return cu
 
   def update_sequence(self, new_seq):
     self.shift = len(new_seq) - self.length
