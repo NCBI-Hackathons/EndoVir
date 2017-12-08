@@ -128,6 +128,40 @@ class VirusContig(lib.sequence.sequence.Sequence):
     return extensions
 
 
+  def anneal_lhs(self, lhs_seq, overlap):
+    print("Annealing {} on {} with {} on {}".format(self.name,
+                                                    self.lhs_flank.side,
+                                                    lhs_seq.contig.name,
+                                                    lhs_seq.side))
+    print("LHS")
+    print("OL\tname: {}\n\tstart: {}\n\tstop: {}".format(overlap.lhs_name,
+                                                         overlap.lhs_start,
+                                                         overlap.lhs_stop))
+    print("Ctg\tname: {} len: {}".format(self.name, self.length))
+    print("Flank\tname: {} start: {} stop: {} len: {}".format(self.lhs_flank.name,
+                                                              self.lhs_flank.start,
+                                                              self.lhs_flank.stop,
+                                                              self.lhs_flank.length))
+
+    print("RHS")
+    print("OL\tname: {}\n\tstart: {}\n\tstop: {}".format(overlap.rhs_name,
+                                                         overlap.rhs_start,
+                                                         overlap.rhs_stop))
+    print("Ctg\tname: {} len: {}".format(lhs_seq.contig.name, lhs_seq.contig.length))
+    print("Flank\tname: {} start: {} stop: {} len: {}".format(lhs_seq.name,
+                                                              lhs_seq.start,
+                                                              lhs_seq.stop,
+                                                              lhs_seq.length))
+
+    print("{}: from {} to {}".format(self.name, 0,
+                                     self.length-self.rhs_flank.length+overlap.lhs_start))
+
+    print("{}: from {} to {}".format(lhs_seq.name,overlap.lhs_start, lhs_seq.contig.length))
+    #return self.merge_rhs_contig(self.sequence[:self.length-self.rhs_flank.length+overlap.lhs_start]  \
+                      #+ rhs_seq.contig.sequence[overlap.rhs_stop:], rhs_seq.contig)
+
+
+
   def anneal_rhs(self, rhs_seq, overlap):
     print("Annealing {} on {} with {} on {}".format(self.name,
                                                     self.rhs_flank.side,
@@ -160,8 +194,6 @@ class VirusContig(lib.sequence.sequence.Sequence):
     return self.merge_rhs_contig(self.sequence[:self.length-self.rhs_flank.length+overlap.lhs_start]  \
                       + rhs_seq.contig.sequence[overlap.rhs_stop:], rhs_seq.contig)
 
-    # update lhs contig with rhs contig, create update for hit results, remove rhs contig
-    # this contigs rhs will be the rhs_seq contigs rhs
 
   def get_flanks(self):
     if self.hasRhsFlank:

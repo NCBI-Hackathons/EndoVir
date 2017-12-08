@@ -76,9 +76,10 @@ class FlankChecker(lib.blast.parser.blast_json.BlastParser):
               if flkB.contig.name in contigs:
                 del(contigs[flkB.contig.name])
               del(self.hspmap[i])
-          #if flkA.side == 'lhs':
+            #if flkA.side == 'lhs':
             #flkA.contig.anneal_lhs(flkB.contig, c)
     print(contigs)
+
   def update(self):
     if self.hspmap[i].query.title in self.updates:
       c = self.ContigOverlap()
