@@ -28,24 +28,25 @@ README files for installation instructions.
   - export ENDOVIR=`pwd`
   - mkdir tools
   - cd tools
-  - [MagicBLAST 1.3.0](wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/magicblast/LATEST/ncbi-magicblast-1.3.0-x64-linux.tar.gz       [check for updates])
-    tar -xvzf ncbi-magicblast-1.3.0-x64-linux.tar.gz
-    export PATH=$ENDOVIR/EndoVir/tools/ncbi-magicblast-1.3.0/bin/
-  - [sra-toolkit](wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.8.2-1/sratoolkit.2.8.2-1-centos_linux64.tar.gz [check for updates; might also want to use ubuntu])
-    tar -xvzf sratoolkit.2.8.2-1-centos_linux64.tar.gz
-    export PATH=$ENDOVIR/tools/sratoolkit.2.8.2-1-centos_linux64/bin/
+  - [MagicBLAST 1.3.0](ftp://ftp.ncbi.nlm.nih.gov/blast/executables/magicblast/LATEST/ncbi-magicblast-1.3.0-x64-linux.tar.gz       [check for updates])
+    - `wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/magicblast/LATEST/ncbi-magicblast-1.3.0-x64-linux.tar.gz`
+    - `tar -xvzf ncbi-magicblast-1.3.0-x64-linux.tar.gz`
+    - `export PATH=$ENDOVIR/EndoVir/tools/ncbi-magicblast-1.3.0/bin/`
+  - [sra-toolkit](https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.8.2-1/sratoolkit.2.8.2-1-centos_linux64.tar.gz [check for updates; might also want to use ubuntu])
+     - `wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.8.2-1/sratoolkit.2.8.2-1-centos_linux64.tar.gz`
+     - `tar -xvzf sratoolkit.2.8.2-1-centos_linux64.tar.gz`
+     - `export PATH=$ENDOVIR/tools/sratoolkit.2.8.2-1-centos_linux64/bin/`
   - [MEGAHIT](https://github.com/voutcn/megahit)
-     git clone https://github.com/voutcn/megahit.git
-     cd megahit
-     make (-j n, where n is the # of cores you want to use)
-     export PATH=$ENDOVIR/tools/megahit
+      - `git clone https://github.com/voutcn/megahit.git`
+      - `cd megahit` 
+      - `make -j $(cat /proc/cpuinfo | grep processor | wc -l)` (-j n, where n is the # of cores you want to use)
+      - `export PATH=$ENDOVIR/tools/megahit`
   *- [ABYSS2]
     wget http://www.bcgsc.ca/platform/bioinfo/software/abyss/releases/2.0.2/abyss-2.0.2.tar.gz
   - [SOAPdenovo]
   - [SPADES]*
-  - echo "PATH=$PATH:$ENDOVIRPATH" >> ~/.bashrc  // onlyif you switch the
-    console/login after install
-    source ~/.bashrc
+  - `echo "PATH=$PATH:$ENDOVIRPATH" >> ~/.bashrc`  # only if you switch the console/login after install
+  - `source ~/.bashrc` # just in case
 
 
 
