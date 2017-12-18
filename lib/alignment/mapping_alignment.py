@@ -8,7 +8,7 @@
 
 class MappingAlignment:
 
-  class Query:
+  class Read:
 
     def __init__(self, name, start, stop, strand, qlen):
       self.name = name
@@ -24,7 +24,7 @@ class MappingAlignment:
         return (self.start, self.stop)
       return (self.stop, self.start)
 
-  class Reference:
+  class Contig:
 
     def __init__(self, name, start, stop, strand):
       self.name = name
@@ -39,6 +39,6 @@ class MappingAlignment:
       return (self.stop, self.start)
 
   def __init__(self, cols):
-    self.qry = self.Query(cols[0], cols[6], cols[7], cols[13], cols[15])
-    self.ref = self.Reference(cols[1], cols[8], cols[9], cols[14])
+    self.read = self.Read(cols[0], cols[6], cols[7], cols[13], cols[15])
+    self.contig = self.Contig(cols[1], cols[8], cols[9], cols[14])
     self.pident = float(cols[2])

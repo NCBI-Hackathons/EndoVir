@@ -13,22 +13,35 @@ import lib.sequence.sequence
 
 class Flank:
 
-  class Overlap:
+  class Extension:
 
-    def __init__(self, name, flank):
-      self.length = 0
-      self.alignment = None
-      self.isRevCompl = False
-      self.name = name
+    def __init__(self, flank):
       self.flank = flank
+      self.length = 0
       self.start = 0
       self.stop = 0
+      self.alignment = None
+      self.isRevCompl = False
+      self.name = flank.name+"_ex"
+      self.sra_rowid = 0
 
-    def update(self, alignment, length):
-      self.length = length
-      self.alignment = alignment
-      if self.alignment.qry.strand != self.alignment.ref.strand:
-        self.isRevCompl = True
+    def is_longer_alignment(self, alignment):
+      if (alignment.read.length - abs(alignment.read.stop-alignment.read.start)+1) > self.length:
+        self.length = alignment.read.length - abs(alignment.read.stop-alignment.read.start)+1
+        self.alignment = alignment
+        self.sra_rowid = alignment.read.sra_rowid
+        return True
+      return False
+
+    def update_lhs_coordinates(self):
+      self.start = 0
+      if self.alignment != None:
+        self.stop = self.length + abs(self.alignment.read.stop-self.alignment.read.start)
+
+    def update_rhs_coordinates(self):
+      self.stop = self.flank.contig.length
+      if self.alignment != None:
+        self.start = self.flank.contig.length - abs(self.alignment.read.stop-self.alignment.read.start)
 
     def get_contig(self):
       return self.flank.contig
@@ -42,20 +55,16 @@ class Flank:
     self.stop = 0
     self.ref_overlap = 5
     self.qry_overlap = 20
-    self.overlap = self.Overlap(self.name+"_ol", self)
+    self.extension = self.Extension(self)
     self.calculate_coordinates(ctg)
 
+
   def has_extension(self):
-    if self.overlap.alignment is None:
+    if self.extension.alignment is None:
       return False
     return True
 
-  def has_overlap(self, alignment):
-    if self.check_overlap(alignment):
-      return True
-    return False
-
-  def check_overlap(self, alignment):
+  def is_extended(self, alignment):
     raise NotImplementedError("Require  check_overlap() implementation")
 
   def get_extension(self, reads):

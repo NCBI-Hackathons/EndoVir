@@ -16,22 +16,21 @@ class MagicblastFlankParser(magicblast_parser.MagicblastParser):
   def __init__(self, flankmap):
     super().__init__()
     self.flankmap = flankmap
-    self.overlaps = {}
+    self.extensions = {}
 
   """
     This is a  weak test considering partial mappings onto the flank
   """
-  def check_single_overlap(self, flank, alignment):
-    if alignment.qry.get_ordered_coords()[0] < 1:
-      if flank.update_extension(alignment):
-        self.overlaps[flank.name] = alignment
+  def check_single_extension(self, flank, alignment):
+    if alignment.read.get_ordered_coords()[0] < 1:
+      if is_extended(alignment):
+        self.extensions[flank.name] = alignment
         #print("{}: LHS Overlap {} :: Len: {}".format(flank.name,
                                                      #flank.overlap.rowid,
                                                      #flank.overlap.length))
-
-    if alignment.qry.get_ordered_coords()[1] < alignment.qry.length:
-      if flank.update_extension(alignment):
-        self.overlaps[flank.name] = alignment
+    if alignment.read.get_ordered_coords()[1] < alignment.read.length:
+      if is_extended(alignment):
+        self.extensions[flank.name] = alignment
         #print("{}: RHS Overlap {} :: Len: {}".format(flank.name,
                                                      #flank.overlap.rowid,
                                                      #flank.overlap.length))
@@ -43,11 +42,11 @@ class MagicblastFlankParser(magicblast_parser.MagicblastParser):
     #print("Ref\t{}\t{}\t{}".format(a.ref.start, a.ref.stop, a.ref.strand))
     if not flank.contig.hasRhsFlank:
       if flank.name not in self.extensions:
-        self.overlaps[flank.name] = None
-      self.check_single_overlap(flank, a)
+        self.extensions[flank.name] = None
+      self.check_single_extension(flank, a)
     else:
-      if flank.has_overlap(a):
-        self.overlaps[flank.name] = a
+      if flank.is_extended(a):
+        self.extensions[flank.name] = a
 
   def parse(self, src, contigs):
     alignments = []
@@ -60,8 +59,8 @@ class MagicblastFlankParser(magicblast_parser.MagicblastParser):
           if self.flankmap[cols[1]].contig.name in contigs:
             self.identify_overlaps(cols, self.flankmap[cols[1]])
         read_count += 1
-    for i in self.overlaps:
-      print(i, self.overlaps[i].qry.sra_rowid)
-      alignments.append(self.overlaps[i])
+    for i in self.extensions:
+      print(i, self.extensions[i].read.sra_rowid)
+      alignments.append(self.extensions[i])
     print("Overlapping reads: {}/{}".format(len(alignments), read_count))
     return alignments

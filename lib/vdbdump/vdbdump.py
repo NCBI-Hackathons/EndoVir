@@ -21,8 +21,8 @@ class VdbDump:
     self.format = 'fastq'
     self.batch_size = 10000
 
-  def show_log(self, size):
-    print(print("Running vdb-dump: {rows}", file=sys.stderr))
+  def show_log(self, dumped, total):
+    print("\rRunning vdb-dump: {}/{}".format(dumped, total), end='', file=sys.stderr)
 
   def run(self, srr, alignments, parser=vdbdump_fastq_parser.VdbdumpFastqParser()):
     opts = [self.cmd, '--format', self.format]
@@ -30,9 +30,8 @@ class VdbDump:
     batch_size = self.batch_size
     parser.reset()
     for i in range(0, len(alignments), batch_size):
-      cmd = opts + ['-R', ','.join(str(x.qry.sra_rowid) for x in alignments[i:i+self.batch_size]), srr]
-      #print(cmd, file=sys.stderr)
-      print("\rRunning vdb-dump", file=sys.stderr, end='')
+      cmd = opts + ['-R', ','.join(str(x.read.sra_rowid) for x in alignments[i:i+self.batch_size]), srr]
+      self.show_log(i, len(alignments))
       vd = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1)
       parser.parse(vd.stdout, alignments[i:i+batch_size])
     print("\n", file=sys.stderr)
@@ -42,9 +41,8 @@ class VdbDump:
     opts = [self.cmd, '--format', fmt]
     batch_size = self.batch_size
     for i in range(0, len(alignments), batch_size):
-      cmd = opts + ['-R', ','.join(str(x.qry.sra_rowid) for x in alignments[i:i+self.batch_size]), srr]
-      #print(cmd, file=sys.stderr)
-      print("\rRunning vdb-dump", file=sys.stderr, end='')
+      cmd = opts + ['-R', ','.join(str(x.read.sra_rowid) for x in alignments[i:i+self.batch_size]), srr]
+      self.show_log(i, len(alignments))
       vd = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1)
       stream.write(vd.stdout.read().decode())
     print("\n", file=sys.stderr)
@@ -55,8 +53,7 @@ class VdbDump:
     reads = {}
     for i in range(0, len(rowids), batch_size):
       cmd = opts + ['-R', ','.join(str(x) for x in rowids[i:i+self.batch_size]), srr]
-      #print(cmd, file=sys.stderr)
-      print("\rRunning vdb-dump", file=sys.stderr, end='')
+      self.show_log(i, len(rowids))
       vd = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1, universal_newlines=True)
       for i in vd.stdout:
         fields = i.strip().split('\t')

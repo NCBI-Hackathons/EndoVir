@@ -27,23 +27,23 @@ class Linker:
   def __init__(self):
     self.flank_map = {}
     self.contig_map = {}
-    self.overlap_map = {}
+    self.extension_map = {}
 
   def add_contig(self, contig):
     self.contig_map[contig.name] = contig
     self.flank_map[contig.lhs_flank.name] = contig.lhs_flank
     self.flank_map[contig.rhs_flank.name] = contig.rhs_flank
-    self.overlap_map[contig.lhs_flank.overlap.name] = contig.lhs_flank.overlap
-    self.overlap_map[contig.rhs_flank.overlap.name] = contig.rhs_flank.overlap
+    self.extension_map[contig.lhs_flank.extension.name] = contig.lhs_flank.extension
+    self.extension_map[contig.rhs_flank.extension.name] = contig.rhs_flank.extension
 
-  def overlap_to_flank(self, overlap):
-    if overlap.name in self.overlap_map:
-      return self.overlap_map[self.overlap_map.name].flank
+  def extension_to_flank(self, extension):
+    if extension.name in self.extension_map:
+      return self.extension_map[self.extension_map.name].flank
     return None
 
-  def overlap_to_contig(self, overlap):
-    if overlap.name in self.overlap_map:
-      return self.flank_to_contig(self.overlap_to_flank(overlap))
+  def extension_to_contig(self, extension):
+    if extension.name in self.extension_map:
+      return self.flank_to_contig(self.extension_to_flank(extension))
     return None
 
   def flank_to_contig(self, flank):
@@ -54,17 +54,17 @@ class Linker:
   def get_flank(self, name):
     if name in self.flank_map:
       return self.flank_map[name]
-    if name in self.overlap_map:
-      return self.overlap_map[name].flank
+    if name in self.extension_map:
+      return self.extension_map[name].flank
 
-  def get_overlap(self, overlap_name):
-    return self.overlap_map.get(overlap_name)
+  def get_extension(self, extension_name):
+    return self.extension_map.get(extension_name)
 
   def get_contig(self, name):
     if name in self.contig_map:
       return self.contig_map[contig]
-    if name in self.overlap_map:
-      return  self.overlap_map[name].flank.contig
+    if name in self.extension_map:
+      return  self.extension_map[name].flank.contig
     if name in self.flank_map:
       return  self.flank_map[name].contig
 
@@ -98,12 +98,6 @@ class Screener:
   def cdd_screen(self, contigs, db, outf):
     return self.cdd_screener.run(contigs, db, outf)
 
-  def find_extensions(self, contigs):
-    pass
-
-  def flank_to_contig(self, flank):
-    pass
-
   def bud(self, contigs):
     lnk = Linker()
     for i in contigs:
@@ -115,7 +109,7 @@ class Screener:
       mb = lib.blast.magicblast.magicblast.Magicblast()
       fp = lib.blast.magicblast.magicblast_flank_parser.MagicblastFlankParser(self.flankdb.flankmap)
       extensions = fp.parse(mb.run(self.srr, self.flankdb.path), contigs)
-      reads = self.vdbdump.rowids_to_reads(self.srr, [x.qry.sra_rowid for x in extensions])
+      reads = self.vdbdump.rowids_to_reads(self.srr, [x.read.sra_rowid for x in extensions])
       rfd, wfd = os.pipe()
       stdout = os.fdopen(wfd, 'w')
       for i in contigs:
@@ -140,6 +134,7 @@ class Screener:
         break
 
   def check_flank_overlaps(self, blast_proc, contigs, lnk):
+    print("Checking flanks for overlaps")
     fc = flank_checker.FlankChecker()
-    #fc.parse(blast_proc.stdout)
-    #fc.check(contigs, lnk)
+    fc.parse(blast_proc.stdout)
+    fc.check(contigs, lnk)

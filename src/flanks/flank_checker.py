@@ -17,82 +17,46 @@ class FlankChecker(lib.blast.parser.blast_json.BlastParser):
 
   class ContigOverlap:
 
-    def __init__(self):
-      self.lhs = None
-      self.lhs_start = 0
-      self.lhs_stop = 0
-      self.lhs_strand = 0
-
-      self.rhs = None
-      self.rhs_start = 0
-      self.rhs_stop= 0
-      self.rhs_strand = 0
+    def __init__(self, l_from, l_to, l_strand, r_from, r_to, r_strand):
+      self.lhs_from = l_from
+      self.lhs_to = l_to
+      self.lhs_strand = l_strand
+      self.rhs_from = r_from
+      self.rhs_to= r_to
+      self.rhs_strand = r_strand
 
   def __init__(self):
     super().__init__()
     self.updates = {}
 
   def check(self, contigs, lnk):
-    hits = list(self.hspmap.keys())
-    for i in hits:
-      if i in self.hspmap:
-        flkA = lnk.get_flank(self.hspmap[i].query.title)
-        flkB = lnk.get_flank(self.hspmap[i].hit.accession)
-        print(flkA.name, flkB.name)
-        if flkA.name in self.updates:
-          print("SUBST: {} -> {}. Shift: {}".format(flkA.name,
-                                                      self.updates[flkA.name].flank.name,
-                                                      self.updates[flkA.name].shift))
-          flkA = self.updates[flkA.name].flank
-        if flkB.name in self.updates:
-          print("SUBST: {} -> {}. Shift: {}".format(flkB.name,
-                                                      self.updates[flkB.name].flank.name,
-                                                      self.updates[flkB.name].shift))
-          flkB = self.updates[flkB.name].flank
-        if flkA.name != flkB.name:
-          print(i, self.hspmap[i].score, self.hspmap[i].alength, self.hspmap[i].identity)
-          print("\t", self.hspmap[i].query.title,
-                      self.hspmap[i].query_from,
-                      self.hspmap[i].query_to,
-                      self.hspmap[i].query_strand,
-                      self.hspmap[i].qseq)
-          print("\t", self.hspmap[i].hit.accession,
-                      self.hspmap[i].hit_from,
-                      self.hspmap[i].hit_to,
-                      self.hspmap[i].hit_strand,
-                      self.hspmap[i].hseq)
+    for i in self.hspmap:
+      flankA = lnk.get_flank(self.hspmap[i].query.title)
+      flankB = lnk.get_flank(self.hspmap[i].hit.accession)
+      if flankA.contig.name != flankB.contig.name:
+        print(flankA.contig.name, flankA.name, flankB.contig.name, flankB.name)
+        print("\t", self.hspmap[i].query.title, self.hspmap[i].query_from,
+                    self.hspmap[i].query_to,    self.hspmap[i].query_strand,
+                    self.hspmap[i].qseq)
+        print("\t", self.hspmap[i].hit.accession, self.hspmap[i].hit_from,
+                    self.hspmap[i].hit_to, self.hspmap[i].hit_strand,
+                    self.hspmap[i].hseq)
+        if flankA.side == 'rhs' and flankB.side == 'lhs':
+          print("{}:{} + {}:{}".format(flankA.contig.name, flankA.side, flankB.contig.name, flankB.side))
+          c = self.ContigOverlap(self.hspmap[i].query_from, self.hspmap[i].query_to,
+                                 self.hspmap[i].query_strand, self.hspmap[i].hit_from,
+                                 self.hspmap[i].hit_to, self.hspmap[i].hit_strand)
+          flankA.contig.merge_contig_rhs(flankA, flankB.contig, c)
+        elif flankA.side == 'lhs' and flankB.side == 'rhs':
+          pass
+          #flankB.contig.merge_contig_rhs(flankA, c)
+        else:
+          print("One flank is on the other strand")
+      else:
+        if flankA.name != flankB.name:
+          raise NotImplementedError("Smells like circular or terminal repeat business. \
+                                    Not yet implemented. How about now?")
 
-          if self.hspmap[i].query_strand == self.hspmap[i].hit_strand:
-            #if flkA.side == 'rhs':
-              #c = self.ContigOverlap()
-              #c.lhs_name = self.hspmap[i].query.title
-              #c.lhs_start = self.hspmap[i].query_from
-              #c.lhs_stop  = self.hspmap[i].query_to
-              #c.rhs_name = self.hspmap[i].hit.accession
-              #c.rhs_start = self.hspmap[i].hit_from
-              #c.rhs_stop  = self.hspmap[i].hit_to
-              #upd = flkA.contig.anneal_rhs(flkB, c)
-              #self.updates[flkB.name] = upd
-              #if flkB.contig.name in contigs:
-                #del(contigs[flkB.contig.name])
-              #del(self.hspmap[i])
-
-            if flkA.side == 'lhs':
-              c = self.ContigOverlap()
-              c.lhs_name = self.hspmap[i].query.title
-              c.lhs_start = self.hspmap[i].query_from
-              c.lhs_stop  = self.hspmap[i].query_to
-              c.rhs_name = self.hspmap[i].hit.accession
-              c.rhs_start = self.hspmap[i].hit_from
-              c.rhs_stop  = self.hspmap[i].hit_to
-              upd = flkA.contig.anneal_lhs(flkB, c)
-              self.updates[flkB.name] = upd
-              if flkB.contig.name in contigs:
-                del(contigs[flkB.contig.name])
-              del(self.hspmap[i])
-          else:
-            raise NotImplementedError("Not yet implemented. How about now?")
-    print(contigs)
 
   def update(self):
     if self.hspmap[i].query.title in self.updates:

@@ -66,17 +66,22 @@ class Endovir:
       srr_alignments = s.screen_srr(s.srr, s.virus_db.path)
       vdb_parser = s.vdbdump.run(s.srr, srr_alignments)
       contigs = s.assemble(vdb_parser.dump_to_file())
-      for j in s.cdd_screen(contigs, s.cdd_db.path, os.path.join(s.wd, 'rpst')):
-        c = virus_contig.VirusContig("ctg_"+str(len(vrs_ctgs)),
-                                     s.assembler.parser.sequences[j].sequence,
-                                     i,
-                                     s.assembler.parser.sequences[j].header,
-                                     self.flank_len,
-                                     s.wd)
-        vrs_ctgs[c.name] = c
-        print("Prepared {} for budding".format(c.name))
-      print("Budding {} contigs".format(len(vrs_ctgs)))
-      s.bud(vrs_ctgs)
+      putative_virus_contigs = s.cdd_screen(contigs, s.cdd_db.path, os.path.join(s.wd, 'rpst'))
+      if len(putative_virus_contigs) > 0:
+        for j in putative_virus_contigs:
+          c = virus_contig.VirusContig("ctg_"+str(len(vrs_ctgs)),
+                                      s.assembler.parser.sequences[j].sequence,
+                                      i,
+                                      s.assembler.parser.sequences[j].header,
+                                      self.flank_len,
+                                      s.wd)
+          vrs_ctgs[c.name] = c
+          print("Prepared {} for budding".format(c.name))
+        print("Budding {} contigs".format(len(vrs_ctgs)))
+        s.bud(vrs_ctgs)
+      else:
+        print("No contigs with virus motifs detected")
+        sys.exit()
 
 def main():
   ap = argparse.ArgumentParser(description='Endovir')
