@@ -111,14 +111,13 @@ class Screener:
 
     while True:
       while self.flankdb.collect_flanks(contigs) != True:
-        time.sleep(0.0001)
+        time.sleep(0.01)
       mb = lib.blast.magicblast.magicblast.Magicblast()
       fp = lib.blast.magicblast.magicblast_flank_parser.MagicblastFlankParser(self.flankdb.flankmap)
       extensions = fp.parse(mb.run(self.srr, self.flankdb.path), contigs)
       reads = self.vdbdump.rowids_to_reads(self.srr, [x.qry.sra_rowid for x in extensions])
       rfd, wfd = os.pipe()
       stdout = os.fdopen(wfd, 'w')
-      contig = lib.blast.blastdb.makeblastdb
       for i in contigs:
         ext = contigs[i].get_extensions(reads)
         if contigs[i].hasExtension:
@@ -136,10 +135,11 @@ class Screener:
       stdin.close()
       self.check_flank_overlaps(ph, contigs, lnk)
       stdin.close()
-      if len(contigs) == 1:
+      sys.exit()
+      if len(contigs) < 2:
         break
 
   def check_flank_overlaps(self, blast_proc, contigs, lnk):
     fc = flank_checker.FlankChecker()
-    fc.parse(blast_proc.stdout)
-    fc.check(contigs, lnk)
+    #fc.parse(blast_proc.stdout)
+    #fc.check(contigs, lnk)

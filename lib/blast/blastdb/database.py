@@ -25,10 +25,6 @@ class BlastDatabase:
     self.cmd  = [cmd]
 
   def make_db(self, fil=None):
-    if fil == None:
-      cmd = self.cmd + ['-dbtype', self.typ, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
-      p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
-      return p
     cmd = self.cmd + ['-dbtype', self.typ, '-in', fil, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
     print(cmd)
     subprocess.run(cmd)

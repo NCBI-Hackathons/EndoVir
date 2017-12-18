@@ -118,6 +118,7 @@ class VirusContig(lib.sequence.sequence.Sequence):
       extensions += self.extend_lhs(self.lhs_flank, reads)
       self.hasExtension = True
     if self.rhs_flank.has_extension():
+      print(self.rhs_flank.name, self.rhs_flank.has_extension)
       extensions += self.extend_rhs(self.rhs_flank, reads)
       self.hasExtension = True
     return extensions
@@ -153,7 +154,7 @@ class VirusContig(lib.sequence.sequence.Sequence):
 
     print("{}: from {} to {}".format(lhs_seq.name,overlap.lhs_start, lhs_seq.contig.length))
     return self.merge_lhs_contig(self.sequence[:overlap.lhs_stop]  \
-                      + lhs_seq.contig.sequence[:-overlap.rhs_stop], rhs_seq.contig)
+                      + lhs_seq.contig.sequence[:-overlap.lhs_stop], lhs_seq.contig)
 
   def merge_lhs_contig(self, sequence, contig):
     print(len(sequence), self.length, len(sequence) - self.length)

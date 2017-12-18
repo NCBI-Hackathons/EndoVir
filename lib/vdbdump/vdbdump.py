@@ -35,6 +35,7 @@ class VdbDump:
       print("\rRunning vdb-dump", file=sys.stderr, end='')
       vd = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1)
       parser.parse(vd.stdout, alignments[i:i+batch_size])
+    print("\n", file=sys.stderr)
     return parser
 
   def dump_to_stream(self, srr, alignments, stream, fmt='fasta'):
@@ -46,6 +47,7 @@ class VdbDump:
       print("\rRunning vdb-dump", file=sys.stderr, end='')
       vd = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1)
       stream.write(vd.stdout.read().decode())
+    print("\n", file=sys.stderr)
 
   def rowids_to_reads(self, srr, rowids):
     opts = [self.cmd, '--format', 'tab', '-C', 'NAME,READ']
@@ -59,4 +61,5 @@ class VdbDump:
       for i in vd.stdout:
         fields = i.strip().split('\t')
         reads[fields[0]] = fields[1]
+    print("\n", file=sys.stderr)
     return reads

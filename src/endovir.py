@@ -35,7 +35,7 @@ class Endovir:
                                                                     dbdir=os.path.join(self.wd, self.dbs_dirname),
                                                                     typ='nucl')},
       'cdd' : {'src' : ['ftp://ftp.ncbi.nlm.nih.gov/pub/mmdb/cdd/cdd.tar.gz'],
-               'db' : lib.blast.blastdb.makeprofiledb.Makeprofiledb(name='Cdd',
+               'db' : lib.blast.blastdb.makeprofiledb.Makeprofiledb(name='endovir_cdd',
                                                                     dbdir=os.path.join(self.wd, self.dbs_dirname),
                                                                     typ='rps')}
     }
