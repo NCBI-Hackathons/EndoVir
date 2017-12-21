@@ -56,60 +56,51 @@ class VirusContig(lib.sequence.sequence.Sequence):
       self.lhs_flank.length = self.length
 
   def log_overlap_coords(self, flank):
-    fstart = flank.start
-    fstop = flank.stop
-    rstart = flank.extension.alignment.read.start
-    rstop = flank.extension.alignment.read.stop
-    if flank.side == 'rhs' and flank.extension.isRevCompl:
-      rstart = 0
-      rstop = flank.extension.alignment.reads.length
+    print(self.srr)
+    print("Flank: {}\t{}\t{}\t{}\t{}\t{}\t{}".format(flank.name,
+                                             flank.start,
+                                             flank.stop,
+                                             flank.length,
+                                             flank.extension.alignment.flank.strand,
+                                             flank.extension.alignment.flank.start,
+                                             flank.extension.alignment.flank.stop))
+    print("Read:  {}\t{}\t{}\t{}\t{}".format(flank.extension.sra_rowid,
+                                             flank.extension.alignment.read.start,
+                                             flank.extension.alignment.read.stop,
+                                             flank.extension.alignment.read.length,
+                                             flank.extension.alignment.read.strand))
 
-    print("Flank: {}\t{}\t{}\t{}".format(fstart,fstop,  self.length,
-                                         flank.extension.alignment.contig.strand))
-    print("Read:  {}\t{}\t{}\t{}".format(rstart,rstop,
-                                         flank.extension.alignment.read.length,
-                                         flank.extension.alignment.read.strand))
+    print("Ext:   {}\t{}\t{}".format(flank.extension.start,
+                                     flank.extension.stop,
+                                     flank.extension.length))
 
-  def log_flank_extension(self, extension):
-    print("Extension: {} : {} : {} : {}".format(self.srr,
-                                                extension.alignment.contig.name,
-                                                extension.alignment.read.sra_rowid,
-                                                extension.isRevCompl))
+
   def revcomp_seq(self, seq, beg, end):
     return seq[beg:end+1][::-1].translate(str.maketrans("ACTG", "TGAC"))
 
   def extend_lhs(self, flank, reads):
     if flank.extension.sra_rowid in reads:
-      self.log_flank_extension(flank.extension)
+      self.log_overlap_coords(flank)
+      ext = None
       if flank.extension.isRevCompl:
         print("DOUBLE CHECK THIS")
-        self.log_overlap_coords(flank)
         ext = self.revcomp_seq(reads[flank.extension.sra_rowid],
                                      flank.extension.alignment.read.stop,
                                      flank.extension.alignment.read.length)
-
-        self.update_sequence(ext + self.sequence[flank.start:])
-        return ">{}\n{}\n".format(flank.extension.name, self.seqeunce[:flank.length])
-      self.update_sequence(reads[flank.extension.sra_rowid][:flank.extension.alignment.read.start+1] \
-                            + self.sequence[flank.start:])
-      return ">{}\n{}\n".format(flank.extension.name, self.sequence[:flank.length])
+      else:
+        ext = reads[flank.extension.sra_rowid][:flank.extension.alignment.read.start]
+      self.update_sequence(ext+self.sequence[flank.start+flank.extension.alignment.flank.start:], flank)
 
   def extend_rhs(self, flank, reads):
     if flank.extension.sra_rowid in reads:
-      self.log_flank_extension(flank.extension)
-
+      ext = None
+      self.log_overlap_coords(flank)
       if flank.extension.isRevCompl:
         print("DOUBLE CHECK THIS")
-        self.log_overlap_coords(flank)
-        ext = self.revcomp_seq(reads[flank.extension.sra_rowid], 0,
-                               flank.extension.alignment.read.start+1)
-        self.update_sequence(self.sequence[:flank.stop+1] + ext)
-        return ">{}\n{}\n".format(flank.extension.name, self.sequence[-flank.length:])
-
-      self.log_overlap_coords(flank)
-      self.update_sequence(self.sequence[:flank.stop+1] + \
-                      reads[flank.extension.sra_rowid][flank.extension.alignment.read.stop:])
-      return ">{}\n{}\n".format(flank.extension.name, self.sequence[-flank.length:])
+        ext = self.revcomp_seq(reads[flank.extension.sra_rowid], 0, flank.extension.alignment.read.stop)
+      else:
+        ext = reads[flank.extension.sra_rowid][flank.extension.alignment.read.stop+1:]
+      self.update_sequence(self.sequence[:flank.start+flank.extension.alignment.flank.stop+1]+ext, flank)
 
 
 
@@ -128,37 +119,36 @@ class VirusContig(lib.sequence.sequence.Sequence):
     #fh = open(self.name+rhs_contig.name, 'w')
     #fh.write(self.sequence[:this_ctg_from]+rhs_contig[])
 
-  def get_extensions(self, reads):
-    extensions = ''
+  def save_fasta(self):
+    fh = open(os.path.join(self.wd, self.name+'.fa'), 'w')
+    fh.write(">{}\n{}\n".format(self.name, self.sequence))
+    fh.close()
+
+  def extend(self, reads):
     if self.lhs_flank.has_extension():
-      extensions += self.extend_lhs(self.lhs_flank, reads)
-      self.hasExtension = True
+      self.extend_lhs(self.lhs_flank, reads)
     if self.rhs_flank.has_extension():
-      extensions += self.extend_rhs(self.rhs_flank, reads)
-      self.hasExtension = True
-    return extensions
+      self.extend_rhs(self.rhs_flank, reads)
 
   def get_flanks(self):
     if self.hasRhsFlank:
       return self.lhs_flank.get_fasta_sequence() + self.rhs_flank.get_fasta_sequence()
     return self.lhs_flank.get_fasta_sequence()
 
-  def update_sequence(self, new_seq):
+  def update_sequence(self, new_seq, flank):
     self.shift = len(new_seq) - self.length
+    print(self.length, len(new_seq), self.shift)
     self.sequence = new_seq
     self.length = len(new_seq)
-    self.lhs_flank.stop = self.lhs_flank.length
-    self.lhs_flank.extension.update_lhs_coordinates()
-    self.rhs_flank.update_coordinates()
-    self.rhs_flank.extension.update_rhs_coordinates()
-    print("Ctg\tlen\tlEbeg\tlEend\tlFbeg\tlFend\trFbeg\trFend\trEbeg\trEend")
-    print("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}".format(self.name,
-                                                          self.length,
-                                                          self.lhs_flank.extension.start,
-                                                          self.lhs_flank.extension.stop,
-                                                          self.lhs_flank.start,
-                                                          self.lhs_flank.stop,
-                                                          self.rhs_flank.start,
-                                                          self.rhs_flank.stop,
-                                                          self.rhs_flank.extension.start,
-                                                          self.rhs_flank.extension.stop))
+    if flank.side == 'lhs':
+      self.rhs_flank.extension.shift_coordinates(self.shift)
+    self.rhs_flank.calculate_coordinates()
+
+  def show(self):
+    print("{}\t{}".format(self.name, self.length))
+    self.lhs_flank.show()
+    self.lhs_flank.extension.show()
+    self.rhs_flank.show()
+    self.rhs_flank.extension.show()
+
+    print("-------------------")
