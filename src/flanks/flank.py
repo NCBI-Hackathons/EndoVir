@@ -12,6 +12,13 @@ sys.path.insert(1, os.path.join(sys.path[0], '../'))
 import lib.sequence.sequence
 import extensions.extension
 
+class BlastData:
+
+    def __init__(self):
+      self.start = 0
+      self.stop = 0
+      self.strand = 0
+
 class Flank:
 
   def __init__(self, ctg, side):
@@ -23,8 +30,10 @@ class Flank:
     self.stop = 0
     self.ref_overlap = 5
     self.qry_overlap = 20
+    self.shift = 0
     self.extension = extensions.extension.Extension(self)
     self.calculate_coordinates()
+    self.blast_data = BlastData()
 
   def has_extension(self):
     if self.extension.length == 0:
@@ -41,8 +50,9 @@ class Flank:
     raise NotImplementedError("Require calculate_coordinates() implementation")
 
   def show(self):
-    print("\t{}\t{} :\t{}\t{}\t{}".format(self.side,
+    print("\t{}\t{} :\t{}\t{}\t{}\t{}".format(self.side,
                                          self.name,
                                          self.start,
                                          self.stop,
-                                         self.length))
+                                         self.length,
+                                         self.shift))

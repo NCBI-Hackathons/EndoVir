@@ -24,6 +24,7 @@ class FlankDb(lib.blast.blastdb.makeblastdb.Makeblastdb):
     rfd, wfd = os.pipe()
     stdout = os.fdopen(wfd, 'w')
     for i in contigs:
+      print()
       stdout.write(contigs[i].get_flanks())
       self.flankmap[contigs[i].lhs_flank.name] = contigs[i].lhs_flank
       if contigs[i].hasRhsFlank:

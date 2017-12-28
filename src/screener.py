@@ -7,7 +7,7 @@
 import os
 import sys
 import shutil
-import  time
+import time
 
 sys.path.insert(1, os.path.join(sys.path[0], '../'))
 import lib.blast.magicblast.magicblast
@@ -112,24 +112,33 @@ class Screener:
       reads = self.vdbdump.rowids_to_reads(self.srr, [x.read.sra_rowid for x in extensions])
       rfd, wfd = os.pipe()
       stdout = os.fdopen(wfd, 'w')
+      ext_rowids = []
       for i in contigs:
         contigs[i].extend(reads)
         contigs[i].save_fasta()
         stdout.write(contigs[i].get_flanks())
+        if contigs[i].lhs_flank.extension.sra_rowid != 0:
+          ext_rowids.append(contigs[i].lhs_flank.extension.sra_rowid)
+        if contigs[i].rhs_flank.extension.sra_rowid != 0:
+          ext_rowids.append(contigs[i].rhs_flank.extension.sra_rowid)
         contigs[i].show()
       stdout.close()
-      #stdin = os.fdopen(rfd, 'r')
-      #blastn = lib.blast.blastn.blastn.BlastN()
-      #ph = blastn.run(self.flankdb.path, stdin)
-      #stdin.close()
-      #self.check_flank_overlaps(ph, contigs, lnk)
-      #stdin.close()
+      for i in ext_rowids:
+        print("vdb-dump {0} -R {1} -f fasta > {1}.fa".format(self.srr, i), file=sys.stderr)
+      self.check_flank_overlaps(rfd, contigs, lnk)
+      print(len(contigs))
       sys.exit()
       if len(contigs) < 2:
         break
 
-  def check_flank_overlaps(self, blast_proc, contigs, lnk):
+  def check_flank_overlaps(self, rfd, contigs, lnk):
     print("Checking flanks for overlaps")
+    blastn = lib.blast.blastn.blastn.BlastN()
+    stdin = os.fdopen(rfd, 'r')
+    ph = blastn.run(self.flankdb.path, stdin)
+    stdin.close()
     fc = flank_checker.FlankChecker()
-    fc.parse(blast_proc.stdout)
+    fc.parse(ph.stdout)
     fc.check(contigs, lnk)
+    for i in fc.updates:
+      print(i, fc.updates[i].name)

@@ -20,12 +20,6 @@ import lib.fasta.parser
 import flanks.flank_lhs
 import flanks.flank_rhs
 
-class ContigUpdate:
-
-  def __init__(self, flank, shift):
-    self.flank = flank
-    self.shift = shift
-
 class VirusContig(lib.sequence.sequence.Sequence):
 
   def __init__(self, name, seq, srr, src, flank_len, screen_dir):
@@ -38,9 +32,11 @@ class VirusContig(lib.sequence.sequence.Sequence):
     self.lhs_flank = flanks.flank_lhs.LhsFlank(self)
     self.rhs_flank = flanks.flank_rhs.RhsFlank(self)
     self.update_flanks()
-    self.hasExtension = False
     self.hasRhsFlank = True
-    self.shift = 0
+    self.history = []
+
+  def get_shift(self):
+    return self.lhs_flank.shift + self.rhs_flank.shift
 
   def mk_wd(self, path):
     if os.path.exists(path):
@@ -56,6 +52,8 @@ class VirusContig(lib.sequence.sequence.Sequence):
       self.lhs_flank.length = self.length
 
   def log_overlap_coords(self, flank):
+    if flank.extension.isRevCompl:
+      print("DOUBLE CHECK THIS")
     print(self.srr)
     print("Flank: {}\t{}\t{}\t{}\t{}\t{}\t{}".format(flank.name,
                                              flank.start,
@@ -83,7 +81,6 @@ class VirusContig(lib.sequence.sequence.Sequence):
       self.log_overlap_coords(flank)
       ext = None
       if flank.extension.isRevCompl:
-        print("DOUBLE CHECK THIS")
         ext = self.revcomp_seq(reads[flank.extension.sra_rowid],
                                      flank.extension.alignment.read.stop,
                                      flank.extension.alignment.read.length)
@@ -96,7 +93,6 @@ class VirusContig(lib.sequence.sequence.Sequence):
       ext = None
       self.log_overlap_coords(flank)
       if flank.extension.isRevCompl:
-        print("DOUBLE CHECK THIS")
         ext = self.revcomp_seq(reads[flank.extension.sra_rowid], 0, flank.extension.alignment.read.stop)
       else:
         ext = reads[flank.extension.sra_rowid][flank.extension.alignment.read.stop+1:]
@@ -105,19 +101,31 @@ class VirusContig(lib.sequence.sequence.Sequence):
 
 
 
-  def merge_contig_rhs(self, lhs_flank, rhs_contig, coords):
-    this_ctg_from = self.length - self.rhs_flank.length + coords.lhs_from
-    this_ctg_to = self.length - self.rhs_flank.length + coords.lhs_to
-    rhs_contig_from = coords.rhs_from
-    rhs_contig_to = coords.rhs_to
+  def merge_contig_rhs(self, rhs_contig):
+    print("LHS:\t{}\nRHS\t{}".format(self.lhs_flank.shift, self.rhs_flank.shift))
+    print("oLHS:\t{}\noRHS\t{}".format(rhs_contig.lhs_flank.shift, rhs_contig.rhs_flank.shift))
     print("Src: {}\t{}".format(self.name, self.length))
     print(" RHS_flank: {}\t{}\t{}".format(self.rhs_flank.start, self.rhs_flank.stop, self.rhs_flank.length))
     print("  Extension: {}\t{}\t{}".format(self.rhs_flank.extension.start, self.rhs_flank.extension.stop, self.rhs_flank.extension.length))
-    print("Dst: {}\t{}\t{}\t{}\t{}".format(rhs_contig.name, rhs_contig.length, rhs_contig_from, rhs_contig_to, rhs_contig.lhs_flank.extension.start))
-    print("Brk: {}\t{}\t{}\t{}".format(self.name, this_ctg_from-1, rhs_contig.name, coords.rhs_from))
+    print("Dst: {}\t{}\t{}\t{}\t{}".format(rhs_contig.name, rhs_contig.length,
+                                           rhs_contig.lhs_flank.blast_data.start, rhs_contig.lhs_flank.blast_data.stop,
+                                           rhs_contig.lhs_flank.extension.start))
+    print("Brk: {}\t{}\t{}\t{}".format(self.name, self.length-self.rhs_flank.length+self.rhs_flank.blast_data.start,
+                                       rhs_contig.name, rhs_contig.lhs_flank.blast_data.start+rhs_contig.lhs_flank.shift))
     print("-------------------")
-    #fh = open(self.name+rhs_contig.name, 'w')
-    #fh.write(self.sequence[:this_ctg_from]+rhs_contig[])
+    # update rhs side
+
+    self.sequence = self.sequence[:self.length-self.rhs_flank.length+self.rhs_flank.blast_data.start] + \
+                    rhs_contig.sequence[rhs_contig.lhs_flank.blast_data.start+rhs_contig.lhs_flank.shift:]
+    shift = len(self.sequence) - self.length
+    fh = open(self.name+rhs_contig.name, 'w')
+    fh.write(self.sequence)
+    fh.close()
+    self.rhs_flank = flanks.flank_rhs.RhsFlank(self)
+    self.rhs_flank.extension.start = rhs_contig.rhs_flank.extension.start + shift
+    self.rhs_flank.extension.stop = rhs_contig.rhs_flank.extension.stop + shift
+    self.rhs_flank.blast_data.start = shift
+    self.rhs_flank.blast_data.stop = shift
 
   def save_fasta(self):
     fh = open(os.path.join(self.wd, self.name+'.fa'), 'w')
@@ -136,12 +144,11 @@ class VirusContig(lib.sequence.sequence.Sequence):
     return self.lhs_flank.get_fasta_sequence()
 
   def update_sequence(self, new_seq, flank):
-    self.shift = len(new_seq) - self.length
-    print(self.length, len(new_seq), self.shift)
+    flank.shift = len(new_seq) - self.length
     self.sequence = new_seq
     self.length = len(new_seq)
     if flank.side == 'lhs':
-      self.rhs_flank.extension.shift_coordinates(self.shift)
+      self.rhs_flank.extension.shift_coordinates(flank.shift)
     self.rhs_flank.calculate_coordinates()
 
   def show(self):
@@ -150,5 +157,4 @@ class VirusContig(lib.sequence.sequence.Sequence):
     self.lhs_flank.extension.show()
     self.rhs_flank.show()
     self.rhs_flank.extension.show()
-
     print("-------------------")

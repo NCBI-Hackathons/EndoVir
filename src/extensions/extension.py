@@ -49,9 +49,9 @@ class Extension:
 
   def show(self):
     print("\t{} :\t{}\t{}\t{}\t{}\t{}\t{}".format(self.sra_rowid,
-                                                 self.side,
-                                                 self.start,
-                                                 self.stop,
-                                                 self.length_on_contig,
-                                                 self.length_to_extend,
-                                                 self.length))
+                                                  self.side,
+                                                  self.start,
+                                                  self.stop,
+                                                  self.length_on_contig,
+                                                  self.length_to_extend,
+                                                  self.length))
