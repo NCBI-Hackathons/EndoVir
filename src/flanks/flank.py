@@ -14,10 +14,15 @@ import extensions.extension
 
 class BlastData:
 
-    def __init__(self):
-      self.start = 0
-      self.stop = 0
-      self.strand = 0
+  def __init__(self):
+    self.start = 0
+    self.stop = 0
+    self.strand = 0
+
+  def update(self, start, stop, strand):
+    self.start = start
+    self.stop = stop
+    self.strand = strand
 
 class Flank:
 

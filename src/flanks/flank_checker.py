@@ -41,6 +41,8 @@ class FlankChecker(lib.blast.parser.blast_json.BlastParser):
           continue
         if flankA.side == 'rhs' and flankB.side == 'lhs':
           print("{}:{} + {}:{}".format(flankA.contig.name, flankA.side, flankB.contig.name, flankB.side))
+          flankA.blast_data.update(self.hspmap[i].query_from, self.hspmap[i].query_to, self.hspmap[i].query_strand)
+          flankB.blast_data.update(self.hspmap[i].hit_from, self.hspmap[i].hit_to, self.hspmap[i].hit_strand)
           flankA.contig.merge_contig_rhs(flankB.contig)
           self.update_flank_map(contigs, flankA, flankB)
         elif flankA.side == 'lhs' and flankB.side == 'rhs':
@@ -49,13 +51,14 @@ class FlankChecker(lib.blast.parser.blast_json.BlastParser):
           self.update_flank_map(contigs, flankB, flankA)
         else:
           print("One flank is on the other strand")
+          raise NotImplementedError("Different strand overlap.\
+                                     Not yet implemented. How about now?")
       else:
         print(flankA.contig.name, flankA.name, flankB.contig.name, flankB.name)
         if flankA.name != flankB.name:
           raise NotImplementedError("Smells like circular or terminal repeat business. \
-                                    Not yet implemented. How about now?")
+                                     Not yet implemented. How about now?")
   def update_flank_map(self, contigs, anchor_flank, merged_flank):
-    print("---------------------------")
     print("Anchor: {}\tMerge: {}".format(anchor_flank.contig.name, merged_flank.contig.name))
     addFlanks = True
     for i in self.updates:
@@ -64,8 +67,9 @@ class FlankChecker(lib.blast.parser.blast_json.BlastParser):
         self.updates[i].contig.rhs_flank = anchor_flank.contig.rhs_flank
         addFlank = False
         break
+    # This sometimes results in identical keys/values. Doe snot break things so
+    # far, but watch out
     if addFlanks:
-      print(merged_flank.contig.name, anchor_flank.contig.name)
       self.updates[merged_flank.contig.lhs_flank.name] = anchor_flank.contig.lhs_flank
       self.updates[merged_flank.contig.rhs_flank.name] = anchor_flank.contig.rhs_flank
     print(contigs)
