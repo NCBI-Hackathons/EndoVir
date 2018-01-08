@@ -112,9 +112,8 @@ class VirusContig(lib.sequence.sequence.Sequence):
                                            rhs_contig.lhs_flank.extension.start))
     print("Brk: {}\t{}\t{}\t{}".format(self.name, self.length-self.rhs_flank.length+self.rhs_flank.blast_data.start,
                                        rhs_contig.name, rhs_contig.lhs_flank.blast_data.start+rhs_contig.lhs_flank.shift))
-    print("-------------------")
-    # update rhs side
 
+    # update rhs side
     self.sequence = self.sequence[:self.length-self.rhs_flank.length+self.rhs_flank.blast_data.start] + \
                     rhs_contig.sequence[rhs_contig.lhs_flank.blast_data.start+rhs_contig.lhs_flank.shift:]
     shift = len(self.sequence) - self.length
@@ -126,6 +125,7 @@ class VirusContig(lib.sequence.sequence.Sequence):
     self.rhs_flank.extension.stop = rhs_contig.rhs_flank.extension.stop + shift
     self.rhs_flank.blast_data.start = shift
     self.rhs_flank.blast_data.stop = shift
+    print("--------------------------------------------")
 
   def save_fasta(self):
     fh = open(os.path.join(self.wd, self.name+'.fa'), 'w')

@@ -23,56 +23,79 @@ class FlankChecker(lib.blast.parser.blast_json.BlastParser):
     for i in self.hspmap:
       flankA = lnk.get_flank(self.hspmap[i].query.title)
       flankB = lnk.get_flank(self.hspmap[i].hit.accession)
+      print("Blast results: {} vs. {}".format(flankA.name, flankB.name))
       if flankA.contig.name != flankB.contig.name:
-        print("Put. merge", flankA.contig.name, flankA.name, flankB.contig.name, flankB.name)
-        #print("\t", self.hspmap[i].query.title, self.hspmap[i].query_from,
-                    #self.hspmap[i].query_to,    self.hspmap[i].query_strand,
-                    #self.hspmap[i].qseq)
-        #print("\t", self.hspmap[i].hit.accession, self.hspmap[i].hit_from,
-                    #self.hspmap[i].hit_to, self.hspmap[i].hit_strand,
-                    #self.hspmap[i].hseq)
-        if flankA.name in self.updates:
-          print("{} is now {}".format(flankA.name, self.updates[flankA.name].name))
-          flankA = self.updates[flankA.name]
-        if flankB.name in self.updates:
-          print("{} is now {}".format(flankB.name, self.updates[flankB.name].name))
-          flankB = self.updates[flankB.name]
+        print("Checking {} and {} for overlap".format(flankA.name, flankB.name))
+        flankA, flankB = self.check_updated_flanks(flankA, flankB)
+        print(flankA.contig.name, flankB.contig.name)
         if flankA.contig.name == flankB.contig.name:
           continue
-        if flankA.side == 'rhs' and flankB.side == 'lhs':
-          print("{}:{} + {}:{}".format(flankA.contig.name, flankA.side, flankB.contig.name, flankB.side))
-          flankA.blast_data.update(self.hspmap[i].query_from, self.hspmap[i].query_to, self.hspmap[i].query_strand)
-          flankB.blast_data.update(self.hspmap[i].hit_from, self.hspmap[i].hit_to, self.hspmap[i].hit_strand)
-          flankA.contig.merge_contig_rhs(flankB.contig)
-          self.update_flank_map(contigs, flankA, flankB)
-        elif flankA.side == 'lhs' and flankB.side == 'rhs':
-          print("{}:{} + {}:{}".format(flankB.contig.name, flankB.side, flankA.contig.name, flankA.side))
-          flankB.contig.merge_contig_rhs(flankA.contig)
-          self.update_flank_map(contigs, flankB, flankA)
+        flankA.blast_data.update(self.hspmap[i].query_from, self.hspmap[i].query_to, self.hspmap[i].query_strand)
+        flankB.blast_data.update(self.hspmap[i].hit_from, self.hspmap[i].hit_to, self.hspmap[i].hit_strand)
+        if flankA.blast_data.strand == flankB.blast_data.strand:
+          self.update_contig_map(contigs, self.merge_same_strand(flankA, flankB))
         else:
-          print("One flank is on the other strand")
-          raise NotImplementedError("Different strand overlap.\
-                                     Not yet implemented. How about now?")
+          self.update_contig_map(contigs, self.merge_different_strand(flankA, flankB))
       else:
-        print(flankA.contig.name, flankA.name, flankB.contig.name, flankB.name)
         if flankA.name != flankB.name:
           raise NotImplementedError("Smells like circular or terminal repeat business. \
-                                     Not yet implemented. How about now?")
-  def update_flank_map(self, contigs, anchor_flank, merged_flank):
-    print("Anchor: {}\tMerge: {}".format(anchor_flank.contig.name, merged_flank.contig.name))
-    addFlanks = True
+                                      Not yet implemented. How about now?")
+        else:
+          print("Not an overlap")
+      print("-----------")
+
+  def check_updated_flanks(self, flankA, flankB):
+    if flankA.contig.name in self.updates:
+      print("\tUpdate: {} is now {}".format(flankA.contig.name, self.updates[flankA.contig.name].name))
+      if flankA.side == 'rhs':
+        flankA = self.updates[flankA.contig.name].rhs_flank
+      else:
+        flankA = self.updates[flankA.contig.name].lhs_flank
+
+    if flankB.contig.name in self.updates:
+      print("\tUpdate: {} is now {}".format(flankB.contig.name, self.updates[flankB.contig.name].name))
+      if flankB.side == 'rhs':
+        flankB = self.updates[flankB.contig.name].rhs_flank
+      else:
+        flankB = self.updates[flankB.contig.name].lhs_flank
+    return (flankA, flankB)
+
+  def merge_same_strand(self, flankA, flankB):
+    if flankA.side == 'rhs' and flankB.side == 'lhs':
+      print("{}:{} + {}:{}".format(flankA.contig.name, flankA.side, flankB.contig.name, flankB.side))
+      flankA.contig.merge_contig_rhs(flankB.contig)
+      return self.update_flank_map(flankA.contig, flankB.contig)
+
+    if flankA.side == 'lhs' and flankB.side == 'rhs':
+      print("{}:{} + {}:{}".format(flankB.contig.name, flankB.side, flankA.contig.name, flankA.side))
+      flankB.contig.merge_contig_rhs(flankA.contig)
+      return self.update_flank_map(flankB.contig, flankA.contig)
+
+  def merge_diff_strand(self, flankA, flankB):
+    print("One flank is on the other strand")
+    raise NotImplementedError("Different strand overlap.\
+                               Not yet implemented. How about now?")
+
+  def update_contig_map(self, contigs, merged_contig):
+    if merged_contig.name in contigs:
+      print("rm: ", merged_contig.name)
+      del contigs[merged_contig.name]
+    for i in contigs:
+      print(i, contigs[i].history)
+
+  def update_flank_map(self, anchor_ctg, merged_ctg):
+    print("Anchor: {}\tMerge: {}".format(anchor_ctg.name, merged_ctg.name))
     for i in self.updates:
-      if self.updates[i].name == merged_flank.name:
-        self.updates[i].contig.lhs_flank = anchor_flank.contig.lhs_flank
-        self.updates[i].contig.rhs_flank = anchor_flank.contig.rhs_flank
-        addFlank = False
-        break
-    # This sometimes results in identical keys/values. Doe snot break things so
-    # far, but watch out
-    if addFlanks:
-      self.updates[merged_flank.contig.lhs_flank.name] = anchor_flank.contig.lhs_flank
-      self.updates[merged_flank.contig.rhs_flank.name] = anchor_flank.contig.rhs_flank
-    print(contigs)
-    if merged_flank.contig.name in contigs:
-      print("rm: ", merged_flank.contig.name)
-      del contigs[merged_flank.contig.name]
+      if self.updates[i].name == merged_ctg.name:
+        print("value update")
+        self.updates[i] = anchor_ctg
+        #anchor_ctg.history += self.updates[i].history
+        #break
+    if merged_ctg.name not in self.updates:
+      self.updates[merged_ctg.name] = anchor_ctg
+      anchor_ctg.history.append(merged_ctg.name)
+    for i in self.updates:
+      print("{} is merged in {}".format(i, self.updates[i].name))
+
+
+    return merged_ctg

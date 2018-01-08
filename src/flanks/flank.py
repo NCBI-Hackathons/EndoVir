@@ -17,11 +17,11 @@ class BlastData:
   def __init__(self):
     self.start = 0
     self.stop = 0
-    self.strand = 0
+    self.strand = "Plus"
 
   def update(self, start, stop, strand):
-    self.start = start
-    self.stop = stop
+    self.start = int(start)
+    self.stop = int(stop)
     self.strand = strand
 
 class Flank:
