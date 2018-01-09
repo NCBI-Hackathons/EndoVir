@@ -1,0 +1,16 @@
+ \begin{tikzpicture}[>=latex,shorten >=2pt,shorten <=2pt]
+
+    \node (vdbdump)     [tool]   {vdb-dump};
+    \node (extender)    [function, below = of vdbdump]   {extender};
+    \node (flankeexp)   [left = 1em of flanker, font=\small\itshape, text width=2.75cm]  {Extracting 500bp \\ rhs and lhs flanks};
+    \node (flankdb)     [db,   below = of flanker]      {FlankDb};
+    \node (fmapper)     [tool, below = of flankdb]      {magicBLAST};
+    \node (extender)    [function, below = of fmapper]   {extender};
+    \node (extenderexp) [left = 1em of extender, font=\small\itshape, text width=2.75cm]   {Find read with \\ longest extension};
+    \node (sra)         [db,  left = of fmapper]    {SRA};
+    \path[->] (vdbdump)   edge[pipe, -] (flanker)
+              (flanker)   edge[pipe]    (flankdb)
+              (flankdb)   edge[path] (fmapper)
+              (fmapper)   edge[pipe, -] (extender)
+              (sra)       edge (fmapper);
+  \end{tikzpicture}
