@@ -42,8 +42,8 @@ class FlankChecker(lib.blast.parser.blast_json.BlastParser):
                                       Not yet implemented. How about now?")
         else:
           print("Not an overlap")
-      print("-----------")
 
+  # I don't understand why it explicitly requires a return
   def check_updated_flanks(self, flankA, flankB):
     if flankA.contig.name in self.updates:
       print("\tUpdate: {} is now {}".format(flankA.contig.name, self.updates[flankA.contig.name].name))
@@ -87,9 +87,9 @@ class FlankChecker(lib.blast.parser.blast_json.BlastParser):
     print("Anchor: {}\tMerge: {}".format(anchor_ctg.name, merged_ctg.name))
     for i in self.updates:
       if self.updates[i].name == merged_ctg.name:
-        print("value update")
+        print("DEBUG: value update")
         self.updates[i] = anchor_ctg
-        #anchor_ctg.history += self.updates[i].history
+        anchor_ctg.history += self.updates[i].history
         #break
     if merged_ctg.name not in self.updates:
       self.updates[merged_ctg.name] = anchor_ctg
