@@ -8,14 +8,14 @@
 \usepackage{inconsolata}
 \hypersetup{pdfstartview={Fit}}
 \beamertemplatenavigationsymbolsempty
-%\setbeamerfont{page number in head/foot}{size=\small}
 \setbeamertemplate{footline}[frame number]
 \usepackage{xspace}
 \usepackage{booktabs}
 \usepackage{listings}
 \usepackage{multirow}
 \usepackage{ifthen}
-\usepackage{jpb.pgf}
+\usepackage{pgfplots}
+\usepackage{tikz}
 \usepackage{bibentry}
   \lstset{basicstyle=\tiny\ttfamily,breaklines=true}
   \usetikzlibrary{shapes.geometric, positioning, calc, shadings}
@@ -66,7 +66,7 @@
         \item ViruSpy \footnote{https://github.com/NCBI-Hackathons/ViruSpy}
         \item Logic  mostly implemented in Bash and Perl \\
               $\rightarrow$ Complex to expand and adjust
-        \item Initiated during my stay as a visiting bioinfomartician as NCBI
+        \item Initiated during my stay as a visiting bioinformatician as NCBI
               from Oct.2017 to Dec. 2017.
         \item Ongoing
       \end{itemize}
@@ -137,7 +137,7 @@
 
   \begin{frame}{Endovir}
     \begin{description}
-      \item[Open source] MIT licence
+      \item[Open source] MIT license
       \item[Modern] Implemented in Python 3 (3.6)
       \item[Independent] Using only Python standard libraries
       \item[Limited disk I/O] Using pipes where possible
@@ -226,7 +226,6 @@
   \end{frame}
 
 
-
   \begin{frame}{Outlook}
     \begin{itemize}
      \item Adjust tool parameters on the fly
@@ -240,7 +239,7 @@
     \begin{itemize}
       \item Ben Busby
       \item Niki Athanasiadou
-      \item Yadi Yhou
+      \item Yadi Zhou
       \item Richard Copin
       \item Jeff Robinson
       \item Greg Boratyn
