@@ -1,18 +1,14 @@
-#  magicblast_alignment.py
+#  magicblast_parser.py
 #
 #  Author: Jan Piotr Buchmann <jan.buchmann@sydney.edu.au>
 #  Description:
-#
+#  https://ncbi.github.io/magicblast/doc/output.html
 #  Version: 0.0
 
-<<<<<<< HEAD
-from . import mapping_alignment
-
-class MagicblastAlignment(mapping_alignment.MappingAlignment):
-
-  def __init__(self, cols):
-    super().__init__(cols)
-=======
+import os
+import sys
+sys.path.insert(1, os.path.join(sys.path[0], '../...'))
+import lib.alignment.magicblast_alignment
 
 class MagicblastParser:
 
@@ -24,4 +20,3 @@ class MagicblastParser:
     for i in src:
       if i[0] != '#':
         self.alignments.append(lib.alignment.magicblast_alignment.MagicblastAlignment(i.strip().split('\t')))
->>>>>>> 424ad161050d3993fc1b71870d6d3c5eeefc0ffc

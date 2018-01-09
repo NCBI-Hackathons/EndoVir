@@ -1,16 +1,21 @@
- \begin{tikzpicture}[>=latex,shorten >=2pt,shorten <=2pt]
+\begin{tikzpicture}[>=latex,shorten >=2pt,shorten <=2pt, thick]
 
-    \node (vdbdump)     [tool]   {vdb-dump};
-    \node (extender)    [function, below = of vdbdump]   {extender};
-    \node (flankeexp)   [left = 1em of flanker, font=\small\itshape, text width=2.75cm]  {Extracting 500bp \\ rhs and lhs flanks};
-    \node (flankdb)     [db,   below = of flanker]      {FlankDb};
-    \node (fmapper)     [tool, below = of flankdb]      {magicBLAST};
-    \node (extender)    [function, below = of fmapper]   {extender};
-    \node (extenderexp) [left = 1em of extender, font=\small\itshape, text width=2.75cm]   {Find read with \\ longest extension};
-    \node (sra)         [db,  left = of fmapper]    {SRA};
-    \path[->] (vdbdump)   edge[pipe, -] (flanker)
-              (flanker)   edge[pipe]    (flankdb)
-              (flankdb)   edge[path] (fmapper)
-              (fmapper)   edge[pipe, -] (extender)
-              (sra)       edge (fmapper);
-  \end{tikzpicture}
+  \node (extender)  [function] {extender};
+  \node (blastn)    [tool,   below=of extender]  {blastn};
+  \node (flankdb)   [db, left=of blastn] {FlankDb};
+  \node (ctgInsp)   [function, below = of blastn]   {contig\_inspector};
+  \node (ctgFuser)  [function, right =6em  of ctgInsp]  {contig\_fuser};
+  \node (cddscreen) [tool, below = of ctgInsp]   {rpstblastn};
+  \node (cdd)       [db, left = of cddscreen]   {Virus Cdd};
+  \node (break)     [function,below = of cddscreen]   {Check break conditions};
+
+
+  \path[->] (extender)  edge (blastn)
+            (flankdb)   edge (blastn)
+            (blastn)    edge (ctgInsp)
+            (ctgInsp)   edge (cddscreen)
+                        edge[pipe] node[flowcomment] {if overlaps are detected} (ctgFuser)
+            (cdd)       edge (cddscreen)
+            (ctgFuser)  edge (cddscreen.east)
+            (cddscreen) edge (break);
+\end{tikzpicture}

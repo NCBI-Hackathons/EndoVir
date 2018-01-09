@@ -26,9 +26,9 @@
       \coordinate (ctgA) at (\Xa em, \y em);
       \coordinate (ctgB) at (\len em, \y em);
       \coordinate (rb) at (\rb em, \y em);
-      \draw[leftfl, shorten >=2pt,shorten <=2pt, dna] (lb) -- (ctgA);
-      \draw[dna] (ctgA) -- (ctgB);
-      \draw[dna, rightfl, shorten >=2pt,shorten <=2pt] (ctgB) -- (rb);
+      \draw[leftfl, shorten >=2pt,shorten <=2pt] (lb) -- (ctgA);
+      \draw[] (ctgA) -- (ctgB);
+      \draw[rightfl, shorten >=2pt,shorten <=2pt] (ctgB) -- (rb);
       \draw[leftfl, shorten <=2pt] ($(lb)!0.5!(ctgA)$) -- (db.north);
       \draw[rightfl, shorten <=2pt] ($(ctgB)!0.5!(rb)$) -- (db.north);
 
@@ -50,11 +50,11 @@
     \coordinate (B) at ($ (mb.east)+(1, -1.5)$);
     \coordinate (Z) at ($ (mb.west)+(0, -1.5)$);
     \coordinate (Y) at ($ (mb.west)+(-1, -1.5)$);
-    \draw[dna] (A) -- (B);
+    \draw[] (A) -- (B);
     \draw[->, path] (mb.south) -- ($(Z)!0.5!(Y) + (0,0.2)$);
     \draw[->, path] (mb.south) -- ($(A)!0.5!(B) + (0,0.2)$);
-    \draw[dna, path, color=black!70] (A) -- (Z);
-    \draw[dna] (Z) -- (Y);
+    \draw[path, color=black!70] (A) -- (Z);
+    \draw[] (Z) -- (Y);
 
     \def\n {4}
     \def\sp {0.15}
@@ -62,8 +62,8 @@
     \coordinate (L) at ($ (B)+(0.5, -\sp)$);
     \coordinate (Q) at ($ (Z)+(-0.5, -\sp)$);
     \coordinate (R) at ($ (Y)+(-0.5, -\sp)$);
-    \draw[dna, rightfl](K) -- (L);
-    \draw[dna, leftfl](Q) -- (R);
+    \draw[rightfl](K) -- (L);
+    \draw[leftfl](Q) -- (R);
     \foreach \y in {2,...,\n}
     {
       \pgfmathsetmacro{\Xa}{(random()-0.3}
@@ -71,8 +71,8 @@
       \coordinate (D) at ($ (B)+(\Xa, -\y*\sp)$);
       \coordinate (V) at ($ (Z)+(-\Xa, -\y*\sp)$);
       \coordinate (W) at ($ (Y)+(-\Xa, -\y*\sp)$);
-      \draw[dna, rightfl!60] (C) - - (D);
-      \draw[dna, leftfl!60]  (V) - - (W);
+      \draw[rightfl!60] (C) - - (D);
+      \draw[leftfl!60]  (V) - - (W);
     }
 
     \coordinate (0) at ($(L)+(0,-1)$);
@@ -80,8 +80,8 @@
     \coordinate (2) at ($(R)+(0,-1)$);
     \coordinate (3) at ($(Z)+(0,-1.15)$);
 
-    \draw[dna, rightfl] (0) -- (1);
-    \draw[dna, leftfl] (2) -- (3);
+    \draw[rightfl] (0) -- (1);
+    \draw[leftfl] (2) -- (3);
 
     \begin{pgfonlayer}{background}
       \path (Y -| a)+(0, 0.5) node (z) {};
