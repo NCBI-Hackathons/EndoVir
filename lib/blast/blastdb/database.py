@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #  blastdb.py
 #
 #  Author: Jan Piotr Buchmann <jan.buchmann@sydney.edu.au>
@@ -15,7 +16,6 @@ import urllib.request
 from . import blastdbcmd
 
 class BlastDatabase:
-
   def __init__(self, cmd=None, dbdir=None, name=None, typ=None):
     self.title = name
     self.dbdir = dbdir
@@ -41,7 +41,8 @@ class BlastDatabase:
         if not os.path.exists(os.path.join(os.path.join(self.dbdir, self.title))):
           self.fetch_db(src, self.title)
         print("\tfound local data at {0}. Creating database".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
-        self.make_db(fil=os.path.join(self.dbdir, self.title))
+        dbdir_title = os.path.join(self.dbdir, self.title)
+        self.make_db(dbdir_title)
       else:
         print("\tfound local Blast DB {0}".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
     else:

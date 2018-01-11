@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
 #  makeprofiledb.py
 #
 #  Author: Jan Piotr Buchmann <jan.buchmann@sydney.edu.au>
 #  Description:
 #
 #  Version: 0.0
-
+import os
+import subprocess
 from . import database
 
 class Makeprofiledb(database.BlastDatabase):
@@ -17,9 +19,9 @@ class Makeprofiledb(database.BlastDatabase):
                       '-in', pssms,
                       '-out', os.path.join(self.dbdir, self.title),
                       '-title', self.title,
-                      '-threshold',  9.82,
-                      '-scale', 100,
-                      'index', 'true'
+                      '-threshold',  '9.82',
+                      '-scale', '100',
+                      '-index', 'true'
                       ]
     print(cmd)
     subprocess.run(cmd)
