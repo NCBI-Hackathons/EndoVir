@@ -11,6 +11,7 @@ import gzip
 import subprocess
 import tarfile
 import urllib.request
+import time
 
 from . import blastdbcmd
 
@@ -27,27 +28,33 @@ class BlastDatabase:
   def make_db(self, fil=None):
     cmd = self.cmd + ['-dbtype', self.typ, '-in', fil, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
     print(cmd)
-    subprocess.run(cmd)
+    p = subprocess.Popen(cmd)
+    while p.poll() == None:
+      print("\rCreating db {}".format(self.title), end='')
+      time.sleep(2)
+
+    if p.returncode != 0:
+      print("Creating db {} failed. Aborting.".format(self.title))
+      raise RuntimeError()
 
   def make_db_stdin(self, stdout):
     cmd = self.cmd + ['-dbtype', self.typ, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
     print(cmd)
     p = subprocess.Popen(cmd, stdin=stdout)
 
-  def setup(self, src):
+  def check(self):
     if os.path.exists(self.dbdir):
       if not self.dbtool.exists(os.path.join(self.dbdir, self.title)):
-        print("No Blast DB {0}".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
-        if not os.path.exists(os.path.join(os.path.join(self.dbdir, self.title))):
-          self.fetch_db(src, self.title)
-        print("\tfound local data at {0}. Creating database".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
-        self.make_db(fil=os.path.join(self.dbdir, self.title))
+        print("No Blast DB {0}. Did you run setup.sh?".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
+        sys.exit()
       else:
         print("\tfound local Blast DB {0}".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
     else:
-      os.makedir(self.dbdir)
-      self.fetch_db(src)
-      self.make_db(src, self.title)
+      print("No Blast DB {0}. Did you run setup.sh?".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
+      sys.exit()
+      #os.makedir(self.dbdir)
+      #self.fetch_db(src)
+      #self.make_db(src, self.title)
 
   def fetch_db(self, src, title):
     if src == 'Cdd':

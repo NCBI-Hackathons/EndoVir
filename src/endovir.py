@@ -29,13 +29,10 @@ class Endovir:
     self.flank_len = 500
     self.dbs_dirname = 'dbs'
     self.db_sources = {
-      'virusdb' : {'src' : ['ftp://ftp.ncbi.nlm.nih.gov/refseq/release/viral/viral.1.1.genomic.fna.gz',
-                            'ftp://ftp.ncbi.nlm.nih.gov/refseq/release/viral/viral.2.1.genomic.fna.gz'],
-                   'db' : lib.blast.blastdb.makeblastdb.Makeblastdb(name='viral.genomic.refseq.fna',
+      'virusdb' : {'db' : lib.blast.blastdb.makeblastdb.Makeblastdb(name='viral.genomic.refseq.fna',
                                                                     dbdir=os.path.join(self.wd, self.dbs_dirname),
                                                                     typ='nucl')},
-      'cdd' : {'src' : ['ftp://ftp.ncbi.nlm.nih.gov/pub/mmdb/cdd/cdd.tar.gz'],
-               'db' : lib.blast.blastdb.makeprofiledb.Makeprofiledb(name='endovir_cdd',
+      'cdd' : {'db' : lib.blast.blastdb.makeprofiledb.Makeprofiledb(name='endovir_cdd',
                                                                     dbdir=os.path.join(self.wd, self.dbs_dirname),
                                                                     typ='rps')}
     }
@@ -56,7 +53,7 @@ class Endovir:
     for i in self.db_sources:
       print("Setup Blast DB {0}".format(i), file=sys.stderr)
       self.dbs[i] = self.db_sources[i]['db']
-      self.dbs[i].setup(src=self.db_sources[i]['src'])
+      self.dbs[i].check()
 
   def screen(self, srrs=[]):
     vrs_ctgs = {}

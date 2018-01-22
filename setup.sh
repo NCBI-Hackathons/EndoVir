@@ -10,7 +10,7 @@
 esearch=$(which esearch)
 efetch=$(which efetch)
 xtract=$(which xtract)
-makeprofiledb=$(which makeprofiledb)
+
 endovir_pssms='endovir.pn'
 
 
@@ -27,9 +27,24 @@ function setup_magicblast()
   export PATH=$PATH:$endovir_tools/magicblast/bin
 }
 
+function make_virus_db()
+{
+  virus_genome_db="viral.genomic.refseq.fna"
+  wget ftp://ftp.ncbi.nlm.nih.gov/refseq/release/viral/viral.1.1.genomic.fna.gz -O - | gzip -dc  > $endovir_dbs/$virus_genome_db
+  wget ftp://ftp.ncbi.nlm.nih.gov/refseq/release/viral/viral.2.1.genomic.fna.gz -O - | gzip -dc >> $endovir_dbs/$virus_genome_db
+  local makeblastdb=$(which makeblastdb)
+  $makeblastdb -in     $endovir_dbs/$virus_genome_db  \
+               -dbtype 'nucl'                         \
+               -title 'virusdb'                       \
+               -parse_seqids                          \
+               -hash_index                            \
+               -out "$endovir_dbs/$virus_genome_db"
+
+}
+
 function make_endovir_cdd()
 {
-
+  local makeprofiledb=$(which makeprofiledb)
   echo "" > "$endovir_dbs/$endovir_pssms"
   local qry="txid10239[Organism:exp] NOT (predicted OR putative)"
   for i in $($esearch -db  cdd -query "$qry"                      | \
@@ -50,6 +65,8 @@ function make_endovir_cdd()
                  -scale 100                          \
                  -dbtype rps                         \
                  -index true
+  cd $ENDOVIR
 }
 
-make_endovir_cdd
+#make_endovir_cdd
+make_virus_db
