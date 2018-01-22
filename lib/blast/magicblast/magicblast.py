@@ -23,11 +23,14 @@ class Magicblast:
 
   def run(self, srr, db):
     cmd = [self.path, '-db',  db,
-                      '-sra', srr,
                       '-no_unaligned',
                       '-num_threads', str(self.num_threads),
                       '-outfmt', self.outfmt,
                       '-splice', 'F']
+    if os.path.isfile(srr):
+      cmd += ['-query', srr]
+    else:
+      cmd += ['-sra', srr]
     print(cmd)
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1, universal_newlines=True)
     return proc.stdout
