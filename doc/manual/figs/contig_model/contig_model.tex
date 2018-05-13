@@ -1,0 +1,50 @@
+\documentclass[12pt]{standalone}
+%\usepackage{cmbright}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, positioning, calc, shadings}
+\tikzset{%
+        point/.style = {rectangle, draw,inner sep=0},
+        }
+
+\begin{document}
+  \begin{tikzpicture}
+    \def\cLen{10cm}
+    \def\fLen{0.35*\cLen}
+    \def\eLen{0.20*\cLen}
+    \def\fY{2}
+    \def\eY{2*\fY}
+
+    \coordinate[label=left:cBeg] (cBeg)  at (0, 0);
+    \coordinate[label=right:cEnd] (cEnd)  at ($(cBeg) + (\cLen, 0)$);
+
+    \coordinate[label=left:$F\_lhs_{beg}$] (lfBeg) at ($(cBeg) + (0, \fY)$);
+    \coordinate[label=right:$F\_lhs_{end}$] (lfEnd) at ($(cBeg) + (\fLen, \fY)$);
+
+    \coordinate[label=left:$E\_lhs_{beg}$] (leBeg) at ($(cBeg) + (\eLen*-0.5, \eY)$);
+    \coordinate[label=right:$E\_lhs_{end}$] (leEnd) at ($(cBeg) + (\eLen*0.5, \eY)$);
+
+    \coordinate[label=left:$c_{beg}^{\prime}$] (cBegp) at ($(cBeg) + (\eLen*-0.5, -\fY)$);
+    \coordinate[label=right:$c_{end}^{\prime}$] (cEndp) at ($(cEnd) + (\eLen, -\fY)$);
+
+    \coordinate (leBreak) at ($(leBeg)!0.5!(leEnd)$);
+    \coordinate (reBeg) at ($(cEnd) - (\eLen, \eY)$);
+
+    \coordinate (rfBeg) at ($(cEnd) - (\fLen, \fY)$);
+    \coordinate (rfEnd) at (cEnd);
+
+    \coordinate (lhsExtStopCtg) at ($ (cBegp) + (\eLen, 0)$);
+    \coordinate (lhsFlkStopCtg) at ($ (cBegp) + (0.5*\eLen+\fLen, 0)$);
+    \coordinate (lhsFlkStartCtg) at ($(cBegp) + (\eLen*0.5, 0)$);
+
+    \draw[green] (lhsExtStopCtg) -- (leEnd);
+    \draw[green] (lhsFlkStopCtg) -- (lfEnd);
+    \draw[green] (leBreak) -- (lhsFlkStartCtg);
+    \draw[red] (cBeg) -- (cEnd);
+    \draw[red] (cBeg) -- (cEnd);
+    \draw[red] (lfBeg) -- (lfEnd);
+    \draw[red] (leBeg) -- (leEnd);
+    \draw[red] (cBegp) -- (cEndp);
+
+  \end{tikzpicture}
+\end{document}

@@ -36,7 +36,7 @@ class Endovir:
                                                                     dbdir=os.path.join(self.wd, self.dbs_dirname),
                                                                     typ='rps')}
     }
-    self.dbs = {}
+
 
 
   def set_wd(self):
