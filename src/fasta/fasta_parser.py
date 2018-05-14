@@ -1,10 +1,10 @@
-#  parser.py
-#
-#  Author: Jan Piotr Buchmann <jan.buchmann@sydney.edu.au>
-#  Description:
-#
-#  Version: 0.0
-
+#-------------------------------------------------------------------------------
+#  \file fasta_parser.py
+#  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
+#  \copyright 2018 The University of Sydney
+#  \version 0.0.0
+#  \description Implementation of a biological sequence.
+#-------------------------------------------------------------------------------
 
 import sys
 from . import sequence
@@ -16,7 +16,11 @@ class FastaParser:
     self.doFhClose = False
     self.src = sys.stdin
 
-  def parse(self, src=None, fil=None, stream=False):
+  @classmthod
+  def parse_file(self, fil, stream=False):
+
+
+  def parse(self, stream=False):
     if fil != None:
       src = open(fil, 'r')
       self.doFhClose = True

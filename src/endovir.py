@@ -11,6 +11,7 @@
 import os
 import sys
 import argparse
+import logging
 
 sys.path.insert(1, os.path.join(sys.path[0], '../'))
 import lib.blast.blastdb.makeblastdb
@@ -86,8 +87,6 @@ def main():
                   help='SRR number, e.g. SRR5150787'),
   ap.add_argument('--wd', type=str, default='analysis',
                   help='Working directory for analysis')
-  ap.add_argument('--max_cpu', '-p', type=int, default=1,
-                  help='Max number of cores to use. NOT YET IMPLEMENTED')
   args = ap.parse_args()
   #srrs = ['SRR5150787', 'SRR5832142']
   if args.srr == 'SRR5150787':
