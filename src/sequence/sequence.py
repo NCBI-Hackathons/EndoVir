@@ -14,10 +14,13 @@ import sys
 
 class Sequence:
 
-  def __init__(self, name=None, sequence=None, description=None):
+  def __init__(self, name=None, sequence=None, metadata=None):
     self.name = name
     self.sequence = seqence
     self.length = None
     if sequence != None:
       self.length = len(seqence)
-    self.description = None
+    self.metadata = metadata
+
+  def format(self, formatter):
+    return formatter.format(self)

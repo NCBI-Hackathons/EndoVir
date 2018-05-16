@@ -1,9 +1,10 @@
-#  blastdb.py
-#
-#  Author: Jan Piotr Buchmann <jan.buchmann@sydney.edu.au>
-#  Description:
-#
-#  Version: 0.0
+#-------------------------------------------------------------------------------
+#  \file blast_database.py
+#  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
+#  \copyright 2018 The University of Sydney
+#  \version 0.0.0
+#  \description Blast database base class.
+#-------------------------------------------------------------------------------
 
 import os
 import sys
@@ -13,20 +14,19 @@ import tarfile
 import urllib.request
 import time
 
-from . import blastdbcmd
+from process import basic_process
+from biodb import basic_biodb
 
-class BlastDatabase:
+class BlastDatabase(basic_biodb.BasicBioDatabase):
 
-  def __init__(self, cmd=None, dbdir=None, name=None, typ=None):
-    self.title = name
-    self.dbdir = dbdir
-    self.typ  = typ
-    self.dbtool = blastdbcmd.Blastdbcmd()
-    self.path = os.path.join(self.dbdir, self.title)
-    self.cmd  = [cmd]
+  def __init__(self, dbdir=None, title=None, dbtype=None, dbstyle=None):
+    super().__init__(name=title, dbdir=dbdir, dbtype=dbtype, dbstyle=dbstyle)
+
+  def add_client(self, client):
+    self.client = client
 
   def make_db(self, fil=None):
-    cmd = self.cmd + ['-dbtype', self.typ, '-in', fil, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
+    cmd = self.cmd + ['-dbtype', self.dbtyp, '-in', fil, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
     print(cmd)
     p = subprocess.Popen(cmd)
     while p.poll() == None:
@@ -38,9 +38,18 @@ class BlastDatabase:
       raise RuntimeError()
 
   def make_db_stdin(self, stdout):
-    cmd = self.cmd + ['-dbtype', self.typ, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
+    cmd = self.cmd + ['-dbtype', self.dbtyp, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
     print(cmd)
     p = subprocess.Popen(cmd, stdin=stdout)
+
+  def isDatabase(self):
+    self.clear_options()
+    self.add_options([{'-db' : self.path},{'-info': None}])
+    pfh = self.run()
+    if self.hasFinished(pfh):
+      if pfh.returncode == 0:
+        return True
+      return False
 
   def check(self):
     if os.path.exists(self.dbdir):
