@@ -8,22 +8,18 @@
 
 import os
 import sys
-import gzip
-import subprocess
 import tarfile
 import urllib.request
 import time
 
-from process import basic_process
-from biodb import basic_biodb
+from . import basic_biodb
 
 class BlastDatabase(basic_biodb.BasicBioDatabase):
 
-  def __init__(self, dbdir=None, title=None, dbtype=None, dbstyle=None):
-    super().__init__(name=title, dbdir=dbdir, dbtype=dbtype, dbstyle=dbstyle)
-
-  def add_client(self, client):
+  def __init__(self, dbdir, title, dbtype, client, tool):
+    super().__init__(name=title, dbdir=dbdir, dbtype=dbtype)
     self.client = client
+    self.tool = tool
 
   def make_db(self, fil=None):
     cmd = self.cmd + ['-dbtype', self.dbtyp, '-in', fil, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
@@ -42,25 +38,32 @@ class BlastDatabase(basic_biodb.BasicBioDatabase):
     print(cmd)
     p = subprocess.Popen(cmd, stdin=stdout)
 
-  def isDatabase(self):
-    self.clear_options()
-    self.add_options([{'-db' : self.path},{'-info': None}])
-    pfh = self.run()
-    if self.hasFinished(pfh):
-      if pfh.returncode == 0:
-        return True
-      return False
+  def isValidDatabase(self, toolbox):
+    tool = toolbox.get_tool_by_name(self.client)
+    tool.clear_options()
+    tool.add_options([{'-db': self.dbpath}, {'-info':None}])
+    pfh = tool.run()
+    if tool.hasFinished(pfh):
+      if pfh.returncode != 0:
+        return False
+      return True
+    #self.add_options([{'-db' : self.path},{'-info': None}])
+    #pfh = self.run()
+    #if self.hasFinished(pfh):
+      #if pfh.returncode == 0:
+        #return True
+      #return False
 
-  def check(self):
-    if os.path.exists(self.dbdir):
-      if not self.dbtool.exists(os.path.join(self.dbdir, self.title)):
-        print("No Blast DB {0}. Did you run setup.sh?".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
-        sys.exit()
-      else:
-        print("\tfound local Blast DB {0}".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
-    else:
-      print("No Blast DB {0}. Did you run setup.sh?".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
-      sys.exit()
+  #def check(self):
+    #if os.path.exists(self.dbdir):
+      #if not self.dbtool.exists(os.path.join(self.dbdir, self.title)):
+        #print("No Blast DB {0}. Did you run setup.sh?".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
+        #sys.exit()
+      #else:
+        #print("\tfound local Blast DB {0}".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
+    #else:
+      #print("No Blast DB {0}. Did you run setup.sh?".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
+      #sys.exit()
       #os.makedir(self.dbdir)
       #self.fetch_db(src)
       #self.make_db(src, self.title)

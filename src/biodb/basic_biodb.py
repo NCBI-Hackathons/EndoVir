@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #  -------------------------------------------------------------------------------
 #  \file basic_biodb.py
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
@@ -7,15 +5,14 @@
 #  \version 0.0.0
 #  \description
 #  -------------------------------------------------------------------------------
-
+import os
 
 class BasicBioDatabase:
 
-  def __init__(self, name=None, dbdir=None, dbtype=None, dbstyle=None):
+  def __init__(self, name=None, dbdir=None, dbtype=None):
     self.name = name
     self.dbdir = dbdir
     self.dbtype = dbtype
-    self.dbstyle = dbstyle
     self.dbpath = None
     if name != None and dbdir != None:
       self.dbpath = os.path.join(self.dbdir, self.name)

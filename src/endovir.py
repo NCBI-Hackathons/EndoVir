@@ -21,23 +21,38 @@ import argparse
 #import screener
 #import virus_contig
 
-import configurator.endovir_configurator
-import process.toolshed
+import utils.endovir_utils
+import toolbox.endovir_toolbox
+import biodb.biodb_manager
+
 
 class Endovir:
 
   class Config:
 
-    def __init__(self):
-      self.wd = None
-      self.dbdir = None
-      self.flank_len = None
+    def __init__(self, config):
+      self.wd = config.pop('wd')
+      if not os.path.isabs(self.wd):
+        self.wd = os.path.join(os.getcwd(), self.wd)
+      utils.endovir_utils.make_dir(self.wd)
+      self.dbdir = os.path.join(self.wd, config.pop('dbdirectory'))
+      utils.endovir_utils.make_dir(self.dbdir)
+      self.flank_len = config.pop('flank_length')
 
-  def __init__(self):
-    self.config = self.Config()
+  def __init__(self, config_file):
+    config = json.load(config_file)
+    self.config = self.Config(config['analysis'])
+    self.toolbox = toolbox.endovir_toolbox.EndovirToolbox()
+    self.toolbox.configure(config['tools'])
+    self.dbmanager = biodb.biodb_manager.BiodbManager(self.toolbox)
+    self.dbmanager.configure(self.config.dbdir, config['databases'])
+    self.dbmanager.test_databases()
     self.screens = {}
-    self.toolshed = process.toolshed.EndovirToolshed()
 
+  # def initial_screen():
+  #   return contigs
+  # def analyze_contigs():
+  #
   #def screen(self, srrs=[]):
     #vrs_ctgs = {}
     #for i in srrs:
@@ -76,9 +91,7 @@ def main():
     #print("Running test in {} using {}".format(args.wd, args.srr), file=sys.stderr)
   #else:
     #print("Analyzing  {} using {}.".format(args.srr, args.wd), file=sys.stderr)
-  ev = Endovir()
-  ev_cfgr = configurator.endovir_configurator.EndovirConfigurator()
-  ev_cfgr.configure(args.config, ev.config)
+  ev = Endovir(args.config)
   #e = Endovir(wd=args.wd)
   #print("Checking databases", file=sys.stderr)
   #e.setup()

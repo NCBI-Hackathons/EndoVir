@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-#  \file asm_base.py
+#  \file tool.py
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
 #  \version 0.0.1
@@ -11,7 +9,7 @@ import time
 import json
 import subprocess
 
-class BasicProcess:
+class EndovirTool:
 
   def __init__(self, name, path, role):
     self.name = name
@@ -19,15 +17,6 @@ class BasicProcess:
     self.role = role
     self.option_map = {}
     self.option_list = []
-
-  #def load_config_file(self, cfg_file):
-    #fh = open(cfg_file, 'r')
-    #cfg = json.load(fh)
-    #fh.close()
-    #self.add_options(cfg.pop('options'))
-    #self.role = cfg.pop('role')
-    #self.name = cfg.pop('name')
-    #self.path = cfg.pop('path')
 
   def update_options(self, options):
     for i in options:
@@ -51,6 +40,7 @@ class BasicProcess:
         cmd.append(i)
       else:
         cmd += [i, self.option_map[i]]
+    print(cmd)
     return subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE,
                             bufsize=1, universal_newlines=True)
 

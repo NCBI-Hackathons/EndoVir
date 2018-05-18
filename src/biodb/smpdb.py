@@ -1,21 +1,23 @@
-#  -------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 #  \file smpdb.py
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
 #  \version 0.0.0
 #  \description
-#  -------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 import os
 import sys
 
+from . import basic_biodb
+
 class SmpDatabase(basic_biodb.BasicBioDatabase):
 
-  def __init__(self, dbdir=None, title=None, dbtype=None, dbstyle=None):
-    super().__init__(name=title, dbdirpath=executable, role='blastdb')
+  def __init__(self, dbdir, title, dbtype, client, tool):
+    super().__init__(name=title, dbdir=dbdir, dbtype=dbtype)
+    self.client = client
+    self.tool = tool
 
-  def add_client(self, client):
-    pass
   def make_db(self, fil=None):
     cmd = self.cmd + ['-dbtype', self.dbtyp, '-in', fil, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
     print(cmd)
@@ -33,14 +35,10 @@ class SmpDatabase(basic_biodb.BasicBioDatabase):
     print(cmd)
     p = subprocess.Popen(cmd, stdin=stdout)
 
-  def isDatabase(self):
-    self.clear_options()
-    self.add_options([{'-db' : self.path},{'-info': None}])
-    pfh = self.run()
-    if self.hasFinished(pfh):
-      if pfh.returncode == 0:
-        return True
-      return False
+  def isValidDatabase(self, toolbox):
+    tool = toolbox.get_tool_by_name(self.client)
+    tool.clear_options()
+    tool.add_options([{'-db': self.dbpath}, {'-info':None}])
 
   def check(self):
     if os.path.exists(self.dbdir):
