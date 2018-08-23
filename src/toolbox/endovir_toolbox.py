@@ -11,45 +11,45 @@ import io
 import os
 import sys
 
-import endovir_tool.endovir_tool
+import tool.endovir_tool
 
 class EndovirToolbox:
 
-  def __init__(self):
-    self.tools_map = {}
-    self.roles_map = {} # Look up process by role
+  tools = {}
+  roles = {} # Look up process by role
 
-  def add_tool(self, process):
-    self.tools_map[process.name] = process
-    if process.role not in self.roles_map:
-      self.roles_map[process.role] = {}
-    self.roles_map[process.role][process.name] = process
+  @staticmethod
+  def add_tool(process):
+    if process.name not in EndovirToolbox.tools:
+      EndovirToolbox.tools[process.name] = process
+      if process.role not in EndovirToolbox.roles:
+        EndovirToolbox.roles[process.role] = {}
+      EndovirToolbox.roles[process.role][process.name] = process
+    return process
 
-  def list_tools(self):
-    for i in self.tools_map:
-      print(self.tools_map[i].name)
+  @staticmethod
+  def list_tools():
+    for i in self.tools:
+      print(self.tools[i].name)
 
-  def get_tool_by_name(self, toolname):
-    return self.tools_map.get(toolname)
+  @staticmethod
+  def get_by_name(toolname):
+    return EndovirToolbox.tools.get(toolname)
 
-  def get_tools_by_role(self, role):
-    return {x.name : x for x in self.roles[role]}
+  @staticmethod
+  def get_by_role(role):
+    return {x.name : x for x in EndovirToolbox.roles[role]}
 
-  def configure(self, config):
-    missing_tools = self.initialize_tools(config)
-    if len(missing_tools) != 0:
-      print("Following tools cannot been found:")
-      for i in missing_tools:
-        print("{}\t{}".format(i, missing_tools[i]))
-      sys.exit("Please install or adust paths. Abort")
-    print("Found all required tools and put them into the endovir toolbox")
-
-  def initialize_tools(self, tools):
+  @staticmethod
+  def initialize_tools(tools):
     missing_tools = {}
     for i in tools:
       for j in tools[i]:
         if not os.path.isfile(tools[i][j]):
           missing_tools[j] = tools[i][j]
         else:
-          self.add_tool(endovir_tool.endovir_tool.EndovirTool(j, tools[i][j], i))
+          EndovirToolbox.add_tool(tool.endovir_tool.EndovirTool(j, tools[i][j], i))
     return missing_tools
+
+  def __init__(self):
+    pass

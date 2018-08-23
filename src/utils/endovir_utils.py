@@ -22,3 +22,12 @@ def make_dir(path):
     print("Error creating {}\t{}.".format(path, err.errno))
     return False
   return True
+
+def isDirectory(dir_path):
+  return os.path.isdir(dir_path)
+
+def isAbsolutePath(path):
+  return os.path.isabs(path)
+
+def pathExists(path):
+  return os.path.exists(path)

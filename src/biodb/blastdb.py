@@ -12,14 +12,37 @@ import tarfile
 import urllib.request
 import time
 
+sys.path.insert(1, os.path.join(sys.path[0], '../'))
+import utils.endovir_utils
+import toolbox.endovir_toolbox
 from . import basic_biodb
 
 class BlastDatabase(basic_biodb.BasicBioDatabase):
 
-  def __init__(self, dbdir, title, dbtype, client, tool):
-    super().__init__(name=title, dbdir=dbdir, dbtype=dbtype)
-    self.client = client
-    self.tool = tool
+  tool = None
+  client = None
+
+  def __init__(self, dbdir, title, dbformat, dbtype, client, tool):
+    super().__init__(name=title, dbdir=dbdir, dbformat=dbformat)
+    self.dbtype = dbtype
+    BlastDatabase.client = toolbox.endovir_toolbox.Toolbox().get_by_name(client)
+    BlastDatabase.tool = toolbox.endovir_toolbox.Toolbox().get_by_name(tool)
+
+  def initialize(self, wd):
+    if not endovir_utils.isAbsolutePath(self.dbdir):
+      self.dbdir = os.path.join(wd, self.dbdir)
+    self.dbname = os.path.join(self.dbdir, self.dbname)
+
+  def test(self):
+    testOK = True
+    if not endovir_utils.isDirectory(self.dbdir):
+      print("Error: Not a database directory: {}".format(self.dbdir))
+    if not self.isValidDatabase():
+      print("Error: Not a valid {}::{} database: {}".format(self.dbformat,
+                                                           self.dbtype,
+                                                           self.dbname))
+      testOK = False
+    return testOK
 
   def make_db(self, fil=None):
     cmd = self.cmd + ['-dbtype', self.dbtyp, '-in', fil, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
@@ -38,22 +61,14 @@ class BlastDatabase(basic_biodb.BasicBioDatabase):
     print(cmd)
     p = subprocess.Popen(cmd, stdin=stdout)
 
-  def isValidDatabase(self, toolbox):
-    tool = toolbox.get_tool_by_name(self.client)
-    tool.clear_options()
-    tool.add_options([{'-db': self.dbpath}, {'-info':None}])
-    pfh = tool.run()
-    if tool.hasFinished(pfh):
-      if pfh.returncode != 0:
-        return False
-      return True
-    #self.add_options([{'-db' : self.path},{'-info': None}])
-    #pfh = self.run()
-    #if self.hasFinished(pfh):
-      #if pfh.returncode == 0:
-        #return True
-      #return False
-
+  def isValidDatabase(self):
+    BlastDatabase.tool.clear_options()
+    BlastDatabase.tool.add_options([{'-db': self.name}, {'-info':None}])
+    pfh = BlastDatabase.tool.run()
+    if BlastDatabase.tool.hasFinished(pfh):
+      if pfh.returncode == 0:
+        return True
+    return False
   #def check(self):
     #if os.path.exists(self.dbdir):
       #if not self.dbtool.exists(os.path.join(self.dbdir, self.title)):

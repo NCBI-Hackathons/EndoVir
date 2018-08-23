@@ -16,37 +16,37 @@ from . import smpdb
 
 class BiodbManager:
 
-  def __init__(self, toolbox):
-    self.dbdir = None
-    self.dbs = {}
-    self.toolbox = toolbox
+  dbs = {}
 
-  def configure(self, dbdir, config):
-    self.dbdir = dbdir
-    self.initialize_databases(config)
+  def __init__(self, wd):
+    self.wd = wd
 
-  def initialize_databases(self, dbs):
-    for i in dbs:
-      if i == 'blast_databases':
-        self.initialize_blast_databases(dbs[i])
-    self.list_databases()
+  def initialize_databases(self, databases):
+    for i in databases:
+      if databases[i]['format'] == 'blast':
+        if i not in BiodbManager.dbs:
+          BiodbManager.dbs[i] = blastdb.BlastDatabase(databases[i]['directory'],
+                                                      databases[i]['name'],
+                                                      databases[i]['format'],
+                                                      databases[i]['dbtype'],
+                                                      databases[i]['client'],
+                                                      databases[i]['tool'])
+      BiodbManager.dbs[i].initialize(self.wd)
 
-  def list_databases(self):
-    for i in self.dbs:
-      print(i, self.dbs[i].name, self.dbs[i].tool)
 
-  def initialize_blast_databases(self, dbs):
-    for i in dbs:
-      print(i, dbs[i]['dbtype'])
-      if dbs[i]['dbtype'] == 'smp':
-        self.dbs[i] = smpdb.SmpDatabase(self.dbdir, dbs[i]['name'],
-                                        dbs[i]['dbtype'], dbs[i]['client'],
-                                        dbs[i]['tool'])
-      else:
-        self.dbs[i] = blastdb.BlastDatabase(self.dbdir, dbs[i]['name'],
-                                            dbs[i]['dbtype'], dbs[i]['client'],
-                                            dbs[i]['tool'])
   def test_databases(self):
-    for i in self.dbs:
-      if not self.dbs[i].isValidDatabase(self.toolbox):
-        print("Not a valid database: ", i, self.dbs[i].name)
+    for i in BiodbManager.dbs:
+      if BiodbManager.dbs[i].test():
+        print("Good databases {}".format(i))
+      else:
+        print("Error in testing databases {}".format(i))
+
+  def fetch_databases(self, databases, toolbox):
+    for i in databases:
+      db = None
+      if i['format'] == 'blast':
+        db = blastdb.BlastDatabase(databases[i]['directory'],
+                                   databases[i]['name'],
+                                   databases[i]['format'],
+                                   databases[i]['client'],
+                                   databases[i]['tool'])

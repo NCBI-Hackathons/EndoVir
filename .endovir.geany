@@ -27,6 +27,24 @@ long_line_behaviour=1
 long_line_column=80
 
 [files]
-current_page=0
-FILE_NAME_0=281;Python;0;EUTF-8;0;1;0;%2Fhome%2Fjan%2Fprojects%2Fendovir%2Fsrc%2Fendovir.py;0;2
-FILE_NAME_1=0;Python;0;EUTF-8;0;1;0;%2Fhome%2Fjan%2Fprojects%2Fendovir%2Fsrc%2Fscreener.py;0;2
+current_page=4
+FILE_NAME_0=975;Python;0;EUTF-8;0;1;0;%2Fhome%2Fjan%2Fprojects%2Fendovir%2Fsrc%2Fendovir.py;0;2
+FILE_NAME_1=729;Python;0;EUTF-8;0;1;0;%2Fhome%2Fjan%2Fprojects%2Fendovir%2Fsrc%2Fendovir-configurator.py;0;2
+FILE_NAME_2=464;Python;0;EUTF-8;0;1;0;%2Fhome%2Fjan%2Fprojects%2Fendovir%2Fsrc%2Fconfigurator%2Fendovir_configurator.py;0;2
+FILE_NAME_3=1076;Python;0;EUTF-8;0;1;0;%2Fhome%2Fjan%2Fprojects%2Fendovir%2Fsrc%2Fbiodb%2Fbiodb_manager.py;0;2
+FILE_NAME_4=434;Python;0;EUTF-8;0;1;0;%2Fhome%2Fjan%2Fprojects%2Fendovir%2Fsrc%2Fbiodb%2Fbasic_biodb.py;0;2
+FILE_NAME_5=359;Python;0;EUTF-8;0;1;0;%2Fhome%2Fjan%2Fprojects%2Fendovir%2Fsrc%2Fbiodb%2Fblastdb.py;0;2
+FILE_NAME_6=51;JSON;0;EUTF-8;0;1;0;%2Fhome%2Fjan%2Fprojects%2Fendovir%2Fcfg%2Fendovir.cfg;0;2
+FILE_NAME_7=0;Python;0;EUTF-8;0;1;0;%2Fhome%2Fjan%2Fprojects%2Fendovir%2Fsrc%2Fscreener.py;0;2
+FILE_NAME_8=1038;Python;0;EUTF-8;0;1;0;%2Fhome%2Fjan%2Fprojects%2Fendovir%2Fsrc%2Ftoolbox%2Fendovir_toolbox.py;0;2
+FILE_NAME_9=1306;Python;0;EUTF-8;0;1;0;%2Fhome%2Fjan%2Fprojects%2Fendovir%2Fsrc%2Fbiodb%2Fsmpdb.py;0;2
+FILE_NAME_10=1212;Python;0;EUTF-8;0;1;0;%2Fhome%2Fjan%2Fprojects%2Fendovir%2Fsrc%2Fendovir_tool%2Fendovir_tool.py;0;2
+FILE_NAME_11=715;Python;0;EUTF-8;0;1;0;%2Fhome%2Fjan%2Fprojects%2Fendovir%2Fsrc%2Futils%2Fendovir_utils.py;0;2
+
+[prjorg]
+source_patterns=*.c;*.C;*.cpp;*.cxx;*.c++;*.cc;*.m;
+header_patterns=*.h;*.H;*.hpp;*.hxx;*.h++;*.hh;
+ignored_dirs_patterns=.*;CVS;
+ignored_file_patterns=*.o;*.obj;*.a;*.lib;*.so;*.dll;*.lo;*.la;*.class;*.jar;*.pyc;*.mo;*.gmo;
+generate_tag_prefs=0
+external_dirs=
