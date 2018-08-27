@@ -10,7 +10,10 @@ import os
 import sys
 import urllib
 import gzip
-#import tarfile
+
+sys.path.insert(1, os.path.join(sys.path[0], '../include/ncbipy_eutils/src'))
+import edbase.edanalyzer
+import callimachus.ncbi_callimachus
 
 class BlastSequenceDatabaseInstaller:
 
@@ -30,7 +33,6 @@ class BlastSequenceDatabaseInstaller:
       fh_tmp_dbfile = gzip.open(self.tmp_dbfile_comp, 'rb')
       db.write(fh_tmp_dbfile.read().decode())
       os.unlink(self.tmp_dbfile_comp)
-    db.seek(0)
     db.close()
     if os.path.getsize(self.tmp_dbfile) > 0:
       return self.tmp_dbfile
@@ -48,3 +50,20 @@ class BlastSequenceDatabaseInstaller:
         os.unlink(self.tmp_dbfile)
         return True
     return False
+
+class BlastMotifDatabaseInstaller:
+
+  def __init__(self):
+    self.tmp_dbfile = '/tmp/endovircdddb'
+    self.tmp_dbfile_comp = '/tmp/endovircdddb.gz'
+
+  def download(self, sourcelist):
+    pass
+
+  def install(self, db):
+    pass
+#edanalyzer
+class DocsumAnalyzer(edbase.edanalyzer.EdAnalyzer):
+
+  def __init__(self):
+    super().__init__()

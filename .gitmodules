@@ -1,0 +1,3 @@
+[submodule "include/ncbipy_eutils"]
+	path = include/ncbipy_eutils
+	url = https://gitlab.com/ncbipy/ncbipy_eutils.git

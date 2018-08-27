@@ -15,7 +15,6 @@ class EndovirStatusManager:
 
   @staticmethod
   def set_status_codes(status_codes, status_name='EndovirStatusCodes'):
-    status_codes.insert(0, 'OK')
     return enum.Flag(status_name, status_codes)
 
   def __init__(self, status_codes):
@@ -28,6 +27,10 @@ class EndovirStatusManager:
     self.triggers[status_name] = trigger
 
   def get_status(self, status_name='OK'):
+    if status_name == 'OK' and self.status == 0:
+      return True
+    if status_name == 'OK' and self.status > 0:
+      return False
     return (self.status & self.status_codes[status_name].value) == self.status_codes[status_name].value
 
   def list_triggers(self, triggers=None):

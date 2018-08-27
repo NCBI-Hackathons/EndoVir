@@ -48,7 +48,7 @@ class BlastDatabase(basic_biodb.BasicBioDatabase):
 
   def isValidDatabase(self):
     BlastDatabase.client.clear_options()
-    BlastDatabase.client.add_options([{'-db': self.name}, {'-info':None}])
+    BlastDatabase.client.add_options([{'-db':self.dbpath}, {'-info':None}])
     pfh = BlastDatabase.client.run()
     if BlastDatabase.client.hasFinished(pfh):
       if pfh.returncode == 0:
@@ -57,11 +57,12 @@ class BlastDatabase(basic_biodb.BasicBioDatabase):
 
   def install(self):
     dbstatus = status.endovir_status.EndovirStatusManager(BlastDatabase.status_codes)
-    if self.dbtype == 'smp':
-      return 0
     dbi = blastdb_installer.BlastSequenceDatabaseInstaller()
+    if self.dbtype == 'smp':
+      dbi = blastdb_installer.BlastMotifDatabaseInstaller()
+    print(dbi)
     if dbi.download(self.source) == None:
-      return dbstatus.set_status('FETCH', 'download_fail')
+      return dbstatus.set_status('FETCHERR', 'download_fail')
     if not dbi.install(self):
       return dbstatus.set_status('DBERR', 'install')
     return dbstatus

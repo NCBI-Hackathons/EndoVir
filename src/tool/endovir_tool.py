@@ -40,7 +40,7 @@ class EndovirTool:
         cmd.append(i)
       else:
         cmd += [i, self.option_map[i]]
-    print(cmd)
+    #print(cmd)
     return subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE,
                             bufsize=1, universal_newlines=True)
 
@@ -48,4 +48,5 @@ class EndovirTool:
     while pfh.poll() == None:
       print("\r PID: {}\tRole: {}\t{}".format(pfh.pid, self.role, pfh.args), end='')
       time.sleep(wait)
+    print("\n")
     return True
