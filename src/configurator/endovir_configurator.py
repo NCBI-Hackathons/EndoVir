@@ -54,11 +54,9 @@ class EndovirConfigurator:
   def configure_databases(self):
     dbmanager = biodb.biodb_manager.BiodbManager(self.get_working_directory())
     dbmanager.initialize_databases(self.get_databases())
-    if not isGo:
-      sys.exit("Database initialization failed. Abort.")
-    return dbmanager
+    dbmanager.test_databases()
 
-  def fetch_databases(self):
-    toolbox = toolbox.endovir_toolbox.EndovirToolbox()
+  def install_databases(self):
+    missing_tools = toolbox.endovir_toolbox.EndovirToolbox().initialize_tools(self.get_tools())
     dbmanager = biodb.biodb_manager.BiodbManager(self.get_working_directory())
-    missing_tools = toolbox.initialize_tools(config)
+    dbmanager.install_databases(self.get_databases())

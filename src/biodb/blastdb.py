@@ -8,93 +8,60 @@
 
 import os
 import sys
+import time
+import enum
 import tarfile
 import urllib.request
-import time
 
 sys.path.insert(1, os.path.join(sys.path[0], '../'))
 import utils.endovir_utils
 import toolbox.endovir_toolbox
+import status.endovir_status
 from . import basic_biodb
+from . import blastdb_installer
 
 class BlastDatabase(basic_biodb.BasicBioDatabase):
 
-  tool = None
+  status_codes = status.endovir_status.EndovirStatusManager.set_status_codes(['PATHERR', 'DBERR', 'FETCHERR'])
   client = None
 
-  def __init__(self, dbdir, title, dbformat, dbtype, client, tool):
-    super().__init__(name=title, dbdir=dbdir, dbformat=dbformat)
+  def __init__(self, dbdir, title, dbformat, source, dbtype, client, tool):
+    super().__init__(name=title, dbdir=dbdir, dbformat=dbformat, source=source)
     self.dbtype = dbtype
-    BlastDatabase.client = toolbox.endovir_toolbox.Toolbox().get_by_name(client)
-    BlastDatabase.tool = toolbox.endovir_toolbox.Toolbox().get_by_name(tool)
+    self.tool = toolbox.endovir_toolbox.EndovirToolbox().get_by_name(tool)
+    BlastDatabase.client = toolbox.endovir_toolbox.EndovirToolbox().get_by_name(client)
 
   def initialize(self, wd):
-    if not endovir_utils.isAbsolutePath(self.dbdir):
+    if not utils.endovir_utils.isAbsolutePath(self.dbdir):
       self.dbdir = os.path.join(wd, self.dbdir)
-    self.dbname = os.path.join(self.dbdir, self.dbname)
+    self.dbpath = os.path.join(self.dbdir, self.name)
 
   def test(self):
-    testOK = True
-    if not endovir_utils.isDirectory(self.dbdir):
-      print("Error: Not a database directory: {}".format(self.dbdir))
+    dbstatus = status.endovir_status.EndovirStatusManager(BlastDatabase.status_codes)
+    if not utils.endovir_utils.isDirectory(self.dbdir):
+      dbstatus.set_status('PATHERR', self.dbdir)
+      return dbstatus
     if not self.isValidDatabase():
-      print("Error: Not a valid {}::{} database: {}".format(self.dbformat,
-                                                           self.dbtype,
-                                                           self.dbname))
-      testOK = False
-    return testOK
-
-  def make_db(self, fil=None):
-    cmd = self.cmd + ['-dbtype', self.dbtyp, '-in', fil, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
-    print(cmd)
-    p = subprocess.Popen(cmd)
-    while p.poll() == None:
-      print("\rCreating db {}".format(self.title), end='')
-      time.sleep(2)
-
-    if p.returncode != 0:
-      print("Creating db {} failed. Aborting.".format(self.title))
-      raise RuntimeError()
-
-  def make_db_stdin(self, stdout):
-    cmd = self.cmd + ['-dbtype', self.dbtyp, '-out', os.path.join(self.dbdir, self.title), '-title', self.title]
-    print(cmd)
-    p = subprocess.Popen(cmd, stdin=stdout)
+      dbstatus.set_status('DBERR', 'nonvalid')
+      return dbstatus
+    return dbstatus
 
   def isValidDatabase(self):
-    BlastDatabase.tool.clear_options()
-    BlastDatabase.tool.add_options([{'-db': self.name}, {'-info':None}])
-    pfh = BlastDatabase.tool.run()
-    if BlastDatabase.tool.hasFinished(pfh):
+    BlastDatabase.client.clear_options()
+    BlastDatabase.client.add_options([{'-db': self.name}, {'-info':None}])
+    pfh = BlastDatabase.client.run()
+    if BlastDatabase.client.hasFinished(pfh):
       if pfh.returncode == 0:
         return True
     return False
-  #def check(self):
-    #if os.path.exists(self.dbdir):
-      #if not self.dbtool.exists(os.path.join(self.dbdir, self.title)):
-        #print("No Blast DB {0}. Did you run setup.sh?".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
-        #sys.exit()
-      #else:
-        #print("\tfound local Blast DB {0}".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
-    #else:
-      #print("No Blast DB {0}. Did you run setup.sh?".format(os.path.join(self.dbdir, self.title), file=sys.stderr))
-      #sys.exit()
-      #os.makedir(self.dbdir)
-      #self.fetch_db(src)
-      #self.make_db(src, self.title)
 
-  def fetch_db(self, src, title):
-    if src == 'Cdd':
-      return
-    print("Fetching database {} from {}".format(title, src))
-    db = open(self.path, 'w')
-    for i in src:
-      dbgz = open('dbgz', 'wb')
-      response = urllib.request.urlopen(i)
-      dbgz.write(response.read())
-      dbgz.close()
-      f = gzip.open('dbgz', 'rb')
-      db.write(f.read().decode())
-      os.unlink('dbgz')
-    db.close()
-    #print("DB fetch placeholder for {0} to make db {1}".format(src, title))
+  def install(self):
+    dbstatus = status.endovir_status.EndovirStatusManager(BlastDatabase.status_codes)
+    if self.dbtype == 'smp':
+      return 0
+    dbi = blastdb_installer.BlastSequenceDatabaseInstaller()
+    if dbi.download(self.source) == None:
+      return dbstatus.set_status('FETCH', 'download_fail')
+    if not dbi.install(self):
+      return dbstatus.set_status('DBERR', 'install')
+    return dbstatus

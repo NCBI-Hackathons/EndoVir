@@ -22,9 +22,9 @@ def main():
                   type=argparse.FileType('r'),
                   required=True,
                   help='endovir JSON config file')
-  ap.add_argument('-f', '--fetch',
+  ap.add_argument('-i', '--install',
                   action='store_true',
-                  help='Download databases')
+                  help='Download and install databases')
   ap.add_argument('-t', '--test',
                   action='store_true',
                   help='Test configuration')
@@ -32,7 +32,9 @@ def main():
   ec = configurator.endovir_configurator.EndovirConfigurator(args.config)
   if args.test:
     ec.test()
-
+    return 0
+  if args.install:
+    ec.install_databases()
   return 0
 
 if __name__ == '__main__':

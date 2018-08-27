@@ -1,4 +1,4 @@
-#  -------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 #  \file basic_biodb.py
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
@@ -11,7 +11,7 @@
 #               actually is.
 #               If the directory of the databse is not absolute, it assumes a
 #               relative path in relation to the working directory.
-#  -------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 class BasicBioDatabase:
 
@@ -19,16 +19,22 @@ class BasicBioDatabase:
   # @input name, str, database name
   # @input dbdir, str, database directory
   # @input dbformat, str, database format
-  def __init__(self, name=None, dbdir=None, dbformat=None):
+  def __init__(self, name=None, dbdir=None, dbformat=None, source=None):
     self.name = name
     self.dbdir = dbdir
     self.dbformat = dbformat
+    self.source = source
     self.dbpath = None
 
   ## Initialize database
   # Virtual method
   #@input wd, str, working directory.
   def initialize(self, wd):
+    raise NotImplementedError("Help! Need implementation")
+
+  ## Install database
+  # Virtual method
+  def install(self):
     raise NotImplementedError("Help! Need implementation")
 
 
