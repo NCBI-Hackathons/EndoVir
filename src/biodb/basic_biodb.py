@@ -2,7 +2,6 @@
 #  \file basic_biodb.py
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
-#  \version 0.1.0
 #  \description Basic database class handling biological databases. Since \
 #               databases can differ in type (sequences, motifs, etc) and format
 #               (e.g. NCBI is different than DIAMOND), it constitutes a

@@ -1,12 +1,10 @@
-"""
--------------------------------------------------------------------------------
-\file untitled.py
-\author Jan P Buchmann <jan.buchmann@sydney.edu.au>
-\copyright 2018 The University of Sydney
-\version 0.0.0
-\description
--------------------------------------------------------------------------------
-"""
+#-------------------------------------------------------------------------------
+#  \file endovir_utils.py
+#  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
+#  \copyright 2018 The University of Sydney
+#  \description
+#-------------------------------------------------------------------------------
+
 import io
 import os
 import sys
@@ -14,7 +12,7 @@ import sys
 
 def make_dir(path):
   if os.path.exists(path):
-    print("Found existing direcotry {}.".format(path))
+    print("Found existing directory {}.".format(path))
     return True
   try:
     os.mkdir(path)

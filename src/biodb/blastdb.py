@@ -2,7 +2,6 @@
 #  \file blast_database.py
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
-#  \version 0.0.0
 #  \description Blast database base class.
 #-------------------------------------------------------------------------------
 

@@ -2,7 +2,6 @@
 #  \file endovir_status.py
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
-#  \version 0.1.0
 #  \description
 #  -------------------------------------------------------------------------------
 
