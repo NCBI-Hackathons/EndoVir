@@ -17,6 +17,12 @@ class BiodbManager:
 
   dbs = {}
 
+  @staticmethod
+  def get_databases():
+    if len (BiodbManager.dbs) == 0:
+      return None
+    return [BiodbManager.dbs[x] for x in BiodbManager.dbs]
+
   def __init__(self, wd):
     self.wd = wd
 
@@ -25,15 +31,14 @@ class BiodbManager:
     for i in databases:
       if databases[i]['format'] == 'blast':
         if i not in BiodbManager.dbs:
-          BiodbManager.dbs[i] = blastdb.BlastDatabase(databases[i]['directory'],
-                                                      databases[i]['name'],
+          BiodbManager.dbs[i] = blastdb.BlastDatabase(i,
+                                                      databases[i]['directory'],
                                                       databases[i]['format'],
                                                       databases[i]['src'],
                                                       databases[i]['dbtype'],
                                                       databases[i]['client'],
                                                       databases[i]['tool'])
       BiodbManager.dbs[i].initialize(self.wd)
-
 
   def test_databases(self):
     for i in BiodbManager.dbs:
@@ -53,11 +58,9 @@ class BiodbManager:
     for i in BiodbManager.dbs:
       print("Installing database {}".format(BiodbManager.dbs[i].name))
       status = BiodbManager.dbs[i].test()
-      print(status.status)
       if not status.get_status(status_name='OK'):
         self.make_database_directory(BiodbManager.dbs[i])
         status = BiodbManager.dbs[i].install()
-        print(status.status)
       else:
         print("Found installed database: {}".format(BiodbManager.dbs[i].name))
 
