@@ -2,9 +2,9 @@
 #  \file tool.py
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
-#  \version 0.0.1
 #  \description Semi-abstract base class for assemblers.
 #-------------------------------------------------------------------------------
+
 import time
 import json
 import subprocess
@@ -39,7 +39,7 @@ class EndovirTool:
       if self.option_map[i] == None:
         cmd.append(i)
       else:
-        cmd += [i, self.option_map[i]]
+        cmd += [i, str(self.option_map[i])]
     #print(cmd)
     return subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE,
                             bufsize=1, universal_newlines=True)
