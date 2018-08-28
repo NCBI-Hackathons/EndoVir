@@ -55,14 +55,15 @@ class BlastDatabase(basic_biodb.BasicBioDatabase):
         return True
     return False
 
-  def install(self):
+  def install(self, email=None):
     dbstatus = status.endovir_status.EndovirStatusManager(BlastDatabase.status_codes)
     dbi = blastdb_installer.BlastSequenceDatabaseInstaller()
-    if self.dbtype == 'smp':
-      dbi = blastdb_installer.BlastMotifDatabaseInstaller()
-    print(dbi)
+    if self.dbtype == 'rps':
+      dbi = blastdb_installer.BlastMotifDatabaseInstaller(email)
     if dbi.download(self.source) == None:
-      return dbstatus.set_status('FETCHERR', 'download_fail')
+      dbstatus.set_status('FETCHERR', 'download_fail')
+      return dbstatus
     if not dbi.install(self):
-      return dbstatus.set_status('DBERR', 'install')
+      dbstatus.set_status('DBERR', 'install')
+      return dbstatus
     return dbstatus
