@@ -2,7 +2,6 @@
 #  \file endovir_configurator.py
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
-#  \version 0.1.0
 #  \description Cconfiguration for endovir.
 #-------------------------------------------------------------------------------
 
@@ -56,7 +55,7 @@ class EndovirConfigurator:
     dbmanager.initialize_databases(self.get_databases())
     dbmanager.test_databases()
 
-  def install_databases(self):
+  def install_databases(self, email):
     missing_tools = toolbox.endovir_toolbox.EndovirToolbox().initialize_tools(self.get_tools())
     dbmanager = biodb.biodb_manager.BiodbManager(self.get_working_directory())
-    dbmanager.install_databases(self.get_databases())
+    dbmanager.install_databases(self.get_databases(), email)

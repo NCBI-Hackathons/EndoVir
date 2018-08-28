@@ -1,12 +1,10 @@
-"""
--------------------------------------------------------------------------------
-\file database_manager.py
-\author Jan P Buchmann <jan.buchmann@sydney.edu.au>
-\copyright 2018 The University of Sydney
-\version 0.0.0
-\description
--------------------------------------------------------------------------------
-"""
+#-------------------------------------------------------------------------------
+# \file database_manager.py
+# \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
+# \copyright 2018 The University of Sydney
+# \description
+#-------------------------------------------------------------------------------
+
 import io
 import os
 import sys
@@ -23,6 +21,7 @@ class BiodbManager:
     self.wd = wd
 
   def initialize_databases(self, databases):
+    print("Initializing databases")
     for i in databases:
       if databases[i]['format'] == 'blast':
         if i not in BiodbManager.dbs:
@@ -46,16 +45,21 @@ class BiodbManager:
       print("Good databases {}".format(BiodbManager.dbs[i].name))
 
 
-  def install_databases(self, databases):
+  def install_databases(self, databases, email):
+    print("Installing databases")
     self.initialize_databases(databases)
     if len(self.wd) == 0:
       sys.exit("No initialized databases. Abort.")
     for i in BiodbManager.dbs:
+      print("Installing database {}".format(BiodbManager.dbs[i].name))
       status = BiodbManager.dbs[i].test()
+      print(status.status)
       if not status.get_status(status_name='OK'):
         self.make_database_directory(BiodbManager.dbs[i])
-        BiodbManager.dbs[i].install()
-
+        status = BiodbManager.dbs[i].install()
+        print(status.status)
+      else:
+        print("Found installed database: {}".format(BiodbManager.dbs[i].name))
 
   def make_database_directory(self, database):
     if not utils.endovir_utils.make_dir(database.dbdir):

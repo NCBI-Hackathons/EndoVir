@@ -3,7 +3,6 @@
 #  \file endovir-configurator.py
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
-#  \version 0.1.0
 #  \description Testing tool for the endovir configuration. It checks for valid
 #               paths and existing tools without calling the actual screening.
 #-------------------------------------------------------------------------------
@@ -28,13 +27,17 @@ def main():
   ap.add_argument('-t', '--test',
                   action='store_true',
                   help='Test configuration')
+  ap.add_argument('-e', '--email',
+                  type=str,
+                  required=True,
+                  help='Email required by NCBI Eutils')
   args = ap.parse_args()
   ec = configurator.endovir_configurator.EndovirConfigurator(args.config)
   if args.test:
     ec.test()
     return 0
   if args.install:
-    ec.install_databases()
+    ec.install_databases(args.email)
   return 0
 
 if __name__ == '__main__':
