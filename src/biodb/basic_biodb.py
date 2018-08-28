@@ -18,12 +18,18 @@ class BasicBioDatabase:
   # @input name, str, database name
   # @input dbdir, str, database directory
   # @input dbformat, str, database format
-  def __init__(self, name=None, dbdir=None, dbformat=None, source=None):
+  def __init__(self, name=None, dbdir=None, dbformat=None, source=None, dbpath=None):
     self.name = name
     self.dbdir = dbdir
     self.dbformat = dbformat
     self.source = source
-    self.dbpath = None
+    self.dbpath = dbpath
+
+  ## Get essential database configuration to recreate database
+  # Virtual method
+  #@return configuration, dict, simplified cfg dictionary
+  def get_configuration(self):
+    raise NotImplementedError("Help! Need implementation")
 
   ## Initialize database
   # Virtual method
@@ -40,6 +46,6 @@ class BasicBioDatabase:
   ## Test database
   # Virtual method
   #@input wd, str, working directory.
-  #@return status, bool
+  #@return status, EndovirStatus instance, test status in form of EndovirStatus
   def test(self):
     raise NotImplementedError("Help! Need implementation")

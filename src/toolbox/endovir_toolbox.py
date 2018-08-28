@@ -48,5 +48,16 @@ class EndovirToolbox:
           EndovirToolbox.add_tool(tool.endovir_tool.EndovirTool(j, tools[i][j], i))
     return missing_tools
 
+  @staticmethod
+  def get_configurations():
+    config = {}
+    for i in EndovirToolbox.tools:
+      roles = EndovirToolbox.tools[i].get_configuration()
+      for j in roles:
+        if j not in config:
+          config[j] = {}
+        config[j].update(roles[j])
+    return config
+
   def __init__(self):
     pass

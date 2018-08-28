@@ -16,7 +16,7 @@ import argparse
 import configurator.endovir_configurator
 
 def main():
-  ap = argparse.ArgumentParser(description='Endovir')
+  ap = argparse.ArgumentParser(description='Endovir configurator')
   ap.add_argument('-c', '--config',
                   type=argparse.FileType('r'),
                   required=True,
@@ -29,8 +29,10 @@ def main():
                   help='Test configuration')
   ap.add_argument('-e', '--email',
                   type=str,
-                  required=True,
                   help='Email required by NCBI Eutils')
+  ap.add_argument('-p', '--prepare',
+                  action='store_true',
+                  help='Prepare configuration for endovir screen')
   args = ap.parse_args()
   ec = configurator.endovir_configurator.EndovirConfigurator(args.config)
   if args.test:
@@ -38,6 +40,10 @@ def main():
     return 0
   if args.install:
     ec.install_databases(args.email)
+    return 0
+  if args.prepare:
+    ec.prepare()
+    return 0
   return 0
 
 if __name__ == '__main__':

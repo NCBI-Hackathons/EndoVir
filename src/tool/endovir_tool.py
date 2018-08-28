@@ -4,7 +4,7 @@
 #  \copyright 2018 The University of Sydney
 #  \description Semi-abstract base class for assemblers.
 #-------------------------------------------------------------------------------
-
+import sys
 import time
 import json
 import subprocess
@@ -17,6 +17,9 @@ class EndovirTool:
     self.role = role
     self.option_map = {}
     self.option_list = []
+
+  def get_configuration(self):
+    return {self.role: {self.name : self.path}}
 
   def update_options(self, options):
     for i in options:
@@ -46,7 +49,7 @@ class EndovirTool:
 
   def hasFinished(self, pfh, wait=0.5):
     while pfh.poll() == None:
-      print("\r PID: {}\tRole: {}\t{}".format(pfh.pid, self.role, pfh.args), end='')
+      print("\r PID: {}\tRole: {}\t{}".format(pfh.pid, self.role, pfh.args), end='', file=sys.stderr)
       time.sleep(wait)
-    print("\n")
+    print("\n", file=sys.stderr)
     return True

@@ -24,12 +24,12 @@ class BlastSequenceDatabaseInstaller:
   def download(self, sourcelist):
     db = open(self.tmp_dbfile, 'w')
     for i in sourcelist:
-      print("Downloading: {} -> {}".format(i, self.tmp_dbfile_comp))
+      print("Downloading: {} -> {}".format(i, self.tmp_dbfile_comp), file=sys.stderr)
       fh_tmp_dbfile_comp = open(self.tmp_dbfile_comp, 'wb')
       response = urllib.request.urlopen(i)
       fh_tmp_dbfile_comp.write(response.read())
       fh_tmp_dbfile_comp.close()
-      print("Decompressing {} -> {}".format(self.tmp_dbfile_comp, self.tmp_dbfile))
+      print("Decompressing {} -> {}".format(self.tmp_dbfile_comp, self.tmp_dbfile), file=sys.stderr)
       fh_tmp_dbfile = gzip.open(self.tmp_dbfile_comp, 'rb')
       db.write(fh_tmp_dbfile.read().decode())
       os.unlink(self.tmp_dbfile_comp)
@@ -73,12 +73,12 @@ class BlastMotifDatabaseInstaller:
     accessions = self.get_virus_pssm()
     fh_pssm = open(self.tmp_pssm_file, 'w')
     for i in sourcelist:
-      print("Downloading: {} -> {}".format(i, self.tmp_dbfile_comp))
+      print("Downloading: {} -> {}".format(i, self.tmp_dbfile_comp), file=sys.stderr)
       #fh_tmp_dbfile_comp = open(self.tmp_dbfile_comp, 'wb')
       #response = urllib.request.urlopen(i)
       #fh_tmp_dbfile_comp.write(response.read())
       #fh_tmp_dbfile_comp.close()
-      print("Extracting PSSM's")
+      print("Extracting PSSM's", file=sys.stderr)
       tar = tarfile.open(self.tmp_dbfile_comp, "r:*")
       for j in tar:
         if j.name in accessions:
@@ -104,7 +104,7 @@ class BlastMotifDatabaseInstaller:
     return False
 
   def get_virus_pssm(self):
-    print("Fetching virus PSSM accessions")
+    print("Fetching virus PSSM accessions", file=sys.stderr)
     nc = callimachus.ncbi_callimachus.NcbiCallimachus(self.email)
     qry = nc.new_query()
     qid = qry.add_query(qry.new_search(parameters={'db' : 'cdd',
@@ -114,4 +114,4 @@ class BlastMotifDatabaseInstaller:
                                                   'retmode':'json'},
                                       analyzer=self.DocsumAnalyzer()))
     dsa = nc.run_query(qry)
-    return  dsa.accessions
+    return dsa.accessions

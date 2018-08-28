@@ -24,11 +24,24 @@ class BlastDatabase(basic_biodb.BasicBioDatabase):
   status_codes = status.endovir_status.EndovirStatusManager.set_status_codes(['PATHERR', 'DBERR', 'FETCHERR'])
   client = None
 
-  def __init__(self, name, dbdir, dbformat, source, dbtype, client, tool):
+  def __init__(self, name, dbdir, dbformat, dbtype, client, tool, source=None):
     super().__init__(name=name, dbdir=dbdir, dbformat=dbformat, source=source)
     self.dbtype = dbtype
     self.tool = toolbox.endovir_toolbox.EndovirToolbox().get_by_name(tool)
     BlastDatabase.client = toolbox.endovir_toolbox.EndovirToolbox().get_by_name(client)
+
+  def get_configuration(self):
+    return {
+            self.name :
+            {
+              'directory' : os.path.abspath(self.dbdir),
+              'format' : self.dbformat,
+              'format' : self.dbformat,
+              'dbtype' : self.dbtype,
+              'client' : BlastDatabase.client.name,
+              'tool' : self.tool.name
+             }
+           }
 
   def initialize(self, wd):
     if not utils.endovir_utils.isAbsolutePath(self.dbdir):
