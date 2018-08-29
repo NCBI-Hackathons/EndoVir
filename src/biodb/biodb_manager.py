@@ -1,5 +1,4 @@
 #-------------------------------------------------------------------------------
-# \file database_manager.py
 # \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 # \copyright 2018 The University of Sydney
 # \description
@@ -46,6 +45,8 @@ class BiodbManager:
                                                       databases[i]['tool'],
                                                       databases[i].get('src'))
       BiodbManager.dbs[i].initialize(self.wd)
+      print("\tInitializing {}".format(i), file=sys.stderr)
+    print("Initializing databases: OK", file=sys.stderr)
 
   def test_databases(self):
     for i in BiodbManager.dbs:
@@ -58,18 +59,21 @@ class BiodbManager:
 
 
   def install_databases(self, databases, email):
-    print("Installing databases", file=sys.stderr)
+    print("Installing databases...", file=sys.stderr)
     self.initialize_databases(databases)
-    if len(self.wd) == 0:
+    if len(self.dbs) == 0:
       sys.exit("No initialized databases. Abort.")
     for i in BiodbManager.dbs:
       print("Installing database {}".format(BiodbManager.dbs[i].name), file=sys.stderr)
       status = BiodbManager.dbs[i].test()
-      if not status.get_status(status_name='OK'):
+      if status.get_status(status_name='OK'):
+        print("Found installed database: {}".format(BiodbManager.dbs[i].name), file=sys.stderr)
+      else:
         self.make_database_directory(BiodbManager.dbs[i])
         status = BiodbManager.dbs[i].install()
-      else:
-        print("Found installed database: {}".format(BiodbManager.dbs[i].name), file=sys.stderr)
+        if not status.get_status(status_name='OK'):
+          sys.exit("Error installing database {}".format(BiodbManager.dbs[i].name))
+    print("Installing databases OK".format(BiodbManager.dbs[i].name), file=sys.stderr)
 
   def make_database_directory(self, database):
     if not utils.endovir_utils.make_dir(database.dbdir):

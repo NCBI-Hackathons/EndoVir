@@ -1,5 +1,4 @@
 #-------------------------------------------------------------------------------
-#  \file blast_database.py
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
 #  \description Blast database base class.
@@ -29,6 +28,7 @@ class BlastDatabase(basic_biodb.BasicBioDatabase):
     self.dbtype = dbtype
     self.tool = toolbox.endovir_toolbox.EndovirToolbox().get_by_name(tool)
     BlastDatabase.client = toolbox.endovir_toolbox.EndovirToolbox().get_by_name(client)
+    self.status = status.endovir_status.EndovirStatusManager(BlastDatabase.status_codes)
 
   def get_configuration(self):
     return {
@@ -49,14 +49,13 @@ class BlastDatabase(basic_biodb.BasicBioDatabase):
     self.dbpath = os.path.join(self.dbdir, self.name)
 
   def test(self):
-    dbstatus = status.endovir_status.EndovirStatusManager(BlastDatabase.status_codes)
     if not utils.endovir_utils.isDirectory(self.dbdir):
-      dbstatus.set_status('PATHERR', self.dbdir)
-      return dbstatus
+      self.status.set_status('PATHERR', self.dbdir)
+      return self.status
     if not self.isValidDatabase():
-      dbstatus.set_status('DBERR', 'nonvalid')
-      return dbstatus
-    return dbstatus
+      self.status.set_status('DBERR', 'nonvalid')
+      return self.status
+    return self.status
 
   def isValidDatabase(self):
     BlastDatabase.client.clear_options()
@@ -68,14 +67,13 @@ class BlastDatabase(basic_biodb.BasicBioDatabase):
     return False
 
   def install(self, email=None):
-    dbstatus = status.endovir_status.EndovirStatusManager(BlastDatabase.status_codes)
     dbi = blastdb_installer.BlastSequenceDatabaseInstaller()
     if self.dbtype == 'rps':
       dbi = blastdb_installer.BlastMotifDatabaseInstaller(email)
     if dbi.download(self.source) == None:
-      dbstatus.set_status('FETCHERR', 'download_fail')
-      return dbstatus
+      self.status.set_status('FETCHERR', 'download_fail')
+      return self.status
     if not dbi.install(self):
-      dbstatus.set_status('DBERR', 'install')
-      return dbstatus
-    return dbstatus
+      self.status.set_status('DBERR', 'install')
+      return self.status
+    return self.status

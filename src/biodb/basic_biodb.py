@@ -1,5 +1,4 @@
 #-------------------------------------------------------------------------------
-#  \file basic_biodb.py
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
 #  \description Basic database class handling biological databases. Since \
