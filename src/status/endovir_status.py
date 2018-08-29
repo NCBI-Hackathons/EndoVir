@@ -1,13 +1,9 @@
 #-------------------------------------------------------------------------------
-#  \file endovir_status.py
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
 #  \description
 #-------------------------------------------------------------------------------
 
-import io
-import os
-import sys
 import enum
 
 class EndovirStatusManager:
@@ -39,3 +35,6 @@ class EndovirStatusManager:
     else:
       for i in self.triggers:
         print(i, self.triggers[i])
+
+  def update(self, status_code):
+    self.status |= status_code

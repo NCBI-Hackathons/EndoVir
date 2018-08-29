@@ -1,5 +1,4 @@
 #-------------------------------------------------------------------------------
-#  \file endovir_utils.py
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
 #  \description
