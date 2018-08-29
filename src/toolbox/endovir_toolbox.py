@@ -1,5 +1,4 @@
 #-------------------------------------------------------------------------------
-#  \file endovir_toolbox.py
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
 #  \description
@@ -8,10 +7,13 @@ import io
 import os
 import sys
 
+sys.path.insert(1, os.path.join(sys.path[0], '../'))
+import status.endovir_status
 import tool.endovir_tool
 
 class EndovirToolbox:
 
+  status = status.endovir_status.EndovirStatusManager(status.endovir_status.EndovirStatusManager.set_status_codes(['MISSINGTOOL']))
   tools = {}
   roles = {} # Look up process by role
 
@@ -46,6 +48,8 @@ class EndovirToolbox:
           missing_tools[j] = tools[i][j]
         else:
           EndovirToolbox.add_tool(tool.endovir_tool.EndovirTool(j, tools[i][j], i))
+    if len(missing_tools) > 0:
+      EndovirToolbox.status.set_status('MISSINGTOOL')
     return missing_tools
 
   @staticmethod
