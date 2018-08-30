@@ -9,7 +9,7 @@ import sys
 
 sys.path.insert(1, os.path.join(sys.path[0], '../'))
 import status.endovir_status
-import tool.endovir_tool
+from . import endovir_tool
 
 class EndovirToolbox:
 
@@ -47,7 +47,7 @@ class EndovirToolbox:
         if not os.path.isfile(tools[i][j]):
           missing_tools[j] = tools[i][j]
         else:
-          EndovirToolbox.add_tool(tool.endovir_tool.EndovirTool(j, tools[i][j], i))
+          EndovirToolbox.add_tool(endovir_tool.EndovirTool(j, tools[i][j], i))
     if len(missing_tools) > 0:
       EndovirToolbox.status.set_status('MISSINGTOOL')
     return missing_tools
