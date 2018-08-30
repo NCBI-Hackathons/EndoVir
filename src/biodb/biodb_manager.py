@@ -10,7 +10,6 @@ import sys
 
 import utils.endovir_utils
 from . import blastdb
-from . import smpdb
 
 class BiodbManager:
 
@@ -29,10 +28,8 @@ class BiodbManager:
       config.update(BiodbManager.dbs[i].get_configuration())
     return config
 
-  def __init__(self, wd):
-    self.wd = wd
-
-  def initialize_databases(self, databases):
+  @staticmethod
+  def initialize_databases(wd, databases):
     print("Initializing databases", file=sys.stderr)
     for i in databases:
       if databases[i]['format'] == 'blast':
@@ -44,11 +41,12 @@ class BiodbManager:
                                                       databases[i]['client'],
                                                       databases[i]['tool'],
                                                       databases[i].get('src'))
-      BiodbManager.dbs[i].initialize(self.wd)
+      BiodbManager.dbs[i].initialize(wd)
       print("\tInitializing {}".format(i), file=sys.stderr)
     print("Initializing databases: OK", file=sys.stderr)
 
-  def test_databases(self):
+  @staticmethod
+  def test_databases():
     for i in BiodbManager.dbs:
       status = BiodbManager.dbs[i].test()
       if not status.get_status('OK'):
@@ -57,11 +55,11 @@ class BiodbManager:
                                                      BiodbManager.dbs[i].dbpath))
       print("Good database {}".format(BiodbManager.dbs[i].name),file=sys.stderr)
 
-
-  def install_databases(self, databases, email):
+  @staticmethod
+  def install_databases(databases, email):
     print("Installing databases...", file=sys.stderr)
-    self.initialize_databases(databases)
-    if len(self.dbs) == 0:
+    BiodbManager.initialize_databases(databases)
+    if len(BiodbManager.dbs) == 0:
       sys.exit("No initialized databases. Abort.")
     for i in BiodbManager.dbs:
       print("Installing database {}".format(BiodbManager.dbs[i].name), file=sys.stderr)
@@ -69,12 +67,16 @@ class BiodbManager:
       if status.get_status(status_name='OK'):
         print("Found installed database: {}".format(BiodbManager.dbs[i].name), file=sys.stderr)
       else:
-        self.make_database_directory(BiodbManager.dbs[i])
+        BiodbManager.make_database_directory(BiodbManager.dbs[i])
         status = BiodbManager.dbs[i].install()
         if not status.get_status(status_name='OK'):
           sys.exit("Error installing database {}".format(BiodbManager.dbs[i].name))
     print("Installing databases OK".format(BiodbManager.dbs[i].name), file=sys.stderr)
 
-  def make_database_directory(self, database):
+  @staticmethod
+  def make_database_directory(database):
     if not utils.endovir_utils.make_dir(database.dbdir):
       sys.exit("Cannot create database directory: {}.Abort.".format(database.dbdir))
+
+  def __init__(self):
+    pass

@@ -42,6 +42,7 @@ class EndovirConfigurator:
     return self.config['analysis']['flank_length']
 
   def test(self):
+    self.configure_working_directory()
     self.configure_toolbox()
     self.configure_databases()
 
@@ -55,14 +56,21 @@ class EndovirConfigurator:
     print("Found all required tools", file=sys.stderr)
 
   def configure_databases(self):
-    dbmanager = biodb.biodb_manager.BiodbManager(self.get_working_directory())
-    dbmanager.initialize_databases(self.get_databases())
-    dbmanager.test_databases()
+    biodb.biodb_manager.BiodbManager.initialize_databases(self.get_working_directory(),
+                                                          self.get_databases())
+    biodb.biodb_manager.BiodbManager.test_databases()
 
   def install_databases(self, email):
     missing_tools = toolbox.endovir_toolbox.EndovirToolbox.initialize_tools(self.get_tools())
-    dbmanager = biodb.biodb_manager.BiodbManager(self.get_working_directory())
-    dbmanager.install_databases(self.get_databases(), email)
+    biodb.biodb_manager.BiodbManager.install_databases(self.get_databases(), email)
+
+  def configure_working_directory(self):
+    if not utils.endovir_utils.isDirectory(self.get_working_directory()):
+      if not utils.endovir_utils.makedir(self.get_working_directory()):
+        sys.exit("Cannot create working directory: {}.Abort".format(self.get_working_directory()))
+      print("Created working directory {}".format(self.get_working_directory()), file=sys.stderr)
+    else:
+      print("Found working directory {}".format(self.get_working_directory()), file=sys.stderr)
 
   def prepare(self):
     self.configure_toolbox()

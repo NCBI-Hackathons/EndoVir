@@ -21,13 +21,13 @@ import status.endovir_status
 import utils.endovir_utils
 import toolbox.endovir_toolbox
 import biodb.biodb_manager
-
+import scanner.endovir_scanner
 
 class Endovir:
 
   status_codes = status.endovir_status.EndovirStatusManager.set_status_codes(['CFGERR'])
-  toolbox = toolbox.endovir_toolbox.EndovirToolbox()
-  dbmanager = None
+  #toolbox = toolbox.endovir_toolbox.EndovirToolbox()
+  #dbmanager = biodb.biodb_manager.BiodbManager()
 
   def __init__(self):
     self.screens = {}
@@ -46,15 +46,20 @@ class Endovir:
   def parse_configuration(self, config):
     self.wd = config['analysis']['wd']
     self.flank_len = config['analysis']['flank_length']
-    Endovir.toolbox.initialize_tools(config['tools'])
-    Endovir.dbmanager = biodb.biodb_manager.BiodbManager(self.wd)
-    Endovir.dbmanager.initialize_databases(config['databases'])
-    print("Endovir  is GO")
+    toolbox.endovir_toolbox.EndovirToolbox.initialize_tools(config['tools'])
+    biodb.biodb_manager.BiodbManager.initialize_databases(self.wd, config['databases'])
 
-  # def initial_screen():
-  #   return contigs
-  # def analyze_contigs():
-  #
+
+  def scan(self, srr):
+    s = scanner.endovir_scanner.EndovirScanner(self.wd, srr, 'asm')
+    s.initial_scan()
+
+  def prepare_analysis_directory(self, srr):
+    if not utils.endovir_utils.make_dir(os.path.join(self.wd, srr, 'asm')):
+      sys.exit("Abort: Cannot create required analysis directories: {}".format(os.path.join(self.wd, srr, 'asm')))
+    print("Endovir  is GO", file=sys.stderr)
+
+
   #def screen(self, srrs=[]):
     #vrs_ctgs = {}
     #for i in srrs:
@@ -94,7 +99,8 @@ def main():
 
   ev = Endovir()
   ev.load_configuration(args.config)
-  #e.screen([args.srr])
+  ev.prepare_analysis_directory(args.srr)
+  ev.scan(args.srr)
   return 0
 
 if __name__ == '__main__':

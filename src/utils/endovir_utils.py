@@ -14,7 +14,7 @@ def make_dir(path):
     print("Found existing directory {}.".format(path))
     return True
   try:
-    os.mkdir(path)
+    os.makedirs(path)
   except OSError as err:
     print("Error creating {}\t{}.".format(path, err.errno))
     return False
