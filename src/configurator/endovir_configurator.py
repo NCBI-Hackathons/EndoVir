@@ -47,7 +47,7 @@ class EndovirConfigurator:
     self.configure_databases()
 
   def configure_toolbox(self):
-    missing_tools = toolbox.endovir_toolbox.EndovirToolbox().initialize_tools(self.get_tools())
+    missing_tools = toolbox.endovir_toolbox.EndovirToolbox.initialize_tools(self.get_tools())
     if len(missing_tools) != 0:
       print("Following tools cannot been found:")
       for i in missing_tools:
@@ -75,9 +75,13 @@ class EndovirConfigurator:
   def prepare(self):
     self.configure_toolbox()
     self.configure_databases()
-    config = {'analysis' : {'wd' : os.path.abspath(self.get_working_directory()),
-                            'flank_length' : self.get_flank_length()}}
-    #config = {}
+    config = {
+                'analysis' :
+                {
+                  'wd' : os.path.abspath(self.get_working_directory()),
+                  'flank_length' : self.get_flank_length()
+                }
+             }
     config['databases'] = biodb.biodb_manager.BiodbManager.get_configurations()
     config['tools'] = toolbox.endovir_toolbox.EndovirToolbox.get_configurations()
     print(json.dumps(config))

@@ -27,8 +27,8 @@ class BlastDatabase(basic_biodb.BasicBioDatabase):
     super().__init__(name=name, dbdir=dbdir, dbformat=dbformat, source=source)
     self.dbtype = dbtype
     self.tool = toolbox.endovir_toolbox.EndovirToolbox().get_by_name(tool)
-    BlastDatabase.client = toolbox.endovir_toolbox.EndovirToolbox().get_by_name(client)
     self.status = status.endovir_status.EndovirStatusManager(BlastDatabase.status_codes)
+    BlastDatabase.client = toolbox.endovir_toolbox.EndovirToolbox().get_by_name(client)
 
   def get_configuration(self):
     return {

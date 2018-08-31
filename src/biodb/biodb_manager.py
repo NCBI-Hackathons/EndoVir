@@ -22,6 +22,10 @@ class BiodbManager:
     return [BiodbManager.dbs[x] for x in BiodbManager.dbs]
 
   @staticmethod
+  def get_database(dbname):
+    return BiodbManager.dbs[dbname]
+
+  @staticmethod
   def get_configurations():
     config = {}
     for i in BiodbManager.dbs:

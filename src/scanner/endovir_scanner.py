@@ -15,7 +15,7 @@ import biodb.biodb_manager
 
 class EndovirScanner:
 
-  status_codes = status.endovir_status.EndovirStatusManager.set_status_codes(['TEST'])
+  status_codes = status.endovir_status.EndovirStatusManager.set_status_codes(['RUNERR'])
 
   def __init__(self, wd, srr, asm_dir):
     self.wd = wd
@@ -24,9 +24,11 @@ class EndovirScanner:
     self.status = status.endovir_status.EndovirStatusManager(EndovirScanner.status_codes)
 
   def initial_scan(self):
-    srr_mapper = toolbox.endovir_toolbox.EndovirToolbox.get_by_role('mapper')
-    srr_mapper.clear_options()
-    srr_mapper
-    print(biodb.biodb_manager.BiodbManager.get_databases())
-    print(toolbox.endovir_toolbox.EndovirToolbox())
-    pass
+    srr_mapper = toolbox.endovir_toolbox.EndovirToolbox.get_by_name('magicblast')
+    srr_mapper.add_srr(self.srr)
+    srr_mapper.add_database(biodb.biodb_manager.BiodbManager.get_database('refseq_virus_genomes'))
+    pfh = srr_mapper.run()
+    print(pfh.stdout)
+    pfh.stdout.close()
+    if not srr_mapper.hasFinished(pfh):
+      self.status.set_status('RUNERR')

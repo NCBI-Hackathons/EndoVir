@@ -35,20 +35,22 @@ class EndovirTool:
         self.option_list.append(j)
         self.option_map[j] = i[j]
 
-  def run(self):
+  def run(self, stdin=False, stdout=True):
     cmd = [self.path]
     for i in self.option_list:
       if self.option_map[i] == None:
         cmd.append(i)
       else:
         cmd += [i, str(self.option_map[i])]
-    #print(cmd)
-    return subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE,
+    #print(cmd, file=sys.stderr)
+    stdin = subprocess.PIPE if stdin else None
+    stdout = subprocess.PIPE if stdout else None
+    return subprocess.Popen(cmd, stdout=stdout, stdin=stdin,
                             bufsize=1, universal_newlines=True)
 
   def hasFinished(self, pfh, wait=0.5):
+    print(pfh.args, file=sys.stderr)
     while pfh.poll() == None:
-      print("\r PID: {}\tRole: {}\t{}".format(pfh.pid, self.role, pfh.args), end='', file=sys.stderr)
+      print("\rPID: {} Role: {}".format(pfh.pid, self.role), end="", file=sys.stderr)
       time.sleep(wait)
-    print("\n", file=sys.stderr)
     return True
