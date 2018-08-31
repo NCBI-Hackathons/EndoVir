@@ -1,14 +1,37 @@
 #-------------------------------------------------------------------------------
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
-#  \description Semi-abstract base class for assemblers.
+#  \description Semi-abstract base class for endovir tools. Assuming line based
+#               standard I/O.
+#               Thanks to Eli Bendersky [0]
+#
+# [0]: https://eli.thegreenplace.net/2017/interacting-with-a-long-running-child-process-in-python/
 #-------------------------------------------------------------------------------
+
 import sys
 import time
 import json
+import queue
+import threading
 import subprocess
 
 class EndovirTool:
+
+  @staticmethod
+  def read_stdout(proc):
+    for i in proc.stdout:
+      print(i)
+
+  @staticmethod
+  def observe(proc, wait=0.3):
+    anim = ['\\\\O', ' O ', 'O//', ' O ']
+    print(proc.args)
+    while proc.poll() == None:
+      for i in range(len(anim)):
+        print("\rPID: {}, {}".format(proc.pid, anim[i]), end="", file=sys.stderr)
+        time.sleep(wait)
+    print(file=sys.stderr)
+    return 0
 
   def __init__(self, name, path, role):
     self.name = name
@@ -35,22 +58,26 @@ class EndovirTool:
         self.option_list.append(j)
         self.option_map[j] = i[j]
 
-  def run(self, stdin=False, stdout=True):
+  def assemble_process(self, stdin, stdout):
     cmd = [self.path]
     for i in self.option_list:
       if self.option_map[i] == None:
         cmd.append(i)
       else:
         cmd += [i, str(self.option_map[i])]
-    #print(cmd, file=sys.stderr)
-    stdin = subprocess.PIPE if stdin else None
-    stdout = subprocess.PIPE if stdout else None
-    return subprocess.Popen(cmd, stdout=stdout, stdin=stdin,
-                            bufsize=1, universal_newlines=True)
+    return subprocess.Popen(cmd,
+                            stdin=subprocess.PIPE if stdin else None,
+                            stdout=subprocess.PIPE if stdout else None,
+                            bufsize=1,
+                            universal_newlines=True)
 
-  def hasFinished(self, pfh, wait=0.5):
-    print(pfh.args, file=sys.stderr)
-    while pfh.poll() == None:
-      print("\rPID: {} Role: {}".format(pfh.pid, self.role), end="", file=sys.stderr)
-      time.sleep(wait)
-    return True
+  def run(self, stdin=False, stdout=True, line_reader=None):
+    if line_reader == None:
+      line_reader = EndovirTool.read_stdout
+    proc = self.assemble_process(stdin, stdout)
+    outq = queue.Queue()
+    t = threading.Thread(target=line_reader, args=(proc, ))
+    s = threading.Thread(target=EndovirTool.observe, args=(proc, ))
+    t.start()
+    s.start()
+    t.join()

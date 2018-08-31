@@ -32,3 +32,7 @@ class EndovirModuleTool(endovir_tool.EndovirTool):
 
   def add_database(self, db):
     self.add_options([{'-db' : db.dbpath}])
+
+
+  def parse(self):
+    pass

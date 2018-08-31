@@ -28,7 +28,5 @@ class EndovirScanner:
     srr_mapper.add_srr(self.srr)
     srr_mapper.add_database(biodb.biodb_manager.BiodbManager.get_database('refseq_virus_genomes'))
     pfh = srr_mapper.run()
-    print(pfh.stdout)
-    pfh.stdout.close()
-    if not srr_mapper.hasFinished(pfh):
-      self.status.set_status('RUNERR')
+    #if not srr_mapper.hasFinished(pfh):
+    #  self.status.set_status('RUNERR')
