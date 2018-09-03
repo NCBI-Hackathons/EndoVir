@@ -11,16 +11,19 @@
 import sys
 import time
 import json
-import queue
 import threading
 import subprocess
 
 class EndovirTool:
 
-  @staticmethod
-  def read_stdout(proc):
-    for i in proc.stdout:
-      print(i)
+  class StdoutInvestigator:
+
+    def __init__(self):
+      pass
+
+    def investigate_stdout(self, proc):
+      for i in proc.stdout:
+        print(i)
 
   @staticmethod
   def observe(proc, wait=0.3):
@@ -39,6 +42,9 @@ class EndovirTool:
     self.role = role
     self.option_map = {}
     self.option_list = []
+    self.investigator = None
+    self.useStdin = False
+    self.useStdout = False
 
   def get_configuration(self):
     return {self.role: {self.name : self.path}}
@@ -58,7 +64,7 @@ class EndovirTool:
         self.option_list.append(j)
         self.option_map[j] = i[j]
 
-  def assemble_process(self, stdin, stdout):
+  def assemble_process(self):
     cmd = [self.path]
     for i in self.option_list:
       if self.option_map[i] == None:
@@ -66,18 +72,20 @@ class EndovirTool:
       else:
         cmd += [i, str(self.option_map[i])]
     return subprocess.Popen(cmd,
-                            stdin=subprocess.PIPE if stdin else None,
-                            stdout=subprocess.PIPE if stdout else None,
+                            stdin=subprocess.PIPE if self.useStdin else None,
+                            stdout=subprocess.PIPE if self.useStdout else None,
                             bufsize=1,
                             universal_newlines=True)
 
-  def run(self, stdin=False, stdout=True, line_reader=None):
-    if line_reader == None:
-      line_reader = EndovirTool.read_stdout
-    proc = self.assemble_process(stdin, stdout)
-    outq = queue.Queue()
-    t = threading.Thread(target=line_reader, args=(proc, ))
-    s = threading.Thread(target=EndovirTool.observe, args=(proc, ))
-    t.start()
+  def run(self, process):
+    t = None
+    if self.useStdout:
+      t = threading.Thread(target=self.investigator.investigate_stdout, args=(process, ))
+    s = threading.Thread(target=EndovirTool.observe, args=(process, ))
+    if t != None:
+      t.start()
     s.start()
-    t.join()
+    if t != None:
+      t.join()
+    s.join()
+    return self.investigator

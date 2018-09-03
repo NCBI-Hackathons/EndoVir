@@ -27,6 +27,9 @@ class EndovirScanner:
     srr_mapper = toolbox.endovir_toolbox.EndovirToolbox.get_by_name('magicblast')
     srr_mapper.add_srr(self.srr)
     srr_mapper.add_database(biodb.biodb_manager.BiodbManager.get_database('refseq_virus_genomes'))
-    pfh = srr_mapper.run()
-    #if not srr_mapper.hasFinished(pfh):
-    #  self.status.set_status('RUNERR')
+    proc = srr_mapper.assemble_process()
+    #staus checkpoint
+    investigator = srr_mapper.run(proc)
+    print(len(investigator.mappings))
+    #staus checkpoint
+    #vdb_parser = s.vdbdump.run(s.srr, srr_alignments)

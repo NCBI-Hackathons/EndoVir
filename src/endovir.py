@@ -26,8 +26,6 @@ import scanner.endovir_scanner
 class Endovir:
 
   status_codes = status.endovir_status.EndovirStatusManager.set_status_codes(['CFGERR'])
-  #toolbox = toolbox.endovir_toolbox.EndovirToolbox()
-  #dbmanager = biodb.biodb_manager.BiodbManager()
 
   def __init__(self):
     self.screens = {}
@@ -53,6 +51,7 @@ class Endovir:
   def scan(self, srr):
     s = scanner.endovir_scanner.EndovirScanner(self.wd, srr, 'asm')
     s.initial_scan()
+    #status checkpoint
 
   def prepare_analysis_directory(self, srr):
     if not utils.endovir_utils.make_dir(os.path.join(self.wd, srr, 'asm')):
