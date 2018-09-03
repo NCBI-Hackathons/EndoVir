@@ -62,7 +62,9 @@ class EndovirConfigurator:
 
   def install_databases(self, email):
     missing_tools = toolbox.endovir_toolbox.EndovirToolbox.initialize_tools(self.get_tools())
-    biodb.biodb_manager.BiodbManager.install_databases(self.get_databases(), email)
+    biodb.biodb_manager.BiodbManager.install_databases(self.get_working_directory(),
+                                                       self.get_databases(),
+                                                       email)
 
   def configure_working_directory(self):
     if not utils.endovir_utils.isDirectory(self.get_working_directory()):

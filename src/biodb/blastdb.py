@@ -60,10 +60,10 @@ class BlastDatabase(basic_biodb.BasicBioDatabase):
   def isValidDatabase(self):
     BlastDatabase.client.clear_options()
     BlastDatabase.client.add_options([{'-db':self.dbpath}, {'-info':None}])
-    pfh = BlastDatabase.client.run()
-    if BlastDatabase.client.hasFinished(pfh):
-      if pfh.returncode == 0:
-        return True
+    proc = BlastDatabase.client.assemble_process()
+    BlastDatabase.client.run(proc)
+    if proc.returncode == 0:
+      return True
     return False
 
   def install(self, email=None):

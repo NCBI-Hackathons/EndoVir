@@ -32,7 +32,6 @@ class BlastSequenceDatabaseInstaller:
       print("Decompressing {} -> {}".format(self.tmp_dbfile_comp, self.tmp_dbfile), file=sys.stderr)
       fh_tmp_dbfile = gzip.open(self.tmp_dbfile_comp, 'rb')
       db.write(fh_tmp_dbfile.read().decode())
-      os.unlink(self.tmp_dbfile_comp)
     db.close()
     if os.path.getsize(self.tmp_dbfile) > 0:
       return self.tmp_dbfile
@@ -43,13 +42,21 @@ class BlastSequenceDatabaseInstaller:
     db.tool.add_options([{'-dbtype' : db.dbtype},
                          {'-out' : db.dbpath},
                          {'-title' : db.name},
+                         {'-parse_seqids' : None},
+                         {'-hash_index' : None},
                          {'-in' : self.tmp_dbfile}])
-    pfh = db.tool.run()
-    if db.tool.hasFinished(pfh):
-      if pfh.returncode == 0:
-        os.unlink(self.tmp_dbfile)
-        return True
+    proc = db.tool.assemble_process()
+    db.tool.run(proc)
+    if proc.returncode == 0:
+      self.clean_up()
+      return True
     return False
+
+  def clean_up(self):
+    print("Cleaning up:", file=sys.stderr)
+    for i in [self.tmp_dbfile, self.tmp_dbfile_comp]:
+      print("Deleting: {}".format(i), file=sys.stderr)
+      os.unlink(i)
 
 class BlastMotifDatabaseInstaller:
 
@@ -74,10 +81,6 @@ class BlastMotifDatabaseInstaller:
     fh_pssm = open(self.tmp_pssm_file, 'w')
     for i in sourcelist:
       print("Downloading: {} -> {}".format(i, self.tmp_dbfile_comp), file=sys.stderr)
-      #fh_tmp_dbfile_comp = open(self.tmp_dbfile_comp, 'wb')
-      #response = urllib.request.urlopen(i)
-      #fh_tmp_dbfile_comp.write(response.read())
-      #fh_tmp_dbfile_comp.close()
       print("Extracting PSSM's", file=sys.stderr)
       tar = tarfile.open(self.tmp_dbfile_comp, "r:*")
       for j in tar:

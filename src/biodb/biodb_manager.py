@@ -34,6 +34,7 @@ class BiodbManager:
 
   @staticmethod
   def initialize_databases(wd, databases):
+    print(databases)
     print("Initializing databases", file=sys.stderr)
     for i in databases:
       if databases[i]['format'] == 'blast':
@@ -60,9 +61,9 @@ class BiodbManager:
       print("Good database {}".format(BiodbManager.dbs[i].name),file=sys.stderr)
 
   @staticmethod
-  def install_databases(databases, email):
+  def install_databases(wd, databases, email):
     print("Installing databases...", file=sys.stderr)
-    BiodbManager.initialize_databases(databases)
+    BiodbManager.initialize_databases(wd, databases)
     if len(BiodbManager.dbs) == 0:
       sys.exit("No initialized databases. Abort.")
     for i in BiodbManager.dbs:
