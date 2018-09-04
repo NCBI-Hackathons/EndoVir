@@ -4,12 +4,11 @@
 #  \description
 #-------------------------------------------------------------------------------
 
-
 import io
 import os
 import sys
 
-sys.path.insert(1, os.path.join(sys.path[0], '../src/'))
+#sys.path.insert(1, os.path.join(sys.path[0], '../src/'))
 import toolbox.endovir_tool
 import result.mapping_result
 
@@ -51,7 +50,8 @@ class EndovirModuleTool(toolbox.endovir_tool.EndovirTool):
     self.default_options = [{'-no_unaligned' : None},
                             {'-num_threads' : self.num_threads},
                             {'-outfmt' : self.outfmt},
-                            {'-splice': 'F'}]
+                            {'-splice': 'F'},
+                            {'-parse_deflines' : 'true'}]
     self.add_options(self.default_options)
     self.investigator = MagicblastInvestigator(fmt=self.outfmt)
     self.useStdout = True
@@ -60,7 +60,8 @@ class EndovirModuleTool(toolbox.endovir_tool.EndovirTool):
     if os.path.isfile(srr):
       self.add_options([{'-query' : srr}])
     else:
-      self.add_options([{'-sra' : srr}])
+      self.add_options([{'-sra' : srr}, {'-sra_cache' : None}])
+
 
   def add_database(self, db):
     self.add_options([{'-db' : db.dbpath}])
