@@ -11,12 +11,8 @@ import json
 import logging
 import argparse
 
-#sys.path.insert(1, os.path.join(sys.path[0], '../include/ncbi/src/ngs/ngs-python/'))
-#from ngs import NGS
-#print(sys.path, NGS)
+sys.path.insert(1, os.path.join(sys.path[0], '.'))
 
-#import screener
-#import virus_contig
 import status.endovir_status
 import utils.endovir_utils
 import toolbox.endovir_toolbox
