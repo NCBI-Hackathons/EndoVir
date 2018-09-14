@@ -19,6 +19,7 @@ class EndovirTool:
   class StdoutInvestigator:
 
     def __init__(self):
+      self.keepTmp = False
       pass
 
     def investigate_stdout(self, proc):
@@ -89,3 +90,6 @@ class EndovirTool:
       t.join()
     s.join()
     return self.investigator
+
+  def configure(self, settings):
+    raise NotImplementedError("Help! Need implementation")

@@ -4,18 +4,16 @@
 #  \description
 #-------------------------------------------------------------------------------
 
-import io
 import os
-import sys
 
-#sys.path.insert(1, os.path.join(sys.path[0], '../src/'))
+import biodb.biodb_manager
 import toolbox.endovir_tool
 import result.mapping_result
 
 class MagicblastInvestigator:
 
   def __init__(self, fmt='tabular'):
-    self.mappings = []
+    self.mapping_result = result.mapping_result.MappingResult()
     self.fmt = fmt
 
   def investigate_stdout(self, proc):
@@ -28,18 +26,14 @@ class MagicblastInvestigator:
     for i in mb_result:
       if i[0] != '#':
         cols = i.strip().split('\t')
-        read = result.mapping_result.MappingResult.Read(cols[0],
-                                                        cols[0].split('.')[1],
-                                                        cols[6],
-                                                        cols[7],
-                                                        cols[13],
-                                                        cols[15])
-        ref =  result.mapping_result.MappingResult.Reference(cols[1],
-                                                             cols[8],
-                                                             cols[9],
-                                                             cols[14])
-        self.mappings.append(result.mapping_result.MappingResult(read, ref))
-
+        read = self.mapping_result.Read(cols[0],
+                                        cols[0].split('.')[1],
+                                        cols[6],
+                                        cols[7],
+                                        cols[13],
+                                        cols[15])
+        ref = self.mapping_result.Reference(cols[1], cols[8], cols[9], cols[14])
+        self.mapping_result.add_mapping(read, ref)
 
 class EndovirModuleTool(toolbox.endovir_tool.EndovirTool):
 
@@ -56,12 +50,10 @@ class EndovirModuleTool(toolbox.endovir_tool.EndovirTool):
     self.investigator = MagicblastInvestigator(fmt=self.outfmt)
     self.useStdout = True
 
-  def add_srr(self, srr):
-    if os.path.isfile(srr):
-      self.add_options([{'-query' : srr}])
+  def configure(self, settings):
+    if os.path.isfile(settings['srr']):
+      self.add_options([{'-query' : settings['srr']}])
     else:
-      self.add_options([{'-sra' : srr}, {'-sra_cache' : None}])
-
-
-  def add_database(self, db):
+      self.add_options([{'-sra' : settings['srr']}, {'-sra_cache' : None}])
+    db  = biodb.biodb_manager.BiodbManager.get_database(settings['virusdb'])
     self.add_options([{'-db' : db.dbpath}])

@@ -2,6 +2,10 @@
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
 #  \description Implementation of a mapping result of a Read to a Reference.
+#                Grouping creates uninterupted ranges to fetch reads
+#                using ranges, not singles. Assumes that mappings are
+#                sorted ascending by their rowids.
+#                ToDo: Add sorted mapping
 #-------------------------------------------------------------------------------
 
 
@@ -37,12 +41,32 @@ class MappingResult:
         return (self.start, self.stop)
       return (self.stop, self.start)
 
-  def __init__(self, read=None, flank=None):
-    self.read = read
-    self.flank = flank
+  def __init__(self):
+    self.srr = None
+    self.mappings = []
+    self.count = 0
+    self.groups = []
 
-  def add_read(self, name, start, stop, strand, length):
-    self.read = self.Read(name, sra_rowid, start, stop, strand, length)
+  def add_mapping(self, read=None, reference=None):
+    self.mappings.append([read, reference])
+    self.update_groups()
+    self.count += 1
 
-  def add_reference(self, name, start, stop, strand):
-    self.reference = self.Reference(name, start, stop, strand)
+  def add_read(self, read):
+    self.add_mapping(read=read)
+
+  def add_reference(self, reference):
+    self.add_mapping(reference=reference)
+
+  def update_groups(self):
+    if self.isNewGroup():
+      self.groups.append([self.mappings[-1][0].sra_rowid, 0])
+    else:
+      self.groups[-1][1] += 1
+
+  def isNewGroup(self):
+    if len(self.groups) == 0:
+      return True
+    if self.mappings[-1][0].sra_rowid - 1 == self.mappings[-2][0].sra_rowid:
+      return False
+    return True
