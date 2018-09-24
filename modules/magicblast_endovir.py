@@ -35,10 +35,13 @@ class MagicblastInvestigator:
         ref = self.mapping_result.Reference(cols[1], cols[8], cols[9], cols[14])
         self.mapping_result.add_mapping(read, ref)
 
+  def get_result(self):
+    return self.mapping_result
+
 class EndovirModuleTool(toolbox.endovir_tool.EndovirTool):
 
   def __init__(self, name, path, role):
-    super().__init__(name, path, role)
+    super().__init__(name, path, role, useStdout=True)
     self.num_threads = 4
     self.outfmt = 'tabular'
     self.default_options = [{'-no_unaligned' : None},
@@ -48,7 +51,6 @@ class EndovirModuleTool(toolbox.endovir_tool.EndovirTool):
                             {'-parse_deflines' : 'true'}]
     self.add_options(self.default_options)
     self.investigator = MagicblastInvestigator(fmt=self.outfmt)
-    self.useStdout = True
 
   def configure(self, settings):
     if os.path.isfile(settings['srr']):
