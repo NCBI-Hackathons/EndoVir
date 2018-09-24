@@ -34,7 +34,6 @@ class BiodbManager:
 
   @staticmethod
   def initialize_databases(wd, databases):
-    print(databases)
     print("Initializing databases", file=sys.stderr)
     for i in databases:
       if databases[i]['format'] == 'blast':

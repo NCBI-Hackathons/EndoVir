@@ -59,7 +59,8 @@ class BlastDatabase(basic_biodb.BasicBioDatabase):
 
   def isValidDatabase(self):
     BlastDatabase.client.clear_options()
-    BlastDatabase.client.add_options([{'-db':self.dbpath}, {'-info':None}])
+    BlastDatabase.client.add_options([{'-db':self.dbpath}, {'-info':None,
+                                                            '-out':sys.stderr}])
     proc = BlastDatabase.client.assemble_process()
     BlastDatabase.client.run(proc)
     if proc.returncode == 0:
