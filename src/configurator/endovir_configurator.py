@@ -3,21 +3,13 @@
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
 #  \description Configuration for endovir. Databses require external tools and
-#               therefore tools need to be initiaized first.
+#               therefore tools need to be initialized first.
 #-------------------------------------------------------------------------------
 
 import os
 import sys
 import json
 import logging
-
-
-#sys.path.insert(1, os.path.join(sys.path[0], '../include/ncbi/src/ngs/ngs-python/'))
-#from ngs import NGS
-#print(sys.path, NGS)
-
-#import screener
-#import virus_contig
 
 import utils.endovir_utils
 import toolbox.endovir_toolbox
