@@ -25,11 +25,12 @@ class Endovir:
 
   class EndovirScreen:
 
-    def __init__(self, srr, wd, assembly_dir, contigs_dir, virus_db):
+    def __init__(self, srr, wd, assembly_dir, contigs_dir, virus_db, motif_db):
       self.srr = srr
       self.wd = wd
       self.asm_dir = os.path.join(wd, srr, assembly_dir)
       self.virus_db = virus_db
+      self.motif_db = motif_db
       self.ctg_dir = os.path.join(wd, srr, contigs_dir)
 
   def __init__(self):
@@ -59,7 +60,12 @@ class Endovir:
       #status checkpoint
 
   def prepare_analysis_directory(self, srr, assembly_dir='asm', contigs_dir='ctgs'):
-    self.screens[srr] = self.EndovirScreen(srr, self.wd, assembly_dir, contigs_dir, 'refseq_virus_genomes')
+    self.screens[srr] = self.EndovirScreen(srr,
+                                           self.wd,
+                                           assembly_dir,
+                                           contigs_dir,
+                                           'refseq_virus_genomes',
+                                           'endovir_cdd')
     for i in [self.screens[srr].asm_dir, self.screens[srr].ctg_dir]:
       if not utils.endovir_utils.make_dir(i):
         sys.exit("Abort: Cannot create required analysis directory: {}".format(i))
