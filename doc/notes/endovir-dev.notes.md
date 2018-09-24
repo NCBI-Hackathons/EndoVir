@@ -20,3 +20,8 @@
 
  - Threading in EndovirTools:
     Detect aborts in threaded processes
+
+### Remarks
+
+ - The namespace `parser` cannot be used in own packages since
+   it's used by python itself.
