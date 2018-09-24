@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 
 import sys
-from . import sequence
+from utils import sequence
 
 class FastaParser:
 
@@ -26,6 +26,7 @@ class FastaParser:
     seq = ''
     header = ''
     for i in self.src:
+      print(i)
       if i[0] == '>':
         if len(seq) > 0:
           self.add_sequence(sequence.Sequence(header, seq))
