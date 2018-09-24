@@ -8,10 +8,10 @@ class Sequence:
 
   def __init__(self, name=None, sequence=None, metadata=None):
     self.name = name
-    self.sequence = seqence
-    self.length = None
+    self.sequence = sequence
+    self.length = 0
     if sequence != None:
-      self.length = len(seqence)
+      self.length = len(sequence)
     self.metadata = metadata
 
   def format(self, formatter):

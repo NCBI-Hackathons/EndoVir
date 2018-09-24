@@ -1,39 +1,39 @@
 #-------------------------------------------------------------------------------
-#  \file fasta_parser.py
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
-#  \version 0.0.0
-#  \description Implementation of a biological sequence.
+#  \description Fasta parser
 #-------------------------------------------------------------------------------
 
 import sys
 from . import sequence
-from ..sequence import sequence_container
 
 class FastaParser:
-
-  def __init__(self):
-    pass
 
   @classmethod
   def parse_file(cls, fil, stream=False):
     src = open(fil, 'r')
-    cls.parse(src=src, stream=stream)
+    inst = cls(src=src, stream=stream)
+    inst.parse()
     src.close()
+    return inst
 
-  def parse(self, src=sys.stdin, stream=False):
-    seq_container = sequence_container.SequenceContainer()
+  def __init__(self, src=sys.stdin, stream=False):
+    self.sequences = {}
+    self.stream = stream
+    self.src = src
+
+  def parse(self):
     seq = ''
     header = ''
-    for i in src:
+    for i in self.src:
       if i[0] == '>':
         if len(seq) > 0:
-          self.add_sequence(sequence.Sequence(header, seq), stream)
+          self.add_sequence(sequence.Sequence(header, seq))
           seq = ''
         header = i[1:].strip()
       else:
         seq += i.strip()
-    self.add_sequence(sequence.Sequence(header, seq), stream)
+    self.add_sequence(sequence.Sequence(header, seq))
 
   def write_file(self, fname):
     fh = open(fname, 'w')
@@ -42,7 +42,7 @@ class FastaParser:
     fh.close()
     return fname
 
-  def add_sequence(self, seq, stream):
-    if stream == True:
+  def add_sequence(self, seq):
+    if self.stream:
       print(seq.get_sequence())
-    self.sequences[seq.header] = seq
+    self.sequences[seq.name] = seq

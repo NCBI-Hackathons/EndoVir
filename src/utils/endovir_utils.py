@@ -28,3 +28,10 @@ def isAbsolutePath(path):
 
 def pathExists(path):
   return os.path.exists(path)
+
+def isNotEmptyFile(path):
+  if not os.path.isfile(path):
+    return False
+  if os.path.getsize(path) == 0:
+    return False
+  return True
