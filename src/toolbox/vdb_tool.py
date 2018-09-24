@@ -21,6 +21,7 @@ from ngs import NGS
 from ngs.ErrorMsg import ErrorMsg
 
 from utils import fasta_formatter
+from utils import endovir_utils
 
 class EndovirVdbTool:
 
@@ -37,21 +38,25 @@ class EndovirVdbTool:
         self.output.write(fasta_formatter.FastaFormatter.format_string(reads.getReadId(),
                                                                    reads.getReadBases()))
 
-  def __init__(self):
+  def __init__(self, overwrite=True):
     self.num_threads = 16
     self.read_location = '/tmp'
     self.suffix = '.reads'
-
+    self.overwrite = overwrite
 
   def fetch_reads(self, acc, mapping_result):
+    contig_file = self.get_output_filename(acc)
+    if not self.overwrite and endovir_utils.isNotEmptyFile(contig_file):
+      print("Found and using previously fetched reads in {}".format(contig_file), file=sys.stderr)
+      return contig_file
+
     print("Fetching {} reads in {} groups".format(mapping_result.count,
                                                   len(mapping_result.groups)),
                                                   file=sys.stderr)
     # Quick solution, but tricky to show ongoing progess. Could use an inherited
     # thread class as worker
     start_time = time.time()
-    output = self.get_output_filename(acc)
-    fh_output = open(output, 'w')
+    fh_output = open(contig_file, 'w')
     rf = self.ReadFetcher(acc, fh_output)
     pool = multiprocessing.dummy.Pool(self.num_threads)
     pool.map_async(rf.fetch, mapping_result.groups)
@@ -61,7 +66,7 @@ class EndovirVdbTool:
     print("Duration to fetch reads using {0} threads: {1} sec".format(self.num_threads,
                                                                       time.time()-start_time),
                                                                       file=sys.stderr)
-    return output
+    return contig_file
 
   def get_output_filename(self, acc):
     return os.path.join(self.read_location, acc+self.suffix)

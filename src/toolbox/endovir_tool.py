@@ -4,7 +4,6 @@
 #  \description Semi-abstract base class for endovir tools. Assuming line based
 #               standard I/O.
 #               Thanks to Eli Bendersky [0]
-#
 # [0]: https://eli.thegreenplace.net/2017/interacting-with-a-long-running-child-process-in-python/
 #-------------------------------------------------------------------------------
 
@@ -29,7 +28,7 @@ class EndovirTool:
   @staticmethod
   def observe(proc, wait=0.3):
     anim = ['\\\\O', ' O ', 'O//', ' O ']
-    print(proc.args)
+    print(proc.args, file=sys.stderr)
     while proc.poll() == None:
       for i in range(len(anim)):
         print("\rPID: {}, {}".format(proc.pid, anim[i]), end="", file=sys.stderr)
@@ -37,15 +36,15 @@ class EndovirTool:
     print(file=sys.stderr)
     return 0
 
-  def __init__(self, name, path, role):
+  def __init__(self, name, path, role, useStdin=False, useStdout=False):
     self.name = name
     self.path = path
     self.role = role
     self.option_map = {}
     self.option_list = []
     self.investigator = None
-    self.useStdin = False
-    self.useStdout = False
+    self.useStdin = useStdin
+    self.useStdout = useStdout
 
   def get_configuration(self):
     return {self.role: {self.name : self.path}}
