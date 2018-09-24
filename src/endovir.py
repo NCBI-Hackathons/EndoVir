@@ -21,15 +21,16 @@ import scanner.endovir_scanner
 
 class Endovir:
 
+  status_codes = status.endovir_status.EndovirStatusManager.set_status_codes(['CFGERR'])
+
   class EndovirScreen:
 
-    def __init__(self, srr, wd, assembly_dir, virus_db):
+    def __init__(self, srr, wd, assembly_dir, contigs_dir, virus_db):
       self.srr = srr
       self.wd = wd
       self.asm_dir = os.path.join(wd, srr, assembly_dir)
       self.virus_db = virus_db
-
-  status_codes = status.endovir_status.EndovirStatusManager.set_status_codes(['CFGERR'])
+      self.ctg_dir = os.path.join(wd, srr, contigs_dir)
 
   def __init__(self):
     self.screens = {}
@@ -57,10 +58,11 @@ class Endovir:
       s.initial_scan()
       #status checkpoint
 
-  def prepare_analysis_directory(self, srr, assembly_dir='asm'):
-    self.screens[srr] = self.EndovirScreen(srr, self.wd, assembly_dir, 'refseq_virus_genomes')
-    if not utils.endovir_utils.make_dir(self.screens[srr].asm_dir):
-      sys.exit("Abort: Cannot create required analysis directories: {}".format(self.screens[srr].asm_dir))
+  def prepare_analysis_directory(self, srr, assembly_dir='asm', contigs_dir='ctgs'):
+    self.screens[srr] = self.EndovirScreen(srr, self.wd, assembly_dir, contigs_dir, 'refseq_virus_genomes')
+    for i in [self.screens[srr].asm_dir, self.screens[srr].ctg_dir]:
+      if not utils.endovir_utils.make_dir(i):
+        sys.exit("Abort: Cannot create required analysis directory: {}".format(i))
     print("Endovir  is GO", file=sys.stderr)
 
   #def screen(self, srrs=[]):
