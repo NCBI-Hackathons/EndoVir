@@ -4,10 +4,6 @@
 #  \description
 #-------------------------------------------------------------------------------
 
-import io
-import os
-import sys
-
 import status.endovir_status
 import utils.endovir_utils
 import toolbox.endovir_toolbox
@@ -23,9 +19,10 @@ class EndovirScanner:
     self.srr = screen.srr
     self.asm_dir = screen.asm_dir
     self.virus_db = screen.virus_db
-    self.status = status.endovir_status.EndovirStatusManager(EndovirScanner.status_codes)
+    self.motif_db = screen.motif_db
     self.contigs = {}
     self.ctg_num = 0
+    self.status = status.endovir_status.EndovirStatusManager(EndovirScanner.status_codes)
 
   def initial_scan(self, mapper='magicblast', assembler='megahit'):
     srr_mapper = toolbox.endovir_toolbox.EndovirToolbox.get_by_name(mapper)
@@ -40,12 +37,16 @@ class EndovirScanner:
     asm.configure(self.get_settings())
     asm.add_reads(reads)
     investigator = asm.run(asm.assemble_process())
-    self.contigs.update(investigator.get_result())
-    for i in self.contigs:
-      self.contigs[i].metadata = {}
-      self.contigs[i].metadata['asm_name'] = self.contigs[i].name
-      self.contigs[i].name = "{0}-ctg-{1}".format(self.srr, self.ctg_num)
-      self.ctg_num += 1
+    #status checkpoint
+    rpsblast = toolbox.endovir_toolbox.EndovirToolbox.get_by_name('rpsblast')
+    rpsblast.add_input_file(investigator.contigs)
+    investigator = rpsblast.run(rpsblast.assemble_process())
+    #for i in investigator.get_result():
+      #self.contigs[i].metadata = {}
+      #self.contigs[i].metadata['asm_name'] = self.contigs[i].name
+      #self.contigs[i].name = "{0}-ctg-{1}".format(self.srr, self.ctg_num)
+      #self.ctg_num += 1
+
     #status checkpoint
     print(self.contigs)
 
@@ -54,5 +55,6 @@ class EndovirScanner:
             'wd' : self.wd,
             'srr' : self.srr,
             'asmdir' : self.asm_dir,
-            'virusdb' : self.virus_db
+            'virusdb' : self.virus_db,
+            'motifdb' : self.motif_db
            }
