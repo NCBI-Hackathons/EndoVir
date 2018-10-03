@@ -30,8 +30,10 @@ class BlastDatabase(basic_biodb.BasicBioDatabase):
     self.status = status.endovir_status.EndovirStatusManager(BlastDatabase.status_codes)
     BlastDatabase.client = toolbox.endovir_toolbox.EndovirToolbox().get_by_name(client)
 
-  def get_basic_tool(self):
+  def get_basic_tool(self, useStdin=False, useStdout=False):
     self.tool.clear_options()
+    self.tool.useStdin = useStdin
+    self.tool.useStdout = useStdout
     self.tool.add_options([{'-dbtype' : self.dbtype},
                            {'-out' : self.dbpath},
                            {'-title' : self.name},
