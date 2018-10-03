@@ -16,3 +16,16 @@ class Sequence:
 
   def format(self, formatter):
     return formatter.format(self)
+
+  def get_subseq(self, start=None, length=None, name=None):
+    if start == None:
+      start = 0
+    if length == None:
+      length = self.length
+    if length < 0:
+      length = abs(length)
+      start = self.length - length
+    return Sequence(name, self.sequence[start:start+length])
+
+  def dump_sequence(self):
+    return self.sequence
