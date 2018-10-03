@@ -42,7 +42,7 @@ class EndovirTool:
     self.role = role
     self.option_map = {}
     self.option_list = []
-    self.investigator = None
+    self.investigator = self.StdoutInvestigator()
     self.useStdin = useStdin
     self.useStdout = useStdout
 
@@ -88,7 +88,17 @@ class EndovirTool:
     if t != None:
       t.join()
     s.join()
+    if not self.processSuccess(process):
+      print("Tool {0} returned error.\n\tPID:{1}\n\tCall:{2}".format(self.name,
+                                                                     process.pid,
+                                                                     process.args),file=sys.stderr)
+      return None
     return self.investigator
+
+  def processSuccess(self, proc):
+    if proc.returncode == 0:
+      return True
+    return False
 
   def configure(self, settings):
     raise NotImplementedError("Help! Need implementation")
