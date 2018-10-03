@@ -71,6 +71,7 @@ class BiodbManager:
       if status.get_status(status_name='OK'):
         print("Found installed database: {}".format(BiodbManager.dbs[i].name), file=sys.stderr)
       else:
+        status.reset_status()
         BiodbManager.make_database_directory(BiodbManager.dbs[i])
         status = BiodbManager.dbs[i].install()
         if not status.get_status(status_name='OK'):
