@@ -25,3 +25,7 @@
 
  - The namespace `parser` cannot be used in own packages since
    it's used by python itself.
+
+ - SRR5150787 is assembled into 4 contigs by megahit, but rpsblast (online
+   against CDD and local against curated virus motifs) reports no hits. 
+   blastx wfinds hits, will need to add diamond as well, I guess.
