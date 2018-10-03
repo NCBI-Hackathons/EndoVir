@@ -25,16 +25,17 @@ class Endovir:
 
   class EndovirScreen:
 
-    def __init__(self, srr, wd, assembly_dir, contigs_dir, virus_db, motif_db):
+    def __init__(self, srr, wd, assembly_dir, contigs_dir, virus_db, prot_db):
       self.srr = srr
       self.wd = wd
       self.asm_dir = os.path.join(wd, srr, assembly_dir)
       self.virus_db = virus_db
-      self.motif_db = motif_db
+      self.prot_db = prot_db
       self.ctg_dir = os.path.join(wd, srr, contigs_dir)
+      self.flank_len = 500
 
   def __init__(self):
-    self.screens = {}
+    self.screen = None
     self.wd = None
     self.flank_len = None
     self.status = status.endovir_status.EndovirStatusManager(Endovir.status_codes)
@@ -54,19 +55,19 @@ class Endovir:
     biodb.biodb_manager.BiodbManager.initialize_databases(self.wd, config['databases'])
 
   def scan(self):
-    for i in self.screens:
-      s = scanner.endovir_scanner.EndovirScanner(self.screens[i])
-      s.initial_scan()
-      #status checkpoint
+    s = scanner.endovir_scanner.EndovirScanner(self.screen)
+    s.initial_scan(mapper='magicblast', assembler='megahit', contig_screener='blastx')
+    #s.bud(mapper='magicblast')
+    #status checkpoint
 
   def prepare_analysis_directory(self, srr, assembly_dir='asm', contigs_dir='ctgs'):
-    self.screens[srr] = self.EndovirScreen(srr,
-                                           self.wd,
-                                           assembly_dir,
-                                           contigs_dir,
-                                           'refseq_virus_genomes',
-                                           'endovir_cdd')
-    for i in [self.screens[srr].asm_dir, self.screens[srr].ctg_dir]:
+    self.screen = self.EndovirScreen(srr,
+                                     self.wd,
+                                     assembly_dir,
+                                     contigs_dir,
+                                     'refseq_virus_genomes',
+                                     'virus_refseq_proteins')
+    for i in [self.screen.asm_dir, self.screen.ctg_dir]:
       if not utils.endovir_utils.make_dir(i):
         sys.exit("Abort: Cannot create required analysis directory: {}".format(i))
     print("Endovir  is GO", file=sys.stderr)
