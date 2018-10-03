@@ -40,10 +40,8 @@ class EndovirModuleTool(toolbox.endovir_tool.EndovirTool):
     self.suffix = '.contigs.fa'
     self.investigator = MegahitInvestigator()
 
-  def configure(self, settings):
-    self.add_options([{'--out-dir' : settings['asmdir']}])
-    self.add_options([{'--out-prefix' : settings['srr']}])
-    self.investigator.contigs = os.path.join(settings['asmdir'], settings['srr']) + self.suffix
-
-  def add_reads(self, reads):
-    self.add_options([{'--read' : reads}])
+  def configure(self, options):
+    self.add_options([{'--out-dir' : options['out-dir']}])
+    self.add_options([{'--out-prefix' : options['out-prefix']}])
+    self.add_options([{'--read' : options['read']}])
+    self.investigator.contigs = os.path.join(options['out-dir'], options['out-prefix']) + self.suffix

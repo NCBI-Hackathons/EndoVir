@@ -58,7 +58,9 @@ class EndovirToolbox:
 
   @staticmethod
   def get_by_name(toolname):
-    return EndovirToolbox.tools.get(toolname)
+    t = EndovirToolbox.tools.get(toolname)
+    t.reset()
+    return t
 
   @staticmethod
   def get_by_role(role):

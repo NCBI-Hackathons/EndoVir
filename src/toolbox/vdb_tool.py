@@ -9,6 +9,8 @@
 #             fetch(map_async) reads using 12 threads: 588.5161285400391 s
 #             fetch(map_async) reads using 16 threads: 354.78742814064026 s
 #             fetch(map_async) reads using 16 threads: 440.67980575561523 s
+#             fetch(map_async) reads using 16 threads: 400.13484954833984 sec
+
 
 import os
 import sys
@@ -49,7 +51,6 @@ class EndovirVdbTool:
     if not self.overwrite and endovir_utils.isNotEmptyFile(contig_file):
       print("Found and using previously fetched reads in {}".format(contig_file), file=sys.stderr)
       return contig_file
-
     print("Fetching {} reads in {} groups".format(mapping_result.count,
                                                   len(mapping_result.groups)),
                                                   file=sys.stderr)
@@ -63,9 +64,10 @@ class EndovirVdbTool:
     pool.close()
     pool.join()
     fh_output.close()
-    print("Duration to fetch reads using {0} threads: {1} sec".format(self.num_threads,
-                                                                      time.time()-start_time),
-                                                                      file=sys.stderr)
+    print("Duration to fetch {0} reads using {1} threads: {2} sec".format(mapping_result.count,
+                                                                          self.num_threads,
+                                                                          time.time()-start_time),
+                                                                          file=sys.stderr)
     return contig_file
 
   def get_output_filename(self, acc):

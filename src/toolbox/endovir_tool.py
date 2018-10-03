@@ -45,9 +45,15 @@ class EndovirTool:
     self.investigator = self.StdoutInvestigator()
     self.useStdin = useStdin
     self.useStdout = useStdout
+    self.default_options = {}
 
   def get_configuration(self):
     return {self.role: {self.name : self.path}}
+
+  def reset(self):
+    self.clear_options()
+    if len(self.default_options) > 0:
+      self.add_options(self.default_options)
 
   def update_options(self, options):
     for i in options:

@@ -49,13 +49,18 @@ class EndovirModuleTool(toolbox.endovir_tool.EndovirTool):
                             {'-outfmt' : self.outfmt},
                             {'-splice': 'F'},
                             {'-parse_deflines' : 'true'}]
-    self.add_options(self.default_options)
     self.investigator = MagicblastInvestigator(fmt=self.outfmt)
 
-  def configure(self, settings):
-    if os.path.isfile(settings['srr']):
-      self.add_options([{'-query' : settings['srr']}])
+  def add_sra(self, sra):
+    if os.path.isfile(sra):
+      self.add_options([{'-query' : sra}])
     else:
-      self.add_options([{'-sra' : settings['srr']}, {'-sra_cache' : None}])
-    db  = biodb.biodb_manager.BiodbManager.get_database(settings['virusdb'])
-    self.add_options([{'-db' : db.dbpath}])
+      self.add_options([{'-sra' : sra}, {'-sra_cache' : None}])
+
+  def configure(self, options):
+    if 'sra' in options:
+      self.add_sra(options['sra'])
+    if 'db' in options:
+      self.add_options([{'-db' : options['db']}])
+    if 'subject' in options:
+      self.add_options([{'-subject' : options['subject']}])

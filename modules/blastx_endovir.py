@@ -57,9 +57,10 @@ class EndovirModuleTool(toolbox.endovir_tool.EndovirTool):
     self.add_options(self.default_options)
     self.investigator = BlastxInvestigator(fmt=self.outfmt)
 
-  def configure(self, settings):
-    db  = biodb.biodb_manager.BiodbManager.get_database(settings['proteindb'])
-    self.add_options([{'-db' : db.dbpath}])
-
-  def add_input_file(self, fname):
-    self.add_options([{'-query' : fname}])
+  def configure(self, options):
+    if 'db' in options:
+      self.add_options([{'-db' : options['db']}])
+    if 'subject' in options:
+      self.add_options([{'-subject' : options['subject']}])
+    if 'query' in options:
+      self.add_options([{'-query' : options['query']}])
