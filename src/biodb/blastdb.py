@@ -30,12 +30,20 @@ class BlastDatabase(basic_biodb.BasicBioDatabase):
     self.status = status.endovir_status.EndovirStatusManager(BlastDatabase.status_codes)
     BlastDatabase.client = toolbox.endovir_toolbox.EndovirToolbox().get_by_name(client)
 
+  def get_basic_tool(self):
+    self.tool.clear_options()
+    self.tool.add_options([{'-dbtype' : self.dbtype},
+                           {'-out' : self.dbpath},
+                           {'-title' : self.name},
+                           {'-parse_seqids' : None},
+                           {'-hash_index' : None}])
+    return self.tool
+
   def get_configuration(self):
     return {
             self.name :
             {
               'directory' : os.path.abspath(self.dbdir),
-              'format' : self.dbformat,
               'format' : self.dbformat,
               'dbtype' : self.dbtype,
               'client' : BlastDatabase.client.name,
@@ -60,12 +68,10 @@ class BlastDatabase(basic_biodb.BasicBioDatabase):
   def isValidDatabase(self):
     BlastDatabase.client.clear_options()
     BlastDatabase.client.add_options([{'-db':self.dbpath}, {'-info':None,
-                                                            '-out':sys.stderr}])
-    proc = BlastDatabase.client.assemble_process()
-    BlastDatabase.client.run(proc)
-    if proc.returncode == 0:
-      return True
-    return False
+                                                            '-out':'/dev/null'}])
+    if BlastDatabase.client.run(BlastDatabase.client.assemble_process()) == None:
+      return False
+    return True
 
   def install(self, email=None):
     dbi = blastdb_installer.BlastSequenceDatabaseInstaller()
