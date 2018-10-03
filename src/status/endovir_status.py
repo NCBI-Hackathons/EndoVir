@@ -38,3 +38,6 @@ class EndovirStatusManager:
 
   def update(self, status_code):
     self.status |= status_code
+
+  def reset_status(self):
+    self.status = 0
