@@ -8,14 +8,22 @@ import io
 import os
 import sys
 
-from . import flank
+from . import rhs_flank
+from . import lhs_flank
 
 class VirusContig:
 
-  def __init__(self, name, srr, flank_len, sequence):
-    self.name = name
-    self.srr = srr
-    self.flank_len = flank_len
-    self.sequence = sequence
-    self.lhs_flank = flank.Flank(self.sequence, 0, self.flank_len)
-    self.rhs_flank = flank.Flank(self.sequence, self.sequence.end, -self.flank_len)
+  def __init__(self, sequence, screen):
+    self.name = sequence.name
+    self.srr = screen.srr
+    self.flank_len = screen.flank_len
+    self.location = os.path.join(screen.ctg_dir, self.name)
+    self.lhs_flank = lhs_flank.LhsContigFlank(sequence, 0, screen.flank_len)
+    self.rhs_flank = rhs_flank.RhsContigFlank(sequence, sequence.length, self.flank_len)
+    self.write_sequence(sequence.sequence)
+    self.length = sequence.length
+
+  def write_sequence(self, sequence):
+    fh = open(self.location+'.sequence', 'w')
+    fh.write(sequence)
+    fh.close()
