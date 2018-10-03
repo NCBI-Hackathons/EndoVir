@@ -8,13 +8,16 @@ import os
 
 import biodb.biodb_manager
 import toolbox.endovir_tool
-import result.mapping_result
 import bioparser.blast.blast_json
+import result.blast_result
 
-class RpsblastInvestigator:
+class BlastxInvestigator:
+
+  def __init__(self, fmt='tabular'):
+    self.fmt = fmt
 
   def __init__(self, fmt):
-    #self.blast_result = result.blast.BlastResult()
+    self.blast_result = result.blast_result.BlastResult()
     self.fmt_map = {15 : 'json'}
     self.fmt = self.fmt_map[fmt]
 
@@ -22,6 +25,7 @@ class RpsblastInvestigator:
     if self.fmt == 'json':
       p = bioparser.blast.blast_json.BlastParser()
       p.parse(proc.stdout)
+      self.analyze_result(p)
     else:
       raise NotImplementedError("Parsing {} not implemented".format(self.fmt))
 
@@ -31,25 +35,30 @@ class RpsblastInvestigator:
       p = bioparser.blast.blast_json.BlastParser()
       p.parse(fh)
       fh.close()
+      self.analyze_result(p)
     else:
       raise NotImplementedError("Parsing {} not implemented".format(self.fmt))
 
+  def analyze_result(self, parser):
+    self.blast_result = result.blast_result.BlastResult(parser.querymap, parser.hitmap, parser.hspmap)
+
+  def get_result(self):
+    return self.blast_result
 
 class EndovirModuleTool(toolbox.endovir_tool.EndovirTool):
 
-  def __init__(self, name, path, role, db='endovir_cdd'):
+  def __init__(self, name, path, role):
     super().__init__(name, path, role, useStdout=True)
-    self.max_eval = 10
-    self.num_threads = 0
+    self.num_threads = 4
     self.outfmt = 15
-    self.default_options = [{'-num_threads' : self.num_threads},
-                            {'-outfmt' : self.outfmt},
-                            {'-evalue' : self.max_eval}]
+    self.default_options = [{'-outfmt' : self.outfmt},
+                            {'-parse_deflines' : None},
+                            {'-num_threads' : self.num_threads}]
     self.add_options(self.default_options)
-    #self.investigator = RpsblastInvestigator(fmt=self.outfmt)
+    self.investigator = BlastxInvestigator(fmt=self.outfmt)
 
   def configure(self, settings):
-    db  = biodb.biodb_manager.BiodbManager.get_database(settings['motifdb'])
+    db  = biodb.biodb_manager.BiodbManager.get_database(settings['proteindb'])
     self.add_options([{'-db' : db.dbpath}])
 
   def add_input_file(self, fname):

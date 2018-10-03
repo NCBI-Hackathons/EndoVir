@@ -2,16 +2,17 @@
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
 #  \description
+#  \ToDo: better check for continue option, e.g. something with random tmp dirs?
 #-------------------------------------------------------------------------------
 
 import io
 import os
 import sys
 
-#sys.path.insert(1, os.path.join(sys.path[0], '../src/'))
 import toolbox.endovir_tool
 import result.mapping_result
-import utils.fasta_parser
+import bioparser.fasta.fasta_parser
+import utils.sequence_container
 
 class MegahitInvestigator:
 
@@ -19,8 +20,9 @@ class MegahitInvestigator:
     self.contigs = None
 
   def get_result(self):
-    p = utils.fasta_parser.FastaParser().parse_file(self.contigs)
-    return p.sequences
+    sc = utils.sequence_container.SequenceContainer(self.contigs)
+    sc.load_sequences(bioparser.fasta.fasta_parser.FastaParser())
+    return sc
 
 class EndovirModuleTool(toolbox.endovir_tool.EndovirTool):
 
