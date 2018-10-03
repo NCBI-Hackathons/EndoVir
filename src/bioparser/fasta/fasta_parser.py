@@ -9,41 +9,43 @@ from utils import sequence
 
 class FastaParser:
 
-  @classmethod
-  def parse_file(cls, fil, stream=False):
-    src = open(fil, 'r')
-    inst = cls(src=src, stream=stream)
-    inst.parse()
-    src.close()
-    return inst
-
-  def __init__(self, src=sys.stdin, stream=False):
+  def __init__(self, stream=False):
     self.sequences = {}
     self.stream = stream
-    self.src = src
 
-  def parse(self):
+  def parse(self, src=None):
+    if src != None:
+      self.parse_file_source(src)
+    else:
+      self.parse_source(sys.stdin)
+    return [self.sequences[x] for x in self.sequences]
+
+  def parse_source(self, src):
     seq = ''
     header = ''
-    for i in self.src:
-      print(i)
+    for i in src:
       if i[0] == '>':
         if len(seq) > 0:
           self.add_sequence(sequence.Sequence(header, seq))
           seq = ''
-        header = i[1:].strip()
+        header = i[1:].rstrip()
       else:
-        seq += i.strip()
+        seq += i.rstrip()
     self.add_sequence(sequence.Sequence(header, seq))
 
   def write_file(self, fname):
     fh = open(fname, 'w')
     for i in self.sequences:
-      fh.write(self.sequences[i].get_sequence())
+      fh.write(self.sequences[i].sequence)
     fh.close()
     return fname
 
   def add_sequence(self, seq):
     if self.stream:
-      print(seq.get_sequence())
+      print(seq.sequence)
     self.sequences[seq.name] = seq
+
+  def parse_file_source(self, src):
+    fh = open(src, 'r')
+    self.parse_source(fh)
+    fh.close()

@@ -1,14 +1,10 @@
 #-------------------------------------------------------------------------------
-#  \file blast_query.py
 #  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
 #  \copyright 2018 The University of Sydney
-#  \version 0.1.0
 #  \description Implementation of a BLAST query
 #-------------------------------------------------------------------------------
 
 import hashlib
-#from ..interval import itree
-#from ..interval import interval
 
 class BlastQuery:
 
@@ -16,13 +12,10 @@ class BlastQuery:
     self.id = qid
     self.title = title
     self.length = length
-    self.uid = hashlib.sha256(title.encode())
+    self.uid = hashlib.sha256(qid.encode())
 
   def get_uid(self):
     return self.uid.hexdigest()
 
   def dump(self):
-    print("Qid: {0}\nId: {1}\nTitle: {2}\nLength: {3}".format(self.qid,
-                                                              self.id,
-                                                              self.title,
-                                                              self.length))
+    print("Id: {0}\nTitle: {1}\nLength: {2}".format(self.id, self.title, self.length))

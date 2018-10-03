@@ -8,10 +8,9 @@ import os
 import sys
 import json
 
-from . import components
-#from .components import query
-#from .components import hit
-#from .components import hsp
+from .components import query
+from .components import hit
+from .components import hsp
 
 class BlastParser:
 
@@ -23,29 +22,22 @@ class BlastParser:
 
   def parse(self, src):
     blast_result = json.load(src)
-    self.parse_results(blast_result['BlastOutput2']['report']['results'])
-
+    for i in blast_result['BlastOutput2']:
+      self.parse_results(i['report']['results'])
 
   def parse_results(self, results):
-    bl_query = self.add_query(components.query.BlastQuery(results['search']['query_id'],
-                                               results['search']['query_title'],
-                                               results['search']['query_len']))
-
-
+    bl_query = self.add_query(query.BlastQuery(results['search'].get('query_id'),
+                                               results['search'].get('query_title'),
+                                               results['search'].get('query_len')))
     self.add_hits(results['search']['hits'], bl_query)
 
   def add_hits(self, hits, bl_query):
     for i in hits:
-      bl_hit = self.add_hit(components.hit.BlastHit(i['description'][0]['id'],
+      bl_hit = self.add_hit(hit.BlastHit(i['description'][0]['id'],
                                          i['description'][0]['accession'],
                                          i['description'][0]['title'],
                                          i['len'],
                                          i['num']))
-      for j in i['hsps']:
-        print('qry: ',bl_query.length)
-        print('hit: ',bl_hit.length)
-        h = self.add_hsp(components.hsp.Hsp(j, bl_query, bl_hit))
-        print("----------------")
 
   def add_hsp(self, hsp):
     if hsp.get_uid() not in self.hspmap:
