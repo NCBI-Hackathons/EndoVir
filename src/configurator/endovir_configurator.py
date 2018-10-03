@@ -60,7 +60,7 @@ class EndovirConfigurator:
 
   def configure_working_directory(self):
     if not utils.endovir_utils.isDirectory(self.get_working_directory()):
-      if not utils.endovir_utils.makedir(self.get_working_directory()):
+      if not utils.endovir_utils.make_dir(self.get_working_directory()):
         sys.exit("Cannot create working directory: {}.Abort".format(self.get_working_directory()))
       print("Created working directory {}".format(self.get_working_directory()), file=sys.stderr)
     else:
