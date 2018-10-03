@@ -2,5 +2,5 @@
 	path = include/ncbipy_eutils
 	url = https://gitlab.com/ncbipy/ncbipy_eutils.git
 [submodule "ngs"]
-	path = ngs
-	url = ./include/ncbi/ngs/
+	path = include/ncbi/ngs
+	url = https://github.com/ncbi/ngs.git
