@@ -56,8 +56,8 @@ class Endovir:
 
   def scan(self):
     s = scanner.endovir_scanner.EndovirScanner(self.screen)
-    s.initial_scan(mapper='magicblast', assembler='megahit', contig_screener='blastx')
-    #s.bud(mapper='magicblast')
+    s.initial_scan(sra_mapper='magicblast', assembler='megahit', contig_screener='blastx')
+    s.bud(sra_mapper='magicblast')
     #status checkpoint
 
   def prepare_analysis_directory(self, srr, assembly_dir='asm', contigs_dir='ctgs'):
@@ -65,8 +65,8 @@ class Endovir:
                                      self.wd,
                                      assembly_dir,
                                      contigs_dir,
-                                     'refseq_virus_genomes',
-                                     'virus_refseq_proteins')
+                                     biodb.biodb_manager.BiodbManager.get_database('refseq_virus_genomes'),
+                                     biodb.biodb_manager.BiodbManager.get_database('virus_refseq_proteins'))
     for i in [self.screen.asm_dir, self.screen.ctg_dir]:
       if not utils.endovir_utils.make_dir(i):
         sys.exit("Abort: Cannot create required analysis directory: {}".format(i))
