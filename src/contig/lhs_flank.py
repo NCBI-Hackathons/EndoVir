@@ -20,8 +20,8 @@ class LhsContigFlank(contig_flank.ContigFlank):
     self.sequence = self.setup_flank(start, flank_len, ctg_sequence)
 
   def setup_flank(self, start, flank_len, ctg_sequence):
-    self.start = ctg_sequence.length - flank_len
-    return ctg_sequence.get_subseq(name=self.name, start=self.start)
+    self.start = start
+    return ctg_sequence.get_subseq(name=self.name, start=self.start, length=flank_len)
 
   def get_end_pos(self):
     return self.start + self.flank_len
