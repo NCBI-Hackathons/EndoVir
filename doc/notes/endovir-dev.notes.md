@@ -21,6 +21,7 @@
  - Threading in EndovirTools:
     Detect aborts in threaded processes
 
+- Logging is still a nightmare. Need to add `logging` from `Python`.
 ## Remarks
 
  - The namespace `parser` cannot be used in own packages since
@@ -32,7 +33,8 @@
 
  - Need to find the way to use SRA reads form locally cached DB instead of writing reads to file
 ## Ideas:
-- Status: use coded from /usr/include/sysexits.h?
+- Status: use codes from /usr/include/sysexits.h?
+  - Or use global error codes and not per tool (this sounds more sane)
 
 - Adding a further complexity: use only a fraction of the flanks, e.g. 25%, in 
   mapping extensions
