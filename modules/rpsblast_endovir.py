@@ -11,14 +11,14 @@ import toolbox.endovir_tool
 import result.mapping_result
 import bioparser.blast.blast_json
 
-class RpsblastInvestigator:
+class RpsblastAnalyzer:
 
   def __init__(self, fmt):
     #self.blast_result = result.blast.BlastResult()
     self.fmt_map = {15 : 'json'}
     self.fmt = self.fmt_map[fmt]
 
-  def investigate_stdout(self, proc):
+  def analyze_stdout(self, proc):
     if self.fmt == 'json':
       p = bioparser.blast.blast_json.BlastParser()
       p.parse(proc.stdout)
@@ -46,7 +46,7 @@ class EndovirModuleTool(toolbox.endovir_tool.EndovirTool):
                             {'-outfmt' : self.outfmt},
                             {'-evalue' : self.max_eval}]
     self.add_options(self.default_options)
-    #self.investigator = RpsblastInvestigator(fmt=self.outfmt)
+    self.analzyer = RpsblastAnalyzer(fmt=self.outfmt)
 
   def configure(self, settings):
     db  = biodb.biodb_manager.BiodbManager.get_database(settings['motifdb'])

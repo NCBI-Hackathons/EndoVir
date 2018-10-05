@@ -15,13 +15,13 @@ import subprocess
 
 class EndovirTool:
 
-  class StdoutInvestigator:
+  class StdoutAnalyzer:
 
     def __init__(self):
       self.keepTmp = False
       pass
 
-    def investigate_stdout(self, proc):
+    def analyze_stdout(self, proc):
       for i in proc.stdout:
         print(i)
 
@@ -42,7 +42,7 @@ class EndovirTool:
     self.role = role
     self.option_map = {}
     self.option_list = []
-    self.investigator = self.StdoutInvestigator()
+    self.analyzer = self.StdoutAnalyzer()
     self.useStdin = useStdin
     self.useStdout = useStdout
     self.default_options = {}
@@ -86,7 +86,7 @@ class EndovirTool:
   def run(self, process):
     t = None
     if self.useStdout:
-      t = threading.Thread(target=self.investigator.investigate_stdout, args=(process, ))
+      t = threading.Thread(target=self.analyzer.analyze_stdout, args=(process, ))
     s = threading.Thread(target=EndovirTool.observe, args=(process, ))
     if t != None:
       t.start()
@@ -99,7 +99,7 @@ class EndovirTool:
                                                                      process.pid,
                                                                      process.args),file=sys.stderr)
       return None
-    return self.investigator
+    return self.analyzer
 
   def processSuccess(self, proc):
     if proc.returncode == 0:

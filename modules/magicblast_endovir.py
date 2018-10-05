@@ -16,7 +16,7 @@ class MagicblastInvestigator:
     self.mapping_result = result.mapping_result.MappingResult()
     self.fmt = fmt
 
-  def investigate_stdout(self, proc):
+  def analyze_stdout(self, proc):
     if self.fmt == 'tabular':
       self.parse_tabular(proc.stdout)
     else:
@@ -49,7 +49,7 @@ class EndovirModuleTool(toolbox.endovir_tool.EndovirTool):
                             {'-outfmt' : self.outfmt},
                             {'-splice': 'F'},
                             {'-parse_deflines' : 'true'}]
-    self.investigator = MagicblastInvestigator(fmt=self.outfmt)
+    self.analyzer = MagicblastInvestigator(fmt=self.outfmt)
 
   def add_sra(self, sra):
     if os.path.isfile(sra):

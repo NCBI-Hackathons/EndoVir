@@ -14,7 +14,7 @@ import result.mapping_result
 import bioparser.fasta.fasta_parser
 import utils.sequence_container
 
-class MegahitInvestigator:
+class MegahitAnalyzer:
 
   def __init__(self):
     self.contigs = None
@@ -38,10 +38,10 @@ class EndovirModuleTool(toolbox.endovir_tool.EndovirTool):
                             {'--continue' : None}]
     self.add_options(self.default_options)
     self.suffix = '.contigs.fa'
-    self.investigator = MegahitInvestigator()
+    self.analyzer = MegahitAnalyzer()
 
   def configure(self, options):
     self.add_options([{'--out-dir' : options['out-dir']}])
     self.add_options([{'--out-prefix' : options['out-prefix']}])
     self.add_options([{'--read' : options['read']}])
-    self.investigator.contigs = os.path.join(options['out-dir'], options['out-prefix']) + self.suffix
+    self.analyzer.contigs = os.path.join(options['out-dir'], options['out-prefix']) + self.suffix

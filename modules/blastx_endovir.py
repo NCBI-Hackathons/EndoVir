@@ -11,7 +11,7 @@ import toolbox.endovir_tool
 import bioparser.blast.blast_json
 import result.blast_result
 
-class BlastxInvestigator:
+class BlastxAnalyzer:
 
   def __init__(self, fmt='tabular'):
     self.fmt = fmt
@@ -21,7 +21,7 @@ class BlastxInvestigator:
     self.fmt_map = {15 : 'json'}
     self.fmt = self.fmt_map[fmt]
 
-  def investigate_stdout(self, proc):
+  def analyze_stdout(self, proc):
     if self.fmt == 'json':
       p = bioparser.blast.blast_json.BlastParser()
       p.parse(proc.stdout)
@@ -29,7 +29,7 @@ class BlastxInvestigator:
     else:
       raise NotImplementedError("Parsing {} not implemented".format(self.fmt))
 
-  def investigate(self, src):
+  def analyze(self, src):
     if self.fmt == 'json':
       fh = open(src, 'r')
       p = bioparser.blast.blast_json.BlastParser()
@@ -55,7 +55,7 @@ class EndovirModuleTool(toolbox.endovir_tool.EndovirTool):
                             {'-parse_deflines' : None},
                             {'-num_threads' : self.num_threads}]
     self.add_options(self.default_options)
-    self.investigator = BlastxInvestigator(fmt=self.outfmt)
+    self.analyzer = BlastxAnalyzer(fmt=self.outfmt)
 
   def configure(self, options):
     if 'db' in options:
