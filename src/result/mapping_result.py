@@ -27,6 +27,9 @@ class MappingResult:
         return (self.start, self.stop)
       return (self.stop, self.start)
 
+    def dump(self):
+      return '\t'.join(str(x) for x in [self.name, self.length, self.sra_rowid, self.start, self.stop, self.strand, self.aln_length])
+
   class Reference:
 
     def __init__(self, name, start, stop, strand):
@@ -41,6 +44,8 @@ class MappingResult:
         return (self.start, self.stop)
       return (self.stop, self.start)
 
+    def dump(self):
+      return '\t'.join(str(x) for x in [self.name, self.start, self.stop, self.strand, self.aln_length])
   def __init__(self):
     self.srr = None
     self.mappings = []
