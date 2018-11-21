@@ -1,0 +1,242 @@
+%  -------------------------------------------------------------------------------
+%  \file vge2018-poster.jpb.tex
+%  \author Jan P Buchmann <jan.buchmann@sydney.edu.au>
+%  \copyright 2018 The University of Sydney
+%  \version 0.0.0
+%  \description  Created with Brian Amberg's LaTeX Poster Template.                          %
+%  -------------------------------------------------------------------------------
+\documentclass[final, a0paper, portrait]{baposter}
+%\documentclass[final,paperwidth=28.58cm,paperheight=50.809cm, portrait]{baposter}
+\usepackage{relsize}        % For \smaller
+\usepackage{url}            % For \url
+\usepackage{booktabs}
+\usepackage{xspace}
+\usepackage{rotating}
+\usepackage{multirow}
+\usepackage{pgfplots}
+  \usepgfplotslibrary{dateplot}
+\usepackage{jpb.pgf}
+  \usetikzlibrary{mindmap,backgrounds, shadows}
+\usepackage{microtype}
+\usepackage[sc]{mathpazo}
+\usepackage[default]{sourcesanspro}
+\usepackage[T1]{fontenc}
+\usepackage{natbib}
+\usepackage{multicol}
+  \usetikzlibrary{shapes.geometric, positioning, calc, shadings}
+  \tikzset{%
+  db/.style = {cylinder, draw, fill=white, inner sep=3pt},
+  tool/.style = {rectangle, draw, fill=white, inner sep=3pt, font=\ttfamily},
+  function/.style = {functioncolor, inner sep=3pt},
+  data/.style = {},
+  orf/.style = {rectangle, font=\bfseries, inner sep=3pt, fill=orfcolor},
+  fake/.style = {},
+  path/.style = {thick},
+  vrsgenome/.style = {draw, ultra thick, vrsgenomecolor},
+  hostgenome/.style = {draw, ultra thick, hostgenomecolor},
+  pipe/.style = {draw, very thick, dashed},
+  end/.style = {font=\large, very thick},
+  title/.style = {font=\bfseries},
+  flowcomment/.style = {font=\small\itshape, above},
+  partLabel/.style = {font=\bfseries, fill=gray!10,rounded corners,
+                      draw=black!50, dashed},
+  every legend to name picture/.style={west}
+  }
+  \pgfdeclareplotmark{db}{\node [cylinder, draw=black] {};}
+  \definecolor{orfcolor}{rgb}{0.89,0.33,0.25}
+  \definecolor{vrsgenomecolor}{rgb}{0.89,0.33,0.25}
+  \definecolor{hostgenomecolor}{rgb}{0.48,0.55,0.55}
+  \definecolor{rightfl}{rgb}{0.14,0.75,0.4}
+  \definecolor{leftfl}{rgb}{0.64,0.06,0.06}
+  \definecolor{functioncolor}{rgb}{0.17,0.48,0.71}
+%%% Global Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tracingstats=2         % Enabled LaTeX logging with conditionals
+
+%%% Color Definitions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\definecolor{bordercol}{RGB}{40,40,40}
+\definecolor{headercol}{RGB}{232,113,98}
+%\definecolor{headercol}{RGB}{226,74,55}
+\definecolor{headerfontcol}{RGB}{0,0,0}
+\definecolor{bgColor}{RGB}{247,247,237}
+\definecolor{boxColor}{RGB}{242,238,234}
+\definecolor{mmroot}{RGB}{226,74,55}
+\definecolor{mmlvl1}{RGB}{100,182,177}
+\definecolor{mmlvl2}{RGB}{109,102,98}
+\definecolor{blu}{RGB}{151,204,238}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Utility functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Save space in lists. Use this after the opening of the list %%%%%%%%%%%%%%%%
+\newcommand{\compresslist}{
+    \setlength{\itemsep}{1pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\parsep}{0pt}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Document Start %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\typeout{Poster rendering started}
+
+%%% Setting Background Image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\background{
+    %\begin{tikzpicture}[remember picture,overlay]%
+    %\draw (current page.north west)+(-2em,2em) node[anchor=north west]
+    %%{\includegraphics[height=1.1\textheight]{background}};
+    %\end{tikzpicture}
+}
+
+%%% General Poster Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% Eye Catcher, Title, Authors and University Images %%%%%%%%%%%%%%%%%%%%%%
+\begin{poster}{
+    grid=false,
+    % Option is left on true though the eyecatcher is not used. The reason is
+    % that we have a bit nicer looking title and author formatting in the headercol
+    % this way
+    eyecatcher=false,
+    bgColorOne=bgColor,
+    borderColor=bordercol,
+    headerColorOne=headercol,
+    headerColorTwo=headercol,
+    headerFontColor=headerfontcol,
+    % Only simple background color used, no shading, so boxColorTwo isn't necessary
+    %boxColorOne=white,
+    boxColorOne=boxColor,
+    textborder=faded,
+    %bgColorTwo=white,
+    headershape=roundedright,
+    headerheight=12em,
+    headerfont=\large\sc\bf,
+    textborder=rectangle,
+    background=plain,
+    headerborder=open,
+    boxshade=plain
+}
+%%% Eye Cacther %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+{}
+%%% Title %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+{
+%\Huge\sf\bf
+   Endovir: A pipeline to identify endogenous viruses in \\metagenomic data sets
+}
+%%% Authors %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+{
+    Jan P. Buchmann$^{0}$, Mitchell A. Ellison II$^{1}$, Jacob Waldman$^{1}$,
+    Andrew Clugston$^{1}$, Paul G. Cantalupo$^{1}$, Vineet Raghu$^{1}$,
+    Cody Glickman$^{2}$, Kristyna Kupkova$^{3}$, Karina Zile$^{4}$, Ben Busby$^{4}$
+    and Edward C. Holmes$^{0}$
+    \begin{center}
+      {\smaller\texttt{jan.buchmann@sydney.edu.au},
+    {\url{https://github.com/NCBI-Hackathons/EndoVir}}}
+    \end{center}
+}
+%%% Logo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+{}
+
+\headerbox{NCBI SRA data: a treasure trove for virus genomics}{name=abstract,column=0, row=0, span=3}
+{
+  \begin{minipage}{0.33\linewidth}
+    \includegraphics[width=\linewidth]{figs/sampling.pdf}
+  \end{minipage}
+  \begin{minipage}{0.33\linewidth}
+    \includegraphics[width=\linewidth]{figs/sra_growth.pdf}
+  \end{minipage}
+  \begin{minipage}{0.33\linewidth}
+    \resizebox{\linewidth}{!}{\input{figs/sra.fig.tex}}
+  \end{minipage}
+
+}
+\headerbox{Exogenous and Endogenous viruses}{name=synopsis,column=0, below=abstract, span=3}
+{
+  \begin{minipage}{0.5\textwidth}
+    \resizebox{0.7\linewidth}{!}{\input{figs/exovir.fig.tex}}
+    \begin{itemize}
+      \compresslist
+      \item Integration into host genome not required for replication
+      \item Hist genome integration occurs occasionally, e.g. Human Herpes virus 6
+      \item Not part of the host genome
+      \item RNA viruses: $\le \approx$ 40~kb
+      \item DNA viruses: $\le \approx$ 2~Mbp
+    \end{itemize}
+  \end{minipage}
+  \begin{minipage}{0.5\textwidth}
+    \resizebox{0.7\linewidth}{!}{\input{figs/endovir.fig.tex}}
+    \begin{itemize}
+      \compresslist
+      \item Integration into host genome mandatory for replication
+      \item Retroviridae, e.g. HIV
+      \item Part of the host genome
+      \item Not widely analyzed: complex analysis and missing data
+            \footnote{doi:10.1371/journal.pgen.1001191}
+      \item Allowing to date virus evolution
+      \item Characterize the mechanisms that underpin the integration of
+            viruses into host genomes
+    \end{itemize}
+  \end{minipage}
+}
+\headerbox{Approach}{name=approach,column=0,below=synopsis,span=3}
+{
+  \begin{minipage}{0.6\textwidth}
+    \begin{description}
+      \compresslist
+      \item[Collaboration] Dr. Ben Busby, NCBI/NIH
+      \item[Built on ViruSpy] \url{https://github.com/NCBI-Hackathons/ViruSpy}
+      \item[Modern] Implement in Python 3 ($\geq$3.6)
+      \item[Independent] only standard library, SRA-Toolkit, and scipy
+      \item[Modular] Changing external tools, e.g. assembler,
+                        without touching Endovir internals
+      \item[Status] In development, second revision
+    \end{description}
+  \end{minipage}
+  \begin{minipage}{0.4\textwidth}
+    \includegraphics[width=0.7\linewidth]{figs/bud_algo_0.jpg}
+  \end{minipage}
+}
+\headerbox{Workflow}{name=workflow,column=0,below=approach,span=3}
+{
+  \begin{minipage}{0.75\linewidth}
+    \resizebox{\linewidth}{!}{\input{figs/workflow.fig.tex}}
+  \end{minipage}
+  \begin{minipage}{0.2\linewidth}
+    \begin{itemize}
+      \compresslist
+        \item Plugin system: facilitate adding external tools
+        \item SRA downloads using NCBI SRA-Toolkit
+        \item Limit disk I/O by using pipes where possible
+    \end{itemize}
+  \end{minipage}
+
+}
+
+
+\headerbox{Funding}{name=funding, column=0, below=workflow, span=1}
+{\small
+  \begin{itemize}
+   \item This work is supported by a National Health and Medical Research (NHMRC)
+          Australia Fellowship awarded to Edward C. Holmes.
+   \item Initial development was funded by an ORISE scientific visitor
+         fellowship to  Jan P. Buchmann
+  \end{itemize}
+}
+\headerbox{Affiliations}{name=affil, column=1, below=workflow, span=2}
+{
+  \small
+  \begin{description}
+   \compresslist
+    \item[0] The University of Sydney, Sydney, Australia
+    \item[1] The University of Pittsburgh, Pittsburgh, PA 15224, USA
+    \item[2] The University of Colorado, Denver, Aurora, Colorado 80045, USA
+    \item[3] Brno University of Technology, Brno, 612 00, Czech Republic
+    \item[4] NCBI, NLM, NIH, Bethesda, MD 20894, USA
+  \end{description}
+}
+
+ \end{poster}
+\end{document}
